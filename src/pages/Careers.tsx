@@ -266,7 +266,7 @@ const Careers = () => {
                 <Mail className="w-4 h-4 mr-2" />
                 Send Resume
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-ph">
+              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white hover:text-ph">
                 Contact Us
               </Button>
             </div>
