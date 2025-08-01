@@ -8,8 +8,11 @@ const EstatePlanning = () => {
         <h1 className="text-5xl font-bold mb-12">Estate Planning Services</h1>
         <div className="w-full max-w-2xl mx-auto mb-12 bg-gradient-to-br from-ph/10 to-ph/5 rounded-lg aspect-video flex items-center justify-center">
           <div className="text-center">
-            <Shield className="w-24 h-24 text-ph/30 mx-auto mb-4" />
-            <p className="text-ph/50">Estate Planning Illustration</p>
+            <img 
+              src="/img/estate-planning.png"
+              alt="Estate Planning" 
+              className="w-1/2 h-auto object-cover rounded-lg mb-12 transition-transform transform hover:scale-95 mx-auto"
+            />
           </div>
         </div>
         <p className="text-lg text-gray-700 mb-12 max-w-3xl mx-auto">
