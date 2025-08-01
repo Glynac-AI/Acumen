@@ -23,7 +23,7 @@ const Footer = () => {
   
   const aboutLinks = [
     { name: "About Us", link: "/about" },
-    { name: "Our Team", link: "/about#team" },
+    { name: "Our Team", link: "/about/team" },
     { name: "Careers", link: "/careers" },
     { name: "Contact", link: "/contact" }
   ];
