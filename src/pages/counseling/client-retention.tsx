@@ -6,12 +6,6 @@ const ClientRetention = () => {
     <div className="min-h-screen pt-32 px-6 bg-gray-50">
       <div className="container mx-auto text-center">
         <h1 className="text-5xl font-bold mb-16">Client Retention Services</h1>
-        <div className="w-full max-w-2xl mx-auto mb-16 bg-gradient-to-br from-ph/10 to-ph/5 rounded-lg aspect-video flex items-center justify-center">
-          <div className="text-center">
-            <Users className="w-24 h-24 text-ph/30 mx-auto mb-4" />
-            <p className="text-ph/50">Client Retention Illustration</p>
-          </div>
-        </div>
         <img 
           src="/img/client-retention.png"
           alt="Client Retention" 
