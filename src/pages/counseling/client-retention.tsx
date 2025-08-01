@@ -12,7 +12,12 @@ const ClientRetention = () => {
             <p className="text-ph/50">Client Retention Illustration</p>
           </div>
         </div>
-        <p className="text-lg text-gray-700 mb-16 max-w-3xl mx-auto">
+        <img 
+          src="/img/client-retention.png"
+          alt="Client Retention" 
+          className="w-1/2 h-auto object-cover rounded-lg mb-16 transition-transform transform hover:scale-95 mx-auto"
+        />
+        <p className="text-lg text-gray-700 mb-16">
           Our Client Retention Services are designed to help businesses maintain strong relationships with their clients. We focus on strategies that enhance client satisfaction and loyalty, ensuring long-term success.
         </p>
         
