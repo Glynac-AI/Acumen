@@ -38,23 +38,13 @@ const About = () => {
     {
       name: "Alisa Kolodizner",
       title: "Founder | Operator | CFP®",
-      bio: (
-        <>
-          <p>Alisa is an entrepreneur, investor, and former top-ranked institutional sales leader with deep expertise in financial services, private equity, and real estate. She was ranked #1 in institutional sales nationally and recognized among the top 1% of financial advisors at a Fortune 500 financial institution.</p>
-          
-          <p>With a background in financial services and emerging technology, Alisa led enterprise partnerships with 300 of the most successful investment firms in the U.S, managing over $3 trillion in assets. She has built sales and product teams from the ground up, supported dozens of strategic mergers and acquisitions, and coached hundreds of financial advisors nationwide.</p>
-          
-          <p>As Co-Owner and Managing Director of Prairie Hill Holdings, she leads business development, investor relations, and client success for a private real estate fund with over $68M in commercial acquisitions. She also serves as Managing Partner of LCW, a leading cultural competence training firm, which she acquired through a complex private equity transaction involving $15M+ in equity, debt, and seller financing.</p>
-          
-          <p>Alisa also co-founded Local Up, a multi-billion-dollar revenue stream aimed at closing the $25T market gap in small and medium-sized business lending. She is a Certified Financial Planner™, a board member of Genesys Works Chicago, and holds a B.S. in Environmental Science from the University of Illinois and Executive Education credentials from the University of Chicago Booth School of Business</p>
-        </>
-      ),
+      bio: "Alisa is an entrepreneur, investor, and former top-ranked institutional sales leader with deep expertise in financial services, private equity, and real estate. She was ranked #1 in institutional sales nationally and recognized among the top 1% of financial advisors at a Fortune 500 financial institution. With a background in financial services and emerging technology, Alisa led enterprise partnerships with 300 of the most successful investment firms in the U.S, managing over $3 trillion in assets.",
       image: "/img/alisa-kolodizner.png"
     },
     {
       name: "Bavu Vilane",
       title: "Chief Strategy Officer",
-      bio: "Bavukile (Bavu) Vilane is an operations and startup specialist with a passion for building systems that drive growth and efficiency. Over the past five years, he has led operations across multiple startups, consulted for early-stage companies, and developed a reputation for problem-solving and strategic execution. His journey—from startup founder to operations lead—has uniquely positioned him to thrive in high-stakes environments. Today, his expertise has naturally evolved into the world of financial services, where he brings structure, relationship-building, and a performance mindset to his work in a dynamic, results-driven setting.",
+      bio: "Bavukile (Bavu) Vilane is an operations and startup specialist with a passion for building systems that drive growth and efficiency. Over the past five years, he has led operations across multiple startups, consulted for early-stage companies, and developed a reputation for problem-solving and strategic execution.",
       image: "/img/bavu-vilane.png"
     }
   ];
@@ -92,13 +82,12 @@ const About = () => {
                 From Industry Insight to Transformative Consulting
               </h2>
               <p className="text-muted-foreground mb-6">
-                Acumen Advisory Consulting was founded by Patricia Hernandez, a veteran of the financial 
-                advisory industry who identified a critical gap in practice management resources 
+                Acumen Advisory Consulting was founded by industry veterans who identified a critical gap in practice management resources 
                 for independent advisors and small to mid-sized firms.
               </p>
               <p className="text-muted-foreground mb-6">
-                After 20 years of leading advisory teams and witnessing the challenges that 
-                prevented capable advisors from reaching their full potential, Patricia assembled 
+                After years of leading advisory teams and witnessing the challenges that 
+                prevented capable advisors from reaching their full potential, we assembled 
                 a team of industry experts to create a consulting firm that addresses the complete 
                 spectrum of practice management needs.
               </p>
@@ -193,19 +182,20 @@ const About = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {team.map((member, index) => (
               <div 
                 key={index} 
                 className="glass-card rounded-xl overflow-hidden animate-fade-up"
                 style={{ animationDelay: `${0.1 + (index * 0.1)}s` }}
               >
-                <div className="aspect-square relative overflow-hidden">
-                  <img 
-                    src={member.image} 
-                    alt={member.name} 
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  />
+                <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-ph/10 to-ph/5">
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <Users className="w-24 h-24 text-ph/30 mx-auto mb-4" />
+                      <p className="text-ph/50 text-sm">Team Member Photo</p>
+                    </div>
+                  </div>
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-medium mb-1">{member.name}</h3>
