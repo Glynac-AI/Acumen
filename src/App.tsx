@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import About from "./pages/About";
+import Team from "./pages/Team";
+import Careers from "./pages/Careers";
 import Services from "./pages/Services";
 import * as CounselingPages from "./pages/counseling";
 import Contact from "./pages/Contact";
@@ -26,7 +28,15 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/about" element={<About />} />
+              <Route path="/about/team" element={<Team />} />
+              <Route path="/careers" element={<Careers />} />
               <Route path="/services" element={<Services />} />
+              {/* Service routes that match footer links */}
+              <Route path="/services/practice-management" element={<CounselingPages.PracticeManagement />} />
+              <Route path="/services/client-retention" element={<CounselingPages.ClientRetention />} />
+              <Route path="/services/tax-planning" element={<CounselingPages.TaxPlanning />} />
+              <Route path="/services/lead-generation" element={<CounselingPages.LeadGeneration />} />
+              {/* Original counseling routes */}
               <Route path="/counseling/succession-planning" element={<CounselingPages.SuccessionPlanning />} />
               <Route path="/counseling/recruiting" element={<CounselingPages.Recruiting />} />
               <Route path="/counseling/tax-planning" element={<CounselingPages.TaxPlanning />} />
@@ -39,7 +49,6 @@ const App = () => (
               <Route path="/counseling/lead-generation" element={<CounselingPages.LeadGeneration />} />
               <Route path="/counseling/practice-management" element={<CounselingPages.PracticeManagement />} />
               <Route path="/counseling/well-being" element={<CounselingPages.WellBeing/>} />
-              {/* Removing wellness route since it doesn't exist in CounselingPages */}
               <Route path="/contact" element={<Contact />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
