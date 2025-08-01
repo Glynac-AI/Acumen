@@ -1,46 +1,47 @@
 import React from 'react';
-import { FaUsers, FaComments, FaStar } from 'react-icons/fa';
+import { Users, MessageSquare, Star } from 'lucide-react';
 
 const ClientRetention = () => {
   return (
     <div className="min-h-screen pt-32 px-6 bg-gray-50">
       <div className="container mx-auto text-center">
         <h1 className="text-5xl font-bold mb-16">Client Retention Services</h1>
-        <img 
-          src="/img/client-retention.png"
-          alt="Client Retention" 
-          className="w-1/2 h-auto object-cover rounded-lg mb-16 transition-transform transform hover:scale-95 mx-auto"
-        />
-        <p className="text-lg text-gray-700 mb-16">
+        <div className="w-full max-w-2xl mx-auto mb-16 bg-gradient-to-br from-ph/10 to-ph/5 rounded-lg aspect-video flex items-center justify-center">
+          <div className="text-center">
+            <Users className="w-24 h-24 text-ph/30 mx-auto mb-4" />
+            <p className="text-ph/50">Client Retention Illustration</p>
+          </div>
+        </div>
+        <p className="text-lg text-gray-700 mb-16 max-w-3xl mx-auto">
           Our Client Retention Services are designed to help businesses maintain strong relationships with their clients. We focus on strategies that enhance client satisfaction and loyalty, ensuring long-term success.
         </p>
         
         <h2 className="text-3xl font-semibold mb-12">Key Strategies for Client Retention</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-4xl mx-auto">
           <div className="bg-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
-            <FaUsers className="text-4xl text-ph mb-2" />
-            <h3 className="text-xl font-semibold">Personalized Communication</h3>
+            <Users className="w-12 h-12 text-ph mb-4 mx-auto" />
+            <h3 className="text-xl font-semibold mb-2">Personalized Communication</h3>
             <p className="text-gray-600">Tailoring interactions to meet client needs.</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
-            <FaComments className="text-4xl text-ph mb-2" />
-            <h3 className="text-xl font-semibold">Feedback Mechanisms</h3>
+            <MessageSquare className="w-12 h-12 text-ph mb-4 mx-auto" />
+            <h3 className="text-xl font-semibold mb-2">Feedback Mechanisms</h3>
             <p className="text-gray-600">Implementing systems to gather and act on client feedback.</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
-            <FaStar className="text-4xl text-ph mb-2" />
-            <h3 className="text-xl font-semibold">Loyalty Programs</h3>
+            <Star className="w-12 h-12 text-ph mb-4 mx-auto" />
+            <h3 className="text-xl font-semibold mb-2">Loyalty Programs</h3>
             <p className="text-gray-600">Creating incentives for repeat business.</p>
           </div>
         </div>
 
         <h2 className="text-3xl font-semibold mb-12">Why Client Retention is Important</h2>
-        <p className="text-lg text-gray-700 mb-16">
+        <p className="text-lg text-gray-700 mb-16 max-w-3xl mx-auto">
           Retaining clients is often more cost-effective than acquiring new ones. By focusing on client retention, businesses can increase profitability, enhance brand reputation, and foster a loyal customer base.
         </p>
 
         <h2 className="text-3xl font-semibold mb-12">Get Started with Our Client Retention Services</h2>
-        <p className="text-lg text-gray-700 mb-16">
+        <p className="text-lg text-gray-700 mb-16 max-w-3xl mx-auto">
           Ready to improve your client retention strategies? Contact us today to learn more about our Client Retention Services and how we can help you build lasting relationships with your clients.
         </p>
         
