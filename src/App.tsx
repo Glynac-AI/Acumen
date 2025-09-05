@@ -2,63 +2,80 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Team from "./pages/Team";
-import Careers from "./pages/Careers";
-import Services from "./pages/Services";
-import * as CounselingPages from "./pages/counseling";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import React from "react";
+
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+// NEW single page
+import Landing from "./pages/Landing";
+
+// (optional) keep Contact route if you use the CTA link
+import Contact from "./pages/Contact";
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+interface ErrorBoundaryState {
+  error?: Error;
+}
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = {};
+  }
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { error };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 24 }}>
+          <h2>Oops, something went wrong.</h2>
+          <pre style={{ whiteSpace: "pre-wrap" }}>
+            {String(this.state.error?.message)}
+          </pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/about/team" element={<Team />} />
-              <Route path="/careers" element={<Careers />} />
-              <Route path="/services" element={<Services />} />
-              {/* Service routes that match footer links */}
-              <Route path="/services/practice-management" element={<CounselingPages.PracticeManagement />} />
-              <Route path="/services/client-retention" element={<CounselingPages.ClientRetention />} />
-              <Route path="/services/tax-planning" element={<CounselingPages.TaxPlanning />} />
-              <Route path="/services/lead-generation" element={<CounselingPages.LeadGeneration />} />
-              {/* Original counseling routes */}
-              <Route path="/counseling/succession-planning" element={<CounselingPages.SuccessionPlanning />} />
-              <Route path="/counseling/recruiting" element={<CounselingPages.Recruiting />} />
-              <Route path="/counseling/tax-planning" element={<CounselingPages.TaxPlanning />} />
-              <Route path="/counseling/estate-planning" element={<CounselingPages.EstatePlanning />} />
-              <Route path="/counseling/holistic-planning" element={<CounselingPages.HolisticPlanning />} />
-              <Route path="/counseling/client-retention" element={<CounselingPages.ClientRetention />} />
-              <Route path="/counseling/portfolio-evaluation" element={<CounselingPages.PortfolioEvaluation />} />
-              <Route path="/counseling/task-automation" element={<CounselingPages.TaskAutomation />} />
-              <Route path="/counseling/sales-coaching" element={<CounselingPages.SalesCoaching />} />
-              <Route path="/counseling/lead-generation" element={<CounselingPages.LeadGeneration />} />
-              <Route path="/counseling/practice-management" element={<CounselingPages.PracticeManagement />} />
-              <Route path="/counseling/well-being" element={<CounselingPages.WellBeing/>} />
-              <Route path="/contact" element={<Contact />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">
+              <ErrorBoundary>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/contact" element={<Contact />} />
+                  {/* You can add a 404 component back later if you like */}
+                </Routes>
+              </ErrorBoundary>
+            </main>
+            <Footer />
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
