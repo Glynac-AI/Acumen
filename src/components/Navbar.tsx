@@ -1,67 +1,66 @@
 // src/components/Navbar.tsx
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { 
-  ChevronDown, 
-  Menu, 
-  X,
-  Briefcase,
-  Users,
-  FileText,
-  Target,
-  Presentation,
-  ShieldCheck,
-  TrendingUp,
-  Cog,
-  Heart,
-  Home,
-  BookOpen,
-  Info,
-  Phone
-} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 
 // Service dropdown items organized by categories
 const serviceItems = [
   {
     category: "Business Growth",
     items: [
-      { name: "Practice Management", icon: <Briefcase className="w-4 h-4 mr-2" />, path: "/counseling/practice-management" },
-      { name: "Lead Generation", icon: <Target className="w-4 h-4 mr-2" />, path: "/counseling/lead-generation" },
-      { name: "Sales Coaching", icon: <Presentation className="w-4 h-4 mr-2" />, path: "/counseling/sales-coaching" },
+      { name: "Practice Management", path: "/counseling/practice-management" },
+      { name: "Lead Generation", path: "/counseling/lead-generation" },
+      { name: "Sales Coaching", path: "/counseling/sales-coaching" },
     ]
   },
   {
     category: "Team Development",
     items: [
-      { name: "Recruiting", icon: <Users className="w-4 h-4 mr-2" />, path: "/counseling/recruiting" },
-      { name: "Succession Planning", icon: <Users className="w-4 h-4 mr-2" />, path: "/counseling/succession-planning" },
-      { name: "Well-being", icon: <Heart className="w-4 h-4 mr-2" />, path: "/counseling/well-being" },
+      { name: "Recruiting", path: "/counseling/recruiting" },
+      { name: "Succession Planning", path: "/counseling/succession-planning" },
+      { name: "Well-being", path: "/counseling/well-being" },
     ]
   },
   {
     category: "Client Services",
     items: [
-      { name: "Client Retention", icon: <Users className="w-4 h-4 mr-2" />, path: "/counseling/client-retention" },
-      { name: "Holistic Planning", icon: <BookOpen className="w-4 h-4 mr-2" />, path: "/counseling/holistic-planning" },
-      { name: "Estate Planning", icon: <FileText className="w-4 h-4 mr-2" />, path: "/counseling/estate-planning" },
-      { name: "Tax Planning", icon: <FileText className="w-4 h-4 mr-2" />, path: "/counseling/tax-planning" },
+      { name: "Client Retention", path: "/counseling/client-retention" },
+      { name: "Holistic Planning", path: "/counseling/holistic-planning" },
+      { name: "Estate Planning", path: "/counseling/estate-planning" },
+      { name: "Tax Planning", path: "/counseling/tax-planning" },
     ]
   },
   {
     category: "Operations",
     items: [
-      { name: "Task Automation", icon: <Cog className="w-4 h-4 mr-2" />, path: "/counseling/task-automation" },
-      { name: "Portfolio Evaluation", icon: <FileText className="w-4 h-4 mr-2" />, path: "/counseling/portfolio-evaluation" },
+      { name: "Task Automation", path: "/counseling/task-automation" },
+      { name: "Portfolio Evaluation", path: "/counseling/portfolio-evaluation" },
     ]
   }
 ];
 
 const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
   const location = useLocation();
+
+  // Track scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -77,243 +76,297 @@ const Navbar = () => {
     setServiceDropdownOpen(false);
   };
 
-  const isActive = (path: string) => {
+  const isActive = (path) => {
     return location.pathname === path;
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-border">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Logo */}
-        <Link 
-          to="/" 
-          className="flex items-center" 
-          onClick={closeMenus}
-        >
-          <span className="text-2xl font-display font-bold text-foreground">
-            <span className="text-ph">Acumen Advisory</span> Consulting
-          </span>
-        </Link>
-
-        {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center space-x-6">
-          <Link 
-            to="/" 
-            className={cn("navbar-link", isActive("/") && "active-link")}
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'py-4 bg-white/90 backdrop-blur-md shadow-sm' : 'py-6 bg-transparent'
+          }`}
+      >
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="relative z-10 flex items-center"
+            onClick={closeMenus}
           >
-            <span className="flex items-center">
-              <Home className="w-4 h-4 mr-1" />
+            <motion.span
+              className={`text-2xl font-display font-light tracking-tight transition-colors duration-300 ${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'
+                }`}
+              whileHover={{ x: -3 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span className={`font-normal text-[#4F6BFF]`}>Acumen</span> Recruiting
+            </motion.span>
+          </Link>
+
+          {/* Desktop Menu */}
+          <div className="hidden lg:flex items-center space-x-1">
+            <NavLink href="/" active={isActive("/")} isScrolled={isScrolled}>
               Home
-            </span>
-          </Link>
-          
-          <div className="relative group">
-            <button 
-              className={cn(
-                "navbar-link flex items-center", 
-                location.pathname.includes("/services") && "active-link"
-              )}
-              onClick={toggleServiceDropdown}
-            >
-              <Briefcase className="w-4 h-4 mr-1" />
-              Services
-              <ChevronDown className="w-4 h-4 ml-1" />
-            </button>
-            
-            {/* Services Mega Menu */}
-            <div className="absolute top-full left-0 mt-1 w-[600px] p-4 glass-card rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 grid grid-cols-2 gap-6">
-              {/* Left Column */}
-              <div className="space-y-3">
-                <h3 className="font-medium text-sm text-muted-foreground">Business Growth</h3>
-                <ul className="space-y-2">
-                  {serviceItems[0].items.map((item, index) => (
-                    <li key={index}>
-                      <Link 
-                        to={item.path} 
-                        className="flex items-center py-1 text-foreground/80 hover:text-ph transition-colors duration-200"
-                        onClick={closeMenus}
-                      >
-                        {item.icon}
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="font-medium text-sm text-muted-foreground">Team Development</h3>
-                <ul className="space-y-2">
-                  {serviceItems[1].items.map((item, index) => (
-                    <li key={index}>
-                      <Link 
-                        to={item.path} 
-                        className="flex items-center py-1 text-foreground/80 hover:text-ph transition-colors duration-200"
-                        onClick={closeMenus}
-                      >
-                        {item.icon}
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            </NavLink>
 
-              {/* Right Column */}
-              <div className="space-y-3">
-                <h3 className="font-medium text-sm text-muted-foreground">Client Services</h3>
-                <ul className="space-y-2">
-                  {serviceItems[2].items.map((item, index) => (
-                    <li key={index}>
-                      <Link 
-                        to={item.path} 
-                        className="flex items-center py-1 text-foreground/80 hover:text-ph transition-colors duration-200"
+            <div className="relative group">
+              <button
+                className={`px-5 py-2 transition-colors duration-300 rounded-full group flex items-center ${location.pathname.includes("/services")
+                    ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
+                    : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
+                  }`}
+                onClick={toggleServiceDropdown}
+                onMouseEnter={() => setServiceDropdownOpen(true)}
+                onMouseLeave={() => setServiceDropdownOpen(false)}
+              >
+                <span>Services</span>
+                <ChevronDown className="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" />
+              </button>
+
+              {/* Services Mega Menu */}
+              <AnimatePresence>
+                {serviceDropdownOpen && (
+                  <motion.div
+                    className="absolute top-full left-0 mt-2 w-[600px] rounded-xl overflow-hidden shadow-xl bg-white border border-gray-100"
+                    initial={{ opacity: 0, y: -5, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: 'auto' }}
+                    exit={{ opacity: 0, y: -5, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    onMouseEnter={() => setServiceDropdownOpen(true)}
+                    onMouseLeave={() => setServiceDropdownOpen(false)}
+                  >
+                    <div className="p-6 grid grid-cols-2 gap-8">
+                      {/* Left Column */}
+                      <div className="space-y-6">
+                        {serviceItems.slice(0, 2).map((category, idx) => (
+                          <div key={idx}>
+                            <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
+                            <ul className="space-y-2">
+                              {category.items.map((item, index) => (
+                                <li key={index}>
+                                  <Link
+                                    to={item.path}
+                                    className="group flex items-center text-[#0A2540] hover:text-[#4F6BFF] transition-colors py-1"
+                                    onClick={closeMenus}
+                                  >
+                                    <span className="opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:-translate-x-2 transition-all">
+                                      <ChevronRight className="w-3 h-3" />
+                                    </span>
+                                    <span className="transform translate-x-0 group-hover:-translate-x-1 transition-transform">
+                                      {item.name}
+                                    </span>
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Right Column */}
+                      <div className="space-y-6">
+                        {serviceItems.slice(2).map((category, idx) => (
+                          <div key={idx}>
+                            <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
+                            <ul className="space-y-2">
+                              {category.items.map((item, index) => (
+                                <li key={index}>
+                                  <Link
+                                    to={item.path}
+                                    className="group flex items-center text-[#0A2540] hover:text-[#4F6BFF] transition-colors py-1"
+                                    onClick={closeMenus}
+                                  >
+                                    <span className="opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:-translate-x-2 transition-all">
+                                      <ChevronRight className="w-3 h-3" />
+                                    </span>
+                                    <span className="transform translate-x-0 group-hover:-translate-x-1 transition-transform">
+                                      {item.name}
+                                    </span>
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Footer with CTA */}
+                    <div className="p-4 bg-gradient-to-r from-[#f5f8ff] to-white border-t border-gray-100">
+                      <Link
+                        to="/services"
+                        className="text-sm text-[#4F6BFF] font-medium hover:underline flex items-center"
                         onClick={closeMenus}
                       >
-                        {item.icon}
-                        {item.name}
+                        <span>View all services</span>
+                        <ChevronRight className="w-4 h-4 ml-1" />
                       </Link>
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="font-medium text-sm text-muted-foreground">Operations</h3>
-                <ul className="space-y-2">
-                  {serviceItems[3].items.map((item, index) => (
-                    <li key={index}>
-                      <Link 
-                        to={item.path} 
-                        className="flex items-center py-1 text-foreground/80 hover:text-ph transition-colors duration-200"
-                        onClick={closeMenus}
-                      >
-                        {item.icon}
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          </div>
-          
-          <Link 
-            to="/about" 
-            className={cn("navbar-link", isActive("/about") && "active-link")}
-          >
-            <span className="flex items-center">
-              <Info className="w-4 h-4 mr-1" />
+
+            <NavLink href="/about" active={isActive("/about")} isScrolled={isScrolled}>
               About
-            </span>
-          </Link>
-          
-          <Link 
-            to="/contact" 
-            className={cn("navbar-link", isActive("/contact") && "active-link")}
-          >
-            <span className="flex items-center">
-              <Phone className="w-4 h-4 mr-1" />
+            </NavLink>
+
+            <NavLink href="/contact" active={isActive("/contact")} isScrolled={isScrolled}>
               Contact
-            </span>
-          </Link>
-          
-          <Link 
-            to="/contact" 
-            className="button-primary ml-2"
-          >
-            Get Started
-          </Link>
-        </div>
+            </NavLink>
 
-        {/* Mobile Menu Button */}
-        <button 
-          className="lg:hidden" 
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      <div className={cn(
-        "fixed inset-0 bg-white z-40 lg:hidden transition-transform duration-300 ease-in-out pt-20",
-        isOpen ? "translate-x-0" : "translate-x-full"
-      )}>
-        <div className="container px-6 py-6 flex flex-col h-full overflow-y-auto">
-          <Link 
-            to="/" 
-            className="flex items-center py-3 text-lg font-medium"
-            onClick={closeMenus}
-          >
-            <Home className="w-5 h-5 mr-2" />
-            Home
-          </Link>
-          
-          <button 
-            className="flex items-center justify-between w-full py-3 text-lg font-medium"
-            onClick={toggleServiceDropdown}
-          >
-            <span className="flex items-center">
-              <Briefcase className="w-5 h-5 mr-2" />
-              Services
-            </span>
-            <ChevronDown className={cn(
-              "w-5 h-5 transition-transform duration-200",
-              serviceDropdownOpen && "rotate-180"
-            )} />
-          </button>
-          
-          {/* Mobile Services Dropdown */}
-          {serviceDropdownOpen && (
-            <div className="pl-4 mb-4 space-y-4">
-              {serviceItems.map((category, idx) => (
-                <div key={idx} className="mb-3">
-                  <h3 className="font-medium text-sm text-muted-foreground mb-2">{category.category}</h3>
-                  <ul className="space-y-2">
-                    {category.items.map((item, index) => (
-                      <li key={index}>
-                        <Link 
-                          to={item.path} 
-                          className="flex items-center py-2 text-foreground/80"
-                          onClick={closeMenus}
-                        >
-                          {item.icon}
-                          {item.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          <Link 
-            to="/about" 
-            className="flex items-center py-3 text-lg font-medium"
-            onClick={closeMenus}
-          >
-            <Info className="w-5 h-5 mr-2" />
-            About
-          </Link>
-          
-          <Link 
-            to="/contact" 
-            className="flex items-center py-3 text-lg font-medium"
-            onClick={closeMenus}
-          >
-            <Phone className="w-5 h-5 mr-2" />
-            Contact
-          </Link>
-          
-          <div className="mt-auto">
-            <Link 
-              to="/contact" 
-              className="button-primary w-full text-center mt-6"
-              onClick={closeMenus}
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              Get Started
-            </Link>
+              <Link
+                to="/contact"
+                className="ml-3 inline-flex items-center justify-center px-6 py-2 bg-[#4F6BFF] text-white text-sm font-medium rounded-full shadow-sm hover:shadow-md transition-all"
+              >
+                Get Started
+              </Link>
+            </motion.div>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="lg:hidden relative z-10"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ opacity: 0, rotate: -90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className={`w-6 h-6 ${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'}`} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ opacity: 0, rotate: 90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: -90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className={`w-6 h-6 ${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'}`} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
         </div>
-      </div>
-    </nav>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="fixed inset-0 bg-white z-40 lg:hidden pt-24 overflow-y-auto flex flex-col"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+          >
+            <div className="container px-6 py-6 flex flex-col h-full">
+              <Link
+                to="/"
+                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
+                onClick={closeMenus}
+              >
+                Home
+              </Link>
+
+              <button
+                className="flex items-center justify-between w-full py-4 text-xl font-medium text-[#0A2540]"
+                onClick={toggleServiceDropdown}
+              >
+                <span>Services</span>
+                <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${serviceDropdownOpen ? 'rotate-180' : ''
+                  }`} />
+              </button>
+
+              {/* Mobile Services Dropdown */}
+              <AnimatePresence>
+                {serviceDropdownOpen && (
+                  <motion.div
+                    className="pl-4 mb-4 space-y-6"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {serviceItems.map((category, idx) => (
+                      <div key={idx} className="mb-4">
+                        <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
+                        <ul className="space-y-3">
+                          {category.items.map((item, index) => (
+                            <li key={index}>
+                              <Link
+                                to={item.path}
+                                className="flex items-center py-2 text-[#0A2540]"
+                                onClick={closeMenus}
+                              >
+                                <ChevronRight className="w-4 h-4 mr-2 text-[#4F6BFF]" />
+                                {item.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <Link
+                to="/about"
+                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
+                onClick={closeMenus}
+              >
+                About
+              </Link>
+
+              <Link
+                to="/contact"
+                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
+                onClick={closeMenus}
+              >
+                Contact
+              </Link>
+
+              <div className="mt-auto pt-6 border-t border-gray-100">
+                <Link
+                  to="/contact"
+                  className="flex items-center justify-center w-full py-4 bg-[#4F6BFF] text-white text-base font-medium rounded-full shadow-sm"
+                  onClick={closeMenus}
+                >
+                  Get Started
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
+// NavLink component for consistent styling
+const NavLink = ({ href, active, isScrolled, children }) => {
+  return (
+    <Link
+      to={href}
+      className={`px-5 py-2 transition-colors duration-300 rounded-full ${active
+          ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
+          : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
+        }`}
+    >
+      {children}
+    </Link>
   );
 };
 
