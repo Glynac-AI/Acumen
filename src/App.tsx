@@ -1,7 +1,5 @@
 import * as React from "react";
 import { motion, useInView } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   CheckCircle,
   Menu,
@@ -14,25 +12,58 @@ import {
   Sparkles,
   TrendingUp,
   PlayCircle,
-  Moon,
-  Sun,
+  ChevronRight,
+  HelpCircle,
 } from "lucide-react";
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 
-/**
- * Runtime sanity tests (non-breaking):
- * These help validate landing-page requirements without breaking UI.
- */
+/* =========================================================
+   Minimal shadcn-style stubs (remove if you use your own)
+   ========================================================= */
+function cn(...cls: (string | false | null | undefined)[]) {
+  return cls.filter(Boolean).join(" ");
+}
+
+export const Button = ({
+  className,
+  children,
+  variant = "solid",
+  ...rest
+}: React.HTMLAttributes<HTMLButtonElement> & { variant?: "solid" | "outline" | "ghost" }) => {
+  const base =
+    "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
+  const styles =
+    variant === "solid"
+      ? "bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
+      : variant === "outline"
+      ? "border border-gray-300 bg-white hover:bg-gray-50 text-gray-900"
+      : "text-gray-700 hover:bg-black/5";
+  return (
+    // @ts-ignore
+    <button className={cn(base, styles, "min-h-[44px] min-w-[44px]", className)} {...rest}>
+      {children}
+    </button>
+  );
+};
+
+export const Card = ({ className, children }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("rounded-2xl border border-gray-200 bg-white/80 backdrop-blur", className)}>{children}</div>
+);
+export const CardContent = ({ className, children }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("p-6", className)}>{children}</div>
+);
+
+/* =========================================================
+   Runtime sanity tests (non-breaking)
+   ========================================================= */
 function runSanityTests() {
   try {
     if (typeof window === "undefined") return;
     const hero = document.getElementById("hero");
     const ctas = hero?.querySelectorAll('[data-testid="primary-cta"]') ?? [];
-    const steps =
-      document.getElementById("how-it-works")?.querySelectorAll('[data-testid="step"]') ?? [];
+    const steps = document.getElementById("how-it-works")?.querySelectorAll('[data-testid="step"]') ?? [];
     const counters = document.querySelectorAll('[data-testid="counter"]') ?? [];
-    const pricing =
-      document.getElementById("pricing")?.querySelectorAll('[data-testid="pricing-card"]') ?? [];
+    const pricing = document.getElementById("pricing")?.querySelectorAll('[data-testid="pricing-card"]') ?? [];
 
     console.assert(!!hero, "Hero section should exist");
     console.assert(ctas.length >= 1, "Primary CTA should be present in hero");
@@ -45,46 +76,8 @@ function runSanityTests() {
 }
 
 /* =========================================================
-   Dark Mode (persisted)
+   Base UI
    ========================================================= */
-function useTheme() {
-  const [theme, setTheme] = React.useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "light";
-    return (
-      (localStorage.getItem("theme") as "light" | "dark") ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-    );
-  });
-
-  React.useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  return { theme, setTheme };
-}
-
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
-  return (
-    <button
-      aria-label="Toggle dark mode"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-white/10 px-2.5 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/10"
-    >
-      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-      <span className="hidden sm:inline">{isDark ? "Light" : "Dark"}</span>
-    </button>
-  );
-}
-
-/* =========================================================
-   Shared / Base UI
-   ========================================================= */
-
 function SkipLink() {
   return (
     <a
@@ -114,16 +107,11 @@ function Counter({ value, label }: { value: number; label: string }) {
   }, [isInView, value]);
 
   return (
-    <div
-      ref={ref}
-      className="flex flex-col items-center justify-center p-4"
-      data-testid="counter"
-      aria-label={`${label}: ${count}+`}
-    >
+    <div ref={ref} className="flex flex-col items-center justify-center p-4" data-testid="counter" aria-label={`${label}: ${count}+`}>
       <span className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-500 to-amber-500 bg-clip-text text-transparent">
         {count}+
       </span>
-      <p className="text-gray-700 dark:text-gray-300 mt-1 text-sm md:text-base text-center">{label}</p>
+      <p className="text-gray-700 mt-1 text-sm md:text-base text-center">{label}</p>
     </div>
   );
 }
@@ -131,29 +119,14 @@ function Counter({ value, label }: { value: number; label: string }) {
 function SectionDivider({ flip = false }: { flip?: boolean }) {
   const gid = React.useId();
   return (
-    <svg
-      className={`w-full h-20 ${flip ? "rotate-180" : ""}`}
-      viewBox="0 0 1440 320"
-      xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="none"
-    >
+    <svg className={cn("w-full h-16 md:h-20", flip && "rotate-180")} viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
       <defs>
         <linearGradient id={`animatedGradient-${gid}`} x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#2563eb">
-            <animate
-              attributeName="stop-color"
-              values="#2563eb;#4f46e5;#f59e0b;#2563eb"
-              dur="8s"
-              repeatCount="indefinite"
-            />
+            <animate attributeName="stop-color" values="#2563eb;#4f46e5;#f59e0b;#2563eb" dur="8s" repeatCount="indefinite" />
           </stop>
           <stop offset="100%" stopColor="#f59e0b">
-            <animate
-              attributeName="stop-color"
-              values="#f59e0b;#2563eb;#4f46e5;#f59e0b"
-              dur="8s"
-              repeatCount="indefinite"
-            />
+            <animate attributeName="stop-color" values="#f59e0b;#2563eb;#4f46e5;#f59e0b" dur="8s" repeatCount="indefinite" />
           </stop>
         </linearGradient>
       </defs>
@@ -165,58 +138,45 @@ function SectionDivider({ flip = false }: { flip?: boolean }) {
   );
 }
 
+/* =========================================================
+   Layout
+   ========================================================= */
 function Header() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const NAV = [
-    { label: "About", href: "/about", type: "route" },
-    { label: "Services", href: "/services", type: "route" },
-    { label: "Jobs", href: "/jobs", type: "route" },
-    { label: "Insights", href: "/insights", type: "route" },
-    { label: "Contact", href: "/contact", type: "route" },
+    { label: "About", href: "/about" },
+    { label: "Services", href: "/services" },
+    { label: "Jobs", href: "/jobs" },
+    { label: "Insights", href: "/insights" },
+    { label: "Contact", href: "/contact" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-lg border-b border-gray-200 dark:border-white/10 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
-        <Link
-          to="/"
-          className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-500 to-amber-500 bg-clip-text text-transparent"
-        >
+        <Link to="/" className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-500 to-amber-500 bg-clip-text text-transparent">
           Acumen Recruiting
         </Link>
-        <nav className="hidden md:flex gap-8 text-gray-700 dark:text-gray-200 font-medium" aria-label="Primary">
+        <nav className="hidden md:flex gap-8 text-gray-700 font-medium" aria-label="Primary">
           {NAV.map((item) => (
-            <Link key={item.label} to={item.href} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+            <Link key={item.label} to={item.href} className="hover:text-indigo-600 transition">
               {item.label}
             </Link>
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <Link
-            to="/contact"
-            className="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white shadow text-sm"
-          >
+          <Link to="/contact" className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow text-sm min-h-[44px]">
             Get Started
           </Link>
-          <button aria-label="Open Menu" className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-            <Menu className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+          <button aria-label="Open Menu" className="md:hidden min-h-[44px] min-w-[44px]" onClick={() => setMobileOpen(!mobileOpen)}>
+            <Menu className="w-6 h-6 text-gray-700" />
           </button>
         </div>
       </div>
       {mobileOpen && (
-        <div
-          className="md:hidden bg-white dark:bg-zinc-950 shadow-lg border-t border-gray-200 dark:border-white/10 px-6 py-4 space-y-4"
-          role="dialog"
-          aria-label="Mobile Menu"
-        >
+        <div className="md:hidden bg-white shadow-lg border-t border-gray-200 px-6 py-4 space-y-4" role="dialog" aria-label="Mobile Menu">
           {[{ label: "Home", href: "/" }, ...NAV].map((item) => (
-            <Link
-              key={item.label}
-              to={item.href}
-              className="block text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400"
-              onClick={() => setMobileOpen(false)}
-            >
+            <Link key={item.label} to={item.href} className="block text-gray-700 hover:text-indigo-600" onClick={() => setMobileOpen(false)}>
               {item.label}
             </Link>
           ))}
@@ -232,18 +192,12 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-10">
         <div>
           <h3 className="text-xl font-semibold mb-4">Acumen Recruiting</h3>
-          <p className="text-sm leading-relaxed opacity-90">
-            Boutique recruiting for the wealth management and financial services ecosystem.
-          </p>
+          <p className="text-sm leading-relaxed opacity-90">Boutique recruiting for the wealth management and financial services ecosystem.</p>
         </div>
         <div>
           <h4 className="text-lg font-semibold mb-3">Quick Links</h4>
           <ul className="space-y-2 text-sm">
-            {[
-              { label: "How It Works", href: "/#how-it-works" },
-              { label: "Pricing", href: "/#pricing" },
-              { label: "Contact", href: "/contact" },
-            ].map((l) => (
+            {[{ label: "How It Works", href: "/#how-it-works" }, { label: "Pricing", href: "/#pricing" }, { label: "Contact", href: "/contact" }].map((l) => (
               <li key={l.label}>
                 <a href={l.href} className="hover:text-amber-300 transition">
                   {l.label}
@@ -256,26 +210,23 @@ function Footer() {
           <h4 className="text-lg font-semibold mb-3">Contact</h4>
           <p className="text-sm">Email: info@acumen-recruit.com</p>
           <p className="text-sm">Phone: +1 (555) 123-4567</p>
-          <Link to="/contact" className="inline-flex mt-4 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg">
+          <Link to="/contact" className="inline-flex mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg min-h-[44px]">
             Book Consultation
           </Link>
         </div>
       </div>
-      <div className="mt-10 text-center text-xs text-gray-200">
-        © {new Date().getFullYear()} Acumen Recruiting. All rights reserved.
-      </div>
+      <div className="mt-10 text-center text-xs text-gray-200">© {new Date().getFullYear()} Acumen Recruiting. All rights reserved.</div>
     </footer>
   );
 }
 
 /* =========================================================
-   Homepage Helpers
+   Helpers
    ========================================================= */
-
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-white/10 border border-gray-200 dark:border-white/10 text-xs font-medium text-gray-800 dark:text-gray-100">
-      <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 border border-gray-200 text-xs font-medium text-gray-800">
+      <CheckCircle className="h-4 w-4 text-emerald-600" />
       {children}
     </span>
   );
@@ -293,19 +244,17 @@ function GradientOrbs() {
 function LogosMarquee() {
   const logos = ["WealthCo", "FinServe", "EstatePro", "PlanWise", "AssetDuty", "HorizonWM"];
   return (
-    <div className="relative overflow-hidden border-y border-gray-200 dark:border-white/10 bg-white/80 dark:bg-zinc-900/60">
-      <div className="max-w-6xl mx-auto">
+    <div className="relative overflow-hidden border-y border-gray-200 bg-white/80">
+      <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-12 py-4 animate-[marquee_18s_linear_infinite] whitespace-nowrap">
           {logos.concat(logos).map((l, i) => (
-            <span key={i} className="text-gray-500 dark:text-gray-400 font-semibold opacity-80">
+            <span key={i} className="text-gray-500 font-semibold opacity-80">
               {l}
             </span>
           ))}
         </div>
       </div>
-      <style>{`
-        @keyframes marquee { 0% { transform: translateX(0%);} 100% { transform: translateX(-50%);} }
-      `}</style>
+      <style>{`@keyframes marquee { 0% { transform: translateX(0%);} 100% { transform: translateX(-50%);} }`}</style>
     </div>
   );
 }
@@ -318,7 +267,7 @@ function ValueBand() {
   ];
   return (
     <section className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-amber-500 text-white">
-      <div className="max-w-6xl mx-auto px-6 py-6 grid gap-4 md:grid-cols-3">
+      <div className="max-w-7xl mx-auto px-6 py-6 grid gap-4 md:grid-cols-3">
         {items.map((x) => (
           <div key={x.title} className="flex items-start gap-3">
             <div className="mt-0.5">{x.icon}</div>
@@ -342,10 +291,7 @@ function TrustStrip() {
   return (
     <div className="mt-6 flex flex-wrap items-center gap-2">
       {items.map((it) => (
-        <span
-          key={it.text}
-          className="inline-flex items-center gap-2 text-xs md:text-sm text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-full px-3 py-1.5"
-        >
+        <span key={it.text} className="inline-flex items-center gap-2 text-xs md:text-sm text-gray-700 bg-white/80 border border-gray-200 rounded-full px-3 py-1.5">
           {it.icon}
           {it.text}
         </span>
@@ -366,21 +312,13 @@ function StickyCTA() {
   return (
     <div className="fixed bottom-4 inset-x-0 z-50">
       <div className="mx-auto max-w-3xl">
-        <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/95 dark:bg-zinc-900/80 backdrop-blur border border-gray-200 dark:border-white/10 shadow-lg px-4 py-3">
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-200">
-            Ready to review candidates on video this week?
-          </p>
+        <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/95 backdrop-blur border border-gray-200 shadow-lg px-4 py-3">
+          <p className="text-sm md:text-base text-gray-700">Ready to review candidates on video this week?</p>
           <div className="flex gap-2">
-            <a
-              href="/#pricing"
-              className="px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 text-sm hover:bg-gray-50 dark:hover:bg-white/10"
-            >
+            <a href="/#pricing" className="px-3 py-2 rounded-lg border border-gray-200 text-sm hover:bg-gray-50">
               See Pricing
             </a>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm"
-            >
+            <Link to="/contact" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm">
               Book Consultation <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -391,113 +329,105 @@ function StickyCTA() {
 }
 
 /* =========================================================
-   Homepage Sections
+   Sections
    ========================================================= */
-
 export function HeroSection() {
+  // Full-bleed hero (uncropped), with inner container for readability
   return (
     <section
       id="hero"
-      className="relative overflow-hidden text-left py-20 md:py-28 px-6 max-w-6xl mx-auto rounded-2xl border border-gray-200 dark:border-white/10 bg-gradient-to-br from-indigo-50 via-white to-amber-50 dark:from-zinc-900 dark:via-zinc-950 dark:to-zinc-900"
+      className="relative overflow-hidden text-left py-20 md:py-28 px-0 bg-gradient-to-br from-indigo-50 via-white to-amber-50 border-b border-gray-200/60"
       aria-labelledby="hero-title"
     >
       <GradientOrbs />
-      <div className="grid md:grid-cols-12 gap-10 items-center">
-        {/* Left copy */}
-        <div className="md:col-span-7">
-          <motion.h1
-            id="hero-title"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight text-gray-900 dark:text-white"
-          >
-            Finance-Specialized Recruiting. Qualified, video-screened talent in{" "}
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-amber-500 bg-clip-text text-transparent">
-              7 days
-            </span>
-            .
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-base md:text-lg text-gray-700 dark:text-gray-300 mb-6 max-w-2xl leading-relaxed"
-          >
-            We blend Talent Snapshot™ videos with recruiter-led DeepDive™ interviews to deliver local,
-            role-ready shortlists—fast.
-          </motion.p>
-
-          <ul className="grid sm:grid-cols-2 gap-2 mb-8">
-            <li className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
-              <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              Pre-screened video intros (Snapshot™)
-            </li>
-            <li className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
-              <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              Structured DeepDive™ interviews
-            </li>
-            <li className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
-              <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              Local & role-appropriate shortlists
-            </li>
-            <li className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
-              <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              Transparent, tiered pricing
-            </li>
-          </ul>
-
-          <div className="flex gap-3 md:gap-4 items-center">
-            <Link
-              to="/contact"
-              data-testid="primary-cta"
-              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg bg-amber-500 hover:bg-amber-600 rounded-xl text-white shadow-md transition-transform hover:scale-[1.02]"
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid md:grid-cols-12 gap-10 items-center">
+          {/* Copy */}
+          <div className="md:col-span-7">
+            <motion.h1
+              id="hero-title"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight text-gray-900"
+              style={{ maxWidth: "20ch" }}
             >
-              Book Consultation
-            </Link>
-            <a
-              href="/#pricing"
-              className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg rounded-xl border border-gray-200 dark:border-white/10 hover:bg-indigo-50 dark:hover:bg-white/10 transition inline-flex items-center gap-2"
+              Finance-specialized recruiting. <br className="hidden sm:block" />
+              Video-screened talent in <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-amber-500 bg-clip-text text-transparent">7 days</span>.
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-base md:text-lg text-gray-700 mb-6 leading-relaxed"
+              style={{ maxWidth: "65ch" }}
             >
-              See Pricing <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
+              We blend Talent Snapshot™ videos with recruiter-led DeepDive™ interviews to deliver local, role-ready shortlists—fast.
+            </motion.p>
 
-          <TrustStrip />
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            <Badge>30+ Wealth Managers placed</Badge>
-            <Badge>20 Planners • 8 Tax Advisors</Badge>
-          </div>
-        </div>
-
-        {/* Right visual */}
-        <div className="md:col-span-5">
-          <div className="relative aspect-[4/3] rounded-2xl border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-zinc-900/60 shadow-sm overflow-hidden">
-            <div className="absolute inset-0 grid grid-cols-6 gap-2 p-4">
-              {[...Array(12)].map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg border border-gray-200 dark:border-white/10 bg-gradient-to-br from-indigo-50 to-white dark:from-zinc-800 dark:to-zinc-900"
-                />
+            <ul className="grid sm:grid-cols-2 gap-2 mb-8">
+              {[
+                "Pre-screened video intros (Snapshot™)",
+                "Structured DeepDive™ interviews",
+                "Local & role-appropriate shortlists",
+                "Transparent, tiered pricing",
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-2 text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-emerald-600" />
+                  {t}
+                </li>
               ))}
+            </ul>
+
+            <div className="flex gap-3 md:gap-4 items-center">
+              <Link
+                to="/contact"
+                data-testid="primary-cta"
+                className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg bg-amber-500 hover:bg-amber-600 rounded-xl text-white shadow-md transition-transform hover:scale-[1.02] min-h-[44px]"
+              >
+                Book Consultation
+              </Link>
+              <a
+                href="/#pricing"
+                className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg rounded-xl border border-gray-300 hover:bg-indigo-50 transition inline-flex items-center gap-2 min-h-[44px]"
+              >
+                See Pricing <ArrowRight className="h-4 w-4" />
+              </a>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="rounded-full bg-indigo-500/10 p-6">
-                <PlayCircle className="h-10 w-10 text-indigo-600 dark:text-indigo-400" />
+
+            <TrustStrip />
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Badge>30+ Wealth Managers placed</Badge>
+              <Badge>20 Planners • 8 Tax Advisors</Badge>
+            </div>
+          </div>
+
+          {/* Visual */}
+          <div className="md:col-span-5">
+            <div className="relative aspect-[4/3] rounded-2xl border border-gray-200 bg-white/80 shadow-sm overflow-hidden">
+              <div className="absolute inset-0 grid grid-cols-6 gap-2 p-4">
+                {[...Array(12)].map((_, i) => (
+                  <div key={i} className="rounded-lg border border-gray-200 bg-gradient-to-br from-indigo-50 to-white" />
+                ))}
               </div>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center">
-              <div className="flex gap-2">
-                <span className="h-2 w-10 rounded bg-indigo-500/80" />
-                <span className="h-2 w-10 rounded bg-blue-500/70" />
-                <span className="h-2 w-10 rounded bg-amber-500/70" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="rounded-full bg-indigo-500/10 p-6">
+                  <PlayCircle className="h-10 w-10 text-indigo-600" />
+                </div>
               </div>
-            </div>
-            <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-white/90 dark:bg-zinc-900/80 border border-gray-200 dark:border-white/10 rounded-full px-2.5 py-1 text-xs text-gray-800 dark:text-gray-100">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              Talent Snapshot™
+              <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-center">
+                <div className="flex gap-2">
+                  <span className="h-2 w-10 rounded bg-indigo-500/80" />
+                  <span className="h-2 w-10 rounded bg-blue-500/70" />
+                  <span className="h-2 w-10 rounded bg-amber-500/70" />
+                </div>
+              </div>
+              <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-white/90 border border-gray-200 rounded-full px-2.5 py-1 text-xs text-gray-800">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                Talent Snapshot™
+              </div>
             </div>
           </div>
         </div>
@@ -506,40 +436,73 @@ export function HeroSection() {
   );
 }
 
-function HighlightsStrip() {
+/* Why Acumen (band + logos + value cards) */
+function WhyAcumen() {
   const items = [
-    { k: "Time-to-Shortlist", v: "7 days" },
-    { k: "Client NPS", v: "+68" },
-    { k: "Roles Covered", v: "40+" },
-    { k: "Markets", v: "US & Canada" },
+    { icon: <Clock className="h-5 w-5" />, title: "Speed", desc: "Shortlist in 7 days" },
+    { icon: <Video className="h-5 w-5" />, title: "Clarity", desc: "Video-screened talent" },
+    { icon: <Shield className="h-5 w-5" />, title: "Predictability", desc: "Transparent pricing" },
   ];
   return (
-    <section className="bg-white dark:bg-zinc-950">
-      <div className="max-w-6xl mx-auto px-6 grid sm:grid-cols-2 md:grid-cols-4 gap-4 py-8">
-        {items.map(({ k, v }) => (
-          <Card
-            key={k}
-            className="shadow-sm border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-zinc-900/60 backdrop-blur"
-          >
-            <CardContent className="p-5">
-              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">{k}</div>
-              <div className="text-xl font-extrabold mt-1 text-gray-900 dark:text-white">{v}</div>
-            </CardContent>
-          </Card>
-        ))}
+    <>
+      <ValueBand />
+      <LogosMarquee />
+      <SectionDivider />
+      <section className="bg-white">
+        <div className="max-w-7xl mx-auto px-6 py-12 grid gap-6 sm:grid-cols-3">
+          {items.map((x) => (
+            <Card key={x.title} className="hover:shadow-md transition-shadow">
+              <CardContent>
+                <div className="flex items-center gap-3">
+                  {x.icon}
+                  <h3 className="text-lg font-semibold text-gray-900">{x.title}</h3>
+                </div>
+                <p className="mt-2 text-gray-600">{x.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* Lightweight product tour */
+function MiniProductTour() {
+  const steps = [
+    { title: "Kickoff & Questions", desc: "We align on role, location, and tailored Snapshot™/DeepDive™ prompts.", cta: "See example prompts" },
+    { title: "Video Screens", desc: "Candidates record Snapshot™ intros; we run DeepDive™ interviews.", cta: "View sample screen" },
+    { title: "Shortlist Delivery", desc: "You receive videos + resumes in your portal, with running updates.", cta: "Explore the portal" },
+  ];
+  return (
+    <section className="bg-white">
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-indigo-700">See the Flow</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {steps.map((s, i) => (
+            <Card key={s.title} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="text-xs text-gray-500 mb-2">{i + 1} / 3</div>
+                <h3 className="text-xl font-semibold text-gray-900">{s.title}</h3>
+                <p className="text-gray-600 mt-2">{s.desc}</p>
+                <Button variant="outline" className="mt-4">
+                  {s.cta} <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
-/* Neutral counters to satisfy tests (not "Proof") */
+/* Quiet metrics strip */
 function StatsCounters() {
   return (
-    <section className="py-12 md:py-16 bg-white dark:bg-zinc-950">
-      <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-indigo-700 dark:text-indigo-400">
-          Our Recruiting Footprint
-        </h2>
+    <section className="py-12 md:py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-indigo-700">At a Glance</h2>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
           <Counter value={30} label="Wealth Managers" />
           <Counter value={20} label="Financial Planners" />
@@ -553,84 +516,30 @@ function StatsCounters() {
   );
 }
 
-function ServicesSection() {
-  return (
-    <section id="services-teaser" className="py-16 md:py-24 bg-gray-50 dark:bg-zinc-950">
-      <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-indigo-700 dark:text-indigo-400">
-          Services
-        </h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { name: "Talent Snapshot™", desc: "Asynchronous videos for fast screening." },
-            { name: "Talent DeepDive™", desc: "Recruiter-led structured interviews." },
-            { name: "Complete Talent Pack™", desc: "Bundle for volume + depth." },
-          ].map((svc) => (
-            <Card
-              key={svc.name}
-              className="transition-transform hover:scale-[1.02] hover:shadow-lg border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-zinc-900/60 backdrop-blur"
-            >
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{svc.name}</h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">{svc.desc}</p>
-                <div className="mt-2">
-                 <Link
-  to="/services"
-  className="inline-flex items-center justify-center px-4 py-2 rounded-md border
-             border-gray-300 dark:border-white/20
-             bg-white hover:bg-gray-50
-             dark:bg-white/10 dark:hover:bg-white/20
-             text-gray-900 dark:text-white
-             font-medium transition-colors
-             focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500
-             focus-visible:ring-offset-2 focus-visible:ring-offset-white
-             dark:focus-visible:ring-offset-zinc-900"
->
-  Explore
-</Link>
-
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
+/* How it works */
 function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-16 md:py-20 bg-white dark:bg-zinc-950">
-      <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-indigo-700 dark:text-indigo-400">
-          How It Works
-        </h2>
+    <section id="how-it-works" className="py-16 md:py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-indigo-700">How It Works</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { title: "Brief", desc: "Kickoff to align on role, location & must-haves." },
             { title: "Video Screens", desc: "Snapshot™ intros + DeepDive™ interviews." },
             { title: "Shortlist in 7 Days", desc: "Local, role-ready candidates to your portal." },
           ].map((step, i) => (
-            <Card
-              key={i}
-              data-testid="step"
-              className="hover:shadow-md transition-transform hover:scale-105 border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-zinc-900/60 backdrop-blur"
-            >
+            <Card key={i} data-testid="step" className="hover:shadow-md transition-transform hover:scale-[1.02]">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+                <h3 className="text-xl font-semibold mb-2 text-gray-900">
                   {i + 1}. {step.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">{step.desc}</p>
+                <p className="text-gray-600 text-sm">{step.desc}</p>
               </CardContent>
             </Card>
           ))}
         </div>
         <div className="text-center mt-8">
-          <Link
-            to="/contact"
-            className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow"
-          >
+          <Link to="/contact" className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow min-h-[44px]">
             Start Hiring
           </Link>
         </div>
@@ -639,47 +548,62 @@ function HowItWorksSection() {
   );
 }
 
+/* Pricing */
 function PricingSection() {
   return (
-    <section id="pricing" className="py-16 md:py-20 bg-gray-50 dark:bg-zinc-950">
-      <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-indigo-700 dark:text-indigo-400">
-          Transparent Pricing
-        </h2>
+    <section id="pricing" className="py-16 md:py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-indigo-700">Transparent Pricing</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { name: "Starter", price: "$450", note: "20 Snapshot + 10 DeepDive", badge: "Most Popular" },
             { name: "Growth", price: "$900", note: "50 Snapshot + 20 DeepDive" },
             { name: "Enterprise", price: "$2,000", note: "100 Snapshot + 50 DeepDive" },
           ].map((p, i) => (
-            <Card
-              key={p.name}
-              data-testid="pricing-card"
-              className={`${i === 0 ? "ring-2 ring-amber-400" : ""} transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-zinc-900/60 backdrop-blur`}
-            >
+            <Card key={p.name} data-testid="pricing-card" className={cn("hover:shadow-lg transition-transform hover:scale-[1.02]", i === 0 && "ring-2 ring-amber-400")}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{p.name}</h3>
-                  {i === 0 && <span className="text-amber-600 dark:text-amber-400 text-xs font-semibold">{p.badge}</span>}
+                  <h3 className="text-xl font-semibold text-gray-900">{p.name}</h3>
+                  {i === 0 && <span className="text-amber-600 text-xs font-semibold">{p.badge}</span>}
                 </div>
-                <div className="text-3xl font-extrabold mb-2 text-gray-900 dark:text-white">{p.price}</div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">{p.note}</p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs">
-                  Pricing scales with compensation (60–120k ×2, 120–300k ×3). Success fee applies.
-                </p>
+                <div className="text-3xl font-extrabold mb-2 text-gray-900">{p.price}</div>
+                <p className="text-gray-600 text-sm mb-1">{p.note}</p>
+                <p className="text-gray-500 text-xs">Pricing scales with compensation (60–120k ×2, 120–300k ×3). Success fee applies.</p>
                 <div className="mt-4">
-                  <Link
-  to="/contact"
-  className="inline-flex items-center justify-center px-4 py-2 rounded-md
-             bg-amber-500 hover:bg-amber-600 text-white font-semibold
-             shadow-sm transition-colors
-             focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500
-             focus-visible:ring-offset-2 focus-visible:ring-offset-white
-             dark:focus-visible:ring-offset-zinc-900"
->
-  Choose Plan
-</Link>
+                  <Link to="/contact" className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-sm min-h-[44px]">
+                    Choose Plan
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
+/* FAQ */
+function FAQ() {
+  const faqs = [
+    { q: "How fast do we see candidates?", a: "You’ll receive your first Snapshot™ videos within a few days; full shortlist within 7 days." },
+    { q: "Do you use the same database for every role?", a: "We maintain a 2,000+ candidate database, but spin up fresh, local sourcing for each engagement." },
+    { q: "Can we customize the questions?", a: "Yes—during kickoff we align on Snapshot™ and DeepDive™ prompts; you can refine after the first 3 candidates." },
+  ];
+  return (
+    <section className="bg-white">
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-indigo-700">FAQs</h2>
+        <div className="mx-auto max-w-3xl space-y-4">
+          {faqs.map((f) => (
+            <Card key={f.q} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <HelpCircle className="h-5 w-5 text-indigo-600 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{f.q}</h3>
+                    <p className="text-gray-600 mt-1">{f.a}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -693,29 +617,27 @@ function PricingSection() {
 /* =========================================================
    Pages
    ========================================================= */
-
 function Homepage() {
   React.useEffect(() => {
     runSanityTests();
   }, []);
   return (
-    <div className="bg-gradient-to-b from-blue-50 via-white to-indigo-50 dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900 min-h-screen text-gray-900 dark:text-gray-100 flex flex-col">
+    <div className="bg-white min-h-screen text-gray-900 flex flex-col">
       <SkipLink />
       <Header />
       <main id="main" className="flex-1">
         <HeroSection />
-        <ValueBand />
-        <LogosMarquee />
-        <SectionDivider />
-        <HighlightsStrip />
+        <WhyAcumen />
         <SectionDivider flip />
-        <ServicesSection />
+        <MiniProductTour />
         <SectionDivider />
         <HowItWorksSection />
         <SectionDivider flip />
         <PricingSection />
         <SectionDivider />
         <StatsCounters />
+        <SectionDivider flip />
+        <FAQ />
       </main>
       <Footer />
       <StickyCTA />
@@ -723,14 +645,14 @@ function Homepage() {
   );
 }
 
-/* Empty placeholders for now (step-by-step focus on homepage) */
+/* Empty placeholders */
 function EmptyPage({ title = "Coming soon." }: { title?: string }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-indigo-50 to-white dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-white via-indigo-50 to-white text-gray-900">
       <Header />
-      <main className="max-w-6xl mx-auto px-6 py-24 text-center">
-        <h1 className="text-4xl md:text-6xl font-extrabold mb-3"> {title} </h1>
-        <p className="text-gray-600 dark:text-gray-300">This page is intentionally empty for now.</p>
+      <main className="max-w-7xl mx-auto px-6 py-24 text-center">
+        <h1 className="text-4xl md:text-6xl font-extrabold mb-3">{title}</h1>
+        <p className="text-gray-600">This page is intentionally empty for now.</p>
       </main>
       <Footer />
     </div>
