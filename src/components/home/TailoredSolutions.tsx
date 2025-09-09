@@ -1,11 +1,10 @@
 import React, { useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import type { Variants } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Play, Users, Layers, ArrowRight, Check } from "lucide-react";
 
 const TailoredSolutions = () => {
-    const sectionRef = useRef<HTMLElement>(null);
     const [activeSolution, setActiveSolution] = useState("snapshot");
+    const sectionRef = useRef(null);
 
     // Scroll-based animations
     const { scrollYProgress } = useScroll({
@@ -16,29 +15,7 @@ const TailoredSolutions = () => {
     // Parallax effects
     const titleOpacity = useTransform(scrollYProgress, [0.05, 0.15], [0, 1]);
     const titleY = useTransform(scrollYProgress, [0.05, 0.15], [30, 0]);
-
-    // Animation variants
-    const fadeInVariants: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                duration: 0.6
-            }
-        }
-    };
-
-    const fadeInUpVariants: Variants = {
-        hidden: { opacity: 0, y: 30 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: {
-                duration: 0.6,
-                ease: "easeOut"
-            }
-        }
-    };
+    const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
     // Solutions data
     const solutions = [
@@ -107,7 +84,10 @@ const TailoredSolutions = () => {
             className="py-36 relative overflow-hidden bg-white"
         >
             {/* Background elements */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/30 pointer-events-none"></div>
+            <motion.div
+                className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/30 pointer-events-none"
+                style={{ y: backgroundY }}
+            />
 
             {/* Subtle pattern */}
             <div className="absolute inset-0 opacity-[0.02]" style={{
@@ -125,7 +105,7 @@ const TailoredSolutions = () => {
                     }}
                 >
                     <motion.span
-                        className="inline-block py-1.5 px-4 bg-[#4F6BFF]/10 text-[#4F6BFF] font-medium rounded-full text-sm mb-6"
+                        className="inline-block py-1.5 px-4 bg-ph/10 text-ph font-medium rounded-full text-sm mb-6"
                         initial={{ opacity: 0, y: -10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -135,217 +115,224 @@ const TailoredSolutions = () => {
                     </motion.span>
 
                     <motion.h2
-                        className="text-4xl md:text-5xl font-display font-light tracking-tight text-[#0A2540] mb-6"
-                        variants={fadeInUpVariants}
-                        initial="hidden"
-                        whileInView="visible"
+                        className="text-4xl md:text-5xl font-display font-light tracking-tight text-foreground mb-6"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
+                        transition={{ duration: 0.7 }}
                     >
                         Tailored Solutions
                     </motion.h2>
 
                     <motion.p
-                        className="text-xl text-[#505c6e]/90 max-w-2xl mx-auto leading-relaxed"
-                        variants={fadeInUpVariants}
-                        initial="hidden"
-                        whileInView="visible"
+                        className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
+                        transition={{ duration: 0.7, delay: 0.1 }}
                     >
                         Discover our thoughtfully designed approaches to talent identification
                     </motion.p>
                 </motion.div>
 
-                {/* Interactive Solutions Navigator - COMPLETELY NEW LAYOUT */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-32">
-                    {/* Left side - Solution tabs - Truly sophisticated */}
-                    <div className="lg:col-span-4 lg:pr-8">
-                        <h3 className="text-xl font-medium text-[#0A2540] mb-6">Choose Your Approach</h3>
+                {/* Solutions Interface */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-28">
+                    {/* Left side - Solution tabs */}
+                    <div className="lg:col-span-4">
+                        <h3 className="text-xl font-medium text-foreground mb-6">Choose Your Approach</h3>
 
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {solutions.map((solution) => (
                                 <motion.div
                                     key={solution.id}
                                     className={`
-                    relative p-4 rounded-lg transition-all duration-300 cursor-pointer
-                    ${activeSolution === solution.id
-                                            ? 'shadow-sm bg-white border border-gray-100'
-                                            : 'bg-white/70 hover:bg-white border border-transparent'}
-                  `}
+                                        relative p-5 rounded-xl transition-all duration-300 cursor-pointer
+                                        ${activeSolution === solution.id
+                                            ? 'shadow-sm glass-card border border-white/20'
+                                            : 'bg-white/80 hover:bg-white/90 border border-transparent'}
+                                    `}
                                     onClick={() => setActiveSolution(solution.id)}
-                                    animate={{
-                                        x: activeSolution === solution.id ? 5 : 0
-                                    }}
+                                    whileHover={{ x: 5 }}
                                     transition={{ duration: 0.3 }}
                                 >
                                     <div className="flex items-center gap-4">
                                         <div
                                             className={`
-                        w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-300
-                        ${activeSolution === solution.id
-                                                    ? `bg-gray-50 text-[${solution.color}]`
-                                                    : `bg-gray-50 text-[#505c6e]`
+                                                w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300
+                                                ${activeSolution === solution.id
+                                                    ? `bg-ph/10 text-ph`
+                                                    : `bg-gray-50 text-muted-foreground`
                                                 }
-                      `}
+                                            `}
                                         >
                                             {solution.icon}
                                         </div>
 
                                         <div className="flex-1">
-                                            <h4 className={`font-medium transition-colors duration-300 ${activeSolution === solution.id ? 'text-[#4F6BFF]' : 'text-[#0A2540]'
-                                                }`}>
+                                            <h4 className={`font-medium transition-colors duration-300 ${activeSolution === solution.id ? 'text-ph' : 'text-foreground'}`}>
                                                 {solution.title}
                                             </h4>
 
-                                            <p className="text-sm text-[#505c6e]/90 line-clamp-2 leading-relaxed">
+                                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                                                 {solution.description}
                                             </p>
                                         </div>
 
-                                        {/* Subtle arrow indicator */}
-                                        <div className="w-6 flex justify-center">
-                                            <motion.div
-                                                animate={{
-                                                    x: activeSolution === solution.id ? 3 : 0,
-                                                    opacity: activeSolution === solution.id ? 1 : 0.3
-                                                }}
-                                                transition={{ duration: 0.3 }}
-                                            >
-                                                <ArrowRight className={`w-4 h-4 ${activeSolution === solution.id ? 'text-[#4F6BFF]' : 'text-gray-400'
-                                                    }`} />
-                                            </motion.div>
-                                        </div>
+                                        <motion.div
+                                            animate={{
+                                                x: activeSolution === solution.id ? 5 : 0,
+                                                opacity: activeSolution === solution.id ? 1 : 0.5
+                                            }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            <ArrowRight className={`w-4 h-4 ${activeSolution === solution.id ? 'text-ph' : 'text-muted-foreground'}`} />
+                                        </motion.div>
                                     </div>
                                 </motion.div>
                             ))}
                         </div>
 
-                        <div className="mt-8 p-6 rounded-lg bg-gray-50 border border-gray-100">
-                            <h4 className="font-medium text-[#0A2540] mb-3">Not Sure Which to Choose?</h4>
-                            <p className="text-sm text-[#505c6e]/90 mb-4">
+                        <motion.div
+                            className="mt-8 p-6 rounded-xl glass-card"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                        >
+                            <h4 className="font-medium text-foreground mb-3">Not Sure Which to Choose?</h4>
+                            <p className="text-sm text-muted-foreground mb-4">
                                 Our team can help you determine the ideal solution based on your specific recruiting needs.
                             </p>
-                            <a
+                            <motion.a
                                 href="/contact"
-                                className="inline-flex items-center px-4 py-2 rounded-lg bg-white border border-gray-200 text-[#4F6BFF] font-medium text-sm hover:bg-[#4F6BFF]/5 transition-colors"
+                                className="inline-flex items-center button-secondary text-sm"
+                                whileHover={{ x: 5 }}
+                                transition={{ duration: 0.2 }}
                             >
                                 Schedule a consultation
                                 <ArrowRight className="ml-2 w-3 h-3" />
-                            </a>
-                        </div>
+                            </motion.a>
+                        </motion.div>
                     </div>
 
                     {/* Right side - Selected solution details */}
-                    <motion.div
-                        className="lg:col-span-8 h-full"
-                        variants={fadeInVariants}
-                        initial="hidden"
-                        animate="visible"
-                        key={activeSolution}
-                    >
-                        <div className="rounded-xl border border-gray-200 h-full overflow-hidden bg-white shadow-sm">
-                            {/* Header with elegant design */}
-                            <div className="px-8 py-6 border-b border-gray-200 bg-white">
-                                <div className="flex items-center gap-4">
-                                    <div
-                                        className="w-12 h-12 rounded-lg flex items-center justify-center shadow-sm"
-                                        style={{ color: activeSolutionData.color, backgroundColor: `${activeSolutionData.color}10` }}
-                                    >
-                                        {activeSolutionData.icon}
-                                    </div>
-
-                                    <div>
-                                        <h3 className="text-xl font-medium text-[#0A2540]">
-                                            {activeSolutionData.title}
-                                        </h3>
-                                        <p className="text-[#505c6e]/90 text-sm">{activeSolutionData.description}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Solution content */}
-                            <div className="p-8">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {/* Features column */}
-                                    <div>
-                                        <h4 className="text-base font-medium text-[#0A2540] mb-5">Key Features</h4>
-                                        <ul className="space-y-4">
-                                            {activeSolutionData.details.map((detail, index) => (
-                                                <motion.li
-                                                    key={index}
-                                                    className="flex items-start gap-3"
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: 0.2 + index * 0.1 }}
-                                                >
-                                                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-[#0A2540] bg-gray-50 mt-0.5 shrink-0">
-                                                        <Check className="w-3 h-3" />
-                                                    </div>
-                                                    <span className="text-[#505c6e]/90 text-sm">{detail}</span>
-                                                </motion.li>
-                                            ))}
-                                        </ul>
-
-                                        <div className="mt-8">
-                                            <a
-                                                href={`/solutions/${activeSolutionData.id}`}
-                                                className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-200 bg-white text-[#4F6BFF] font-medium text-sm hover:bg-[#4F6BFF]/5 transition-colors"
+                    <div className="lg:col-span-8 h-full">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeSolution}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.5 }}
+                                className="h-full"
+                            >
+                                <div className="rounded-xl glass-card h-full overflow-hidden">
+                                    {/* Header with elegant design */}
+                                    <div className="px-8 py-6 border-b border-white/20 bg-gradient-to-r from-ph/5 to-transparent">
+                                        <div className="flex items-center gap-4">
+                                            <div
+                                                className="w-12 h-12 rounded-xl flex items-center justify-center bg-white shadow-sm"
+                                                style={{ color: activeSolutionData.color }}
                                             >
-                                                Learn more about {activeSolutionData.title}
-                                                <ArrowRight className="ml-2 w-3 h-3" />
-                                            </a>
+                                                {activeSolutionData.icon}
+                                            </div>
+
+                                            <div>
+                                                <h3 className="text-xl font-medium text-foreground">
+                                                    {activeSolutionData.title}
+                                                </h3>
+                                                <p className="text-muted-foreground text-sm">{activeSolutionData.description}</p>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Pricing column */}
-                                    <div className="border-l border-gray-200 pl-8">
-                                        <h4 className="text-base font-medium text-[#0A2540] mb-5">Pricing</h4>
+                                    {/* Solution content */}
+                                    <div className="p-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            {/* Features column */}
+                                            <div>
+                                                <h4 className="text-base font-medium text-foreground mb-5">Key Features</h4>
+                                                <ul className="space-y-4">
+                                                    {activeSolutionData.details.map((detail, index) => (
+                                                        <motion.li
+                                                            key={index}
+                                                            className="flex items-start gap-3"
+                                                            initial={{ opacity: 0, x: -20 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            transition={{ delay: 0.2 + index * 0.1 }}
+                                                        >
+                                                            <div className="w-5 h-5 rounded-full flex items-center justify-center text-white bg-ph mt-0.5 shrink-0">
+                                                                <Check className="w-3 h-3" />
+                                                            </div>
+                                                            <span className="text-muted-foreground text-sm">{detail}</span>
+                                                        </motion.li>
+                                                    ))}
+                                                </ul>
 
-                                        <div className="space-y-4">
-                                            {activeSolutionData.pricing.map((tier, index) => (
-                                                <motion.div
-                                                    key={index}
-                                                    className="rounded-lg border border-gray-100 p-4 bg-gray-50"
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: 0.3 + index * 0.1 }}
-                                                >
-                                                    <div className="text-sm font-medium pb-2 mb-2 border-b border-gray-100 text-[#0A2540]">
-                                                        {tier.level}
-                                                    </div>
-                                                    <div className="text-[#505c6e]/90 text-sm">{tier.price}</div>
-                                                </motion.div>
-                                            ))}
-                                        </div>
+                                                <div className="mt-8">
+                                                    <motion.a
+                                                        href={`/solutions/${activeSolutionData.id}`}
+                                                        className="button-secondary inline-flex items-center text-sm"
+                                                        whileHover={{ x: 5 }}
+                                                        transition={{ duration: 0.2 }}
+                                                    >
+                                                        Learn more about {activeSolutionData.title}
+                                                        <ArrowRight className="ml-2 w-4 h-4" />
+                                                    </motion.a>
+                                                </div>
+                                            </div>
 
-                                        <div className="mt-6 text-xs text-[#505c6e]/80">
-                                            <p>Success fee applies per hire. View our <a href="/pricing" className="text-[#4F6BFF] hover:underline">complete pricing details</a> for more information.</p>
+                                            {/* Pricing column */}
+                                            <div className="border-l border-white/20 pl-8">
+                                                <h4 className="text-base font-medium text-foreground mb-5">Pricing</h4>
+
+                                                <div className="space-y-4">
+                                                    {activeSolutionData.pricing.map((tier, index) => (
+                                                        <motion.div
+                                                            key={index}
+                                                            className="rounded-lg glass-card p-4"
+                                                            initial={{ opacity: 0, y: 20 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ delay: 0.3 + index * 0.1 }}
+                                                            whileHover={{ y: -3 }}
+                                                        >
+                                                            <div className="text-sm font-medium pb-2 mb-2 border-b border-white/10 text-foreground">
+                                                                {tier.level}
+                                                            </div>
+                                                            <div className="text-muted-foreground text-sm">{tier.price}</div>
+                                                        </motion.div>
+                                                    ))}
+                                                </div>
+
+                                                <div className="mt-6 text-xs text-muted-foreground bg-ph/5 p-3 rounded-lg">
+                                                    <p>Success fee applies per hire. View our <a href="/pricing" className="text-ph hover:underline">complete pricing details</a> for more information.</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </motion.div>
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
                 </div>
 
                 {/* Salary-based pricing section */}
                 <motion.div
                     className="max-w-5xl mx-auto"
-                    variants={fadeInUpVariants}
-                    initial="hidden"
-                    whileInView="visible"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ delay: 0.4, duration: 0.7 }}
                 >
-                    <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200">
-                        <div className="px-8 py-10 bg-gradient-to-r from-[#4F6BFF]/10 to-white border-b border-gray-200">
-                            <h3 className="text-2xl font-display font-light text-[#0A2540] mb-3">Transparent Value-Based Pricing</h3>
-                            <p className="text-[#505c6e]/90 max-w-3xl">
+                    <div className="rounded-2xl overflow-hidden glass-card border border-white/20">
+                        <div className="px-8 py-10 bg-gradient-to-r from-ph/10 to-transparent border-b border-white/10">
+                            <h3 className="text-2xl font-display font-light text-foreground mb-3">Transparent Value-Based Pricing</h3>
+                            <p className="text-muted-foreground max-w-3xl">
                                 Our pricing scales appropriately with role compensation, reflecting the effort required to source exceptional candidates at each level.
                             </p>
                         </div>
 
-                        <div className="bg-white p-8">
+                        <div className="bg-white/50 backdrop-blur-sm p-8">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <PricingTier
                                     title="Entry Level"
@@ -373,12 +360,15 @@ const TailoredSolutions = () => {
                             </div>
 
                             <div className="text-center mt-10">
-                                <a
+                                <motion.a
                                     href="/pricing"
-                                    className="inline-block px-8 py-3 rounded-lg bg-[#4F6BFF] text-white font-medium shadow-sm hover:shadow-md transition-all"
+                                    className="button-primary inline-block"
+                                    whileHover={{ y: -3 }}
+                                    whileTap={{ y: 0 }}
+                                    transition={{ duration: 0.2 }}
                                 >
                                     View Complete Pricing Details
-                                </a>
+                                </motion.a>
                             </div>
                         </div>
                     </div>
@@ -404,37 +394,38 @@ const PricingTier = ({
 }) => {
     return (
         <motion.div
-            className={`rounded-lg overflow-hidden border ${highlight
-                    ? 'border-gray-200 shadow-sm'
-                    : 'border-gray-100'
+            className={`rounded-lg overflow-hidden ${highlight
+                    ? 'glass-card border border-ph/20 shadow-md shadow-ph/5'
+                    : 'bg-white/80 border border-white/20'
                 }`}
             whileHover={{ y: -3 }}
             transition={{ duration: 0.3 }}
         >
-            <div className={`p-5 ${highlight ? 'bg-gray-50' : 'bg-white'}`}>
+            <div className={`p-5 ${highlight ? 'bg-gradient-to-br from-ph/5 to-transparent' : 'bg-white/50'}`}>
                 <div className="flex justify-between items-start mb-3">
-                    <h4 className="text-base font-medium text-[#0A2540]">{title}</h4>
+                    <h4 className="text-base font-medium text-foreground">{title}</h4>
                     {highlight && (
-                        <span className="px-2 py-0.5 bg-gray-100 text-[#4F6BFF] text-xs font-medium rounded-full">
+                        <span className="px-2 py-0.5 bg-ph/10 text-ph text-xs font-medium rounded-full">
                             Most Popular
                         </span>
                     )}
                 </div>
 
-                <p className="text-xs text-[#505c6e]/90 mb-3">Roles paying {range}</p>
+                <p className="text-xs text-muted-foreground mb-3">Roles paying {range}</p>
 
-                <div className={`text-2xl font-light ${highlight ? 'text-[#4F6BFF]' : 'text-[#0A2540]'}`}>
+                <div className={`text-2xl font-light ${highlight ? 'text-ph' : 'text-foreground'}`}>
                     {successFee}
-                    <span className="text-xs font-normal text-[#505c6e]/80 ml-1">per hire</span>
+                    <span className="text-xs font-normal text-muted-foreground ml-1">per hire</span>
                 </div>
 
-                <div className="mt-3 text-xs text-[#505c6e]/90">{description}</div>
+                <div className="mt-3 text-xs text-muted-foreground">{description}</div>
             </div>
 
-            <div className={`px-5 py-3 border-t ${highlight ? 'border-gray-200 bg-gray-50' : 'border-gray-100 bg-white'}`}>
+            <div className={`px-5 py-3 border-t ${highlight ? 'border-ph/10 bg-white/50' : 'border-gray-100 bg-white/50'
+                }`}>
                 <div className="flex items-center">
-                    <Check className={`w-3 h-3 mr-2 ${highlight ? 'text-[#4F6BFF]' : 'text-gray-400'}`} />
-                    <span className="text-xs text-[#505c6e]/90">Access to all product features</span>
+                    <Check className={`w-3 h-3 mr-2 ${highlight ? 'text-ph' : 'text-gray-400'}`} />
+                    <span className="text-xs text-muted-foreground">Access to all product features</span>
                 </div>
             </div>
         </motion.div>
