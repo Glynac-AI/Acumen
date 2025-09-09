@@ -1,25 +1,42 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { Play, Users, Layers } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import type { Variants } from "framer-motion";
+import { Play, Users, Layers, ArrowRight, Check } from "lucide-react";
 
 const TailoredSolutions = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const [activeSolution, setActiveSolution] = useState("snapshot");
+
+    // Scroll-based animations
+    const { scrollYProgress } = useScroll({
+        target: sectionRef,
+        offset: ["start end", "end start"]
+    });
+
+    // Parallax effects
+    const titleOpacity = useTransform(scrollYProgress, [0.05, 0.15], [0, 1]);
+    const titleY = useTransform(scrollYProgress, [0.05, 0.15], [30, 0]);
+
     // Animation variants
-    const containerVariants = {
+    const fadeInVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.2
+                duration: 0.6
             }
         }
     };
 
-    const itemVariants = {
+    const fadeInUpVariants: Variants = {
         hidden: { opacity: 0, y: 30 },
         visible: {
             opacity: 1,
             y: 0,
-            transition: { duration: 0.6, ease: "easeOut" as const }
+            transition: {
+                duration: 0.6,
+                ease: "easeOut"
+            }
         }
     };
 
@@ -35,8 +52,13 @@ const TailoredSolutions = () => {
                 "Efficient initial assessment of candidate fit",
                 "Immediate access via our secure client portal"
             ],
-            icon: <Play className="w-6 h-6" />,
-            color: "from-blue-500/20 to-blue-500/5"
+            icon: <Play className="w-5 h-5" />,
+            color: "#4F6BFF",
+            pricing: [
+                { level: "0-60k roles", price: "20 for $200 | 50 for $450 | 100 for $800" },
+                { level: "60k-120k roles", price: "Pricing doubles" },
+                { level: "120k-300k roles", price: "Pricing triples" }
+            ]
         },
         {
             id: "deepdive",
@@ -48,8 +70,13 @@ const TailoredSolutions = () => {
                 "Behavioral and situational questions",
                 "Detailed insights into candidate capabilities"
             ],
-            icon: <Users className="w-6 h-6" />,
-            color: "from-indigo-500/20 to-indigo-500/5"
+            icon: <Users className="w-5 h-5" />,
+            color: "#6366f1",
+            pricing: [
+                { level: "0-60k roles", price: "10 for $300 | 20 for $550 | 50 for $1,250" },
+                { level: "60k-120k roles", price: "Pricing doubles" },
+                { level: "120k-300k roles", price: "Pricing triples" }
+            ]
         },
         {
             id: "complete",
@@ -61,160 +88,299 @@ const TailoredSolutions = () => {
                 "Comprehensive screening across all dimensions",
                 "Optimal approach for senior or complex positions"
             ],
-            icon: <Layers className="w-6 h-6" />,
-            color: "from-ph/20 to-ph/5"
+            icon: <Layers className="w-5 h-5" />,
+            color: "#4F6BFF",
+            pricing: [
+                { level: "0-60k roles", price: "Starter: $450 | Growth: $900 | Enterprise: $2,000" },
+                { level: "60k-120k roles", price: "Pricing doubles" },
+                { level: "120k-300k roles", price: "Pricing triples" }
+            ]
         }
     ];
 
-    return (
-        <section className="py-24 relative overflow-hidden">
-            {/* Background decorative elements */}
-            <div className="absolute top-20 right-0 w-96 h-96 bg-ph/5 rounded-full blur-3xl -z-10 opacity-70"></div>
-            <div className="absolute bottom-20 left-0 w-80 h-80 bg-ph/5 rounded-full blur-3xl -z-10 opacity-70"></div>
+    // Get active solution data
+    const activeSolutionData = solutions.find(s => s.id === activeSolution) || solutions[0];
 
-            <div className="container mx-auto px-6">
+    return (
+        <section
+            ref={sectionRef}
+            className="py-36 relative overflow-hidden bg-white"
+        >
+            {/* Background elements */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/30 pointer-events-none"></div>
+
+            {/* Subtle pattern */}
+            <div className="absolute inset-0 opacity-[0.02]" style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                backgroundSize: '200px'
+            }} />
+
+            <div className="container mx-auto px-6 relative z-10">
+                {/* Header section */}
                 <motion.div
-                    className="max-w-3xl mx-auto text-center mb-16"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.6 }}
+                    className="max-w-3xl mx-auto text-center mb-24"
+                    style={{
+                        opacity: titleOpacity,
+                        y: titleY
+                    }}
                 >
-                    <span className="inline-block py-1 px-3 bg-ph/10 text-ph font-medium rounded-full text-sm mb-6">
+                    <motion.span
+                        className="inline-block py-1.5 px-4 bg-[#4F6BFF]/10 text-[#4F6BFF] font-medium rounded-full text-sm mb-6"
+                        initial={{ opacity: 0, y: -10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
                         Our Offerings
-                    </span>
-                    <h2 className="text-4xl md:text-5xl font-display font-light tracking-wide text-foreground mb-6">
+                    </motion.span>
+
+                    <motion.h2
+                        className="text-4xl md:text-5xl font-display font-light tracking-tight text-[#0A2540] mb-6"
+                        variants={fadeInUpVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                    >
                         Tailored Solutions
-                    </h2>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                    </motion.h2>
+
+                    <motion.p
+                        className="text-xl text-[#505c6e]/90 max-w-2xl mx-auto leading-relaxed"
+                        variants={fadeInUpVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                    >
                         Discover our thoughtfully designed approaches to talent identification
-                    </p>
+                    </motion.p>
                 </motion.div>
 
-                <motion.div
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8"
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-50px" }}
-                >
-                    {solutions.map((solution) => (
-                        <motion.div
-                            key={solution.id}
-                            className="relative"
-                            variants={itemVariants}
-                        >
-                            <div className="h-full flex flex-col rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-                                {/* Solution Card Header */}
-                                <div className={`p-6 bg-gradient-to-br ${solution.color}`}>
-                                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center text-ph mb-4">
-                                        {solution.icon}
-                                    </div>
-                                    <h3 className="text-xl font-semibold text-foreground mb-2">{solution.title}</h3>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        {solution.description}
-                                    </p>
-                                </div>
+                {/* Interactive Solutions Navigator - COMPLETELY NEW LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-32">
+                    {/* Left side - Solution tabs - Truly sophisticated */}
+                    <div className="lg:col-span-4 lg:pr-8">
+                        <h3 className="text-xl font-medium text-[#0A2540] mb-6">Choose Your Approach</h3>
 
-                                {/* Solution Card Body */}
-                                <div className="bg-white p-6 flex-grow">
-                                    <ul className="space-y-3">
-                                        {solution.details.map((detail, index) => (
-                                            <li key={index} className="flex items-start gap-3">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-ph/70 mt-2"></div>
-                                                <span className="text-sm text-muted-foreground">{detail}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                        <div className="space-y-3">
+                            {solutions.map((solution) => (
+                                <motion.div
+                                    key={solution.id}
+                                    className={`
+                    relative p-4 rounded-lg transition-all duration-300 cursor-pointer
+                    ${activeSolution === solution.id
+                                            ? 'shadow-sm bg-white border border-gray-100'
+                                            : 'bg-white/70 hover:bg-white border border-transparent'}
+                  `}
+                                    onClick={() => setActiveSolution(solution.id)}
+                                    animate={{
+                                        x: activeSolution === solution.id ? 5 : 0
+                                    }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div
+                                            className={`
+                        w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-300
+                        ${activeSolution === solution.id
+                                                    ? `bg-gray-50 text-[${solution.color}]`
+                                                    : `bg-gray-50 text-[#505c6e]`
+                                                }
+                      `}
+                                        >
+                                            {solution.icon}
+                                        </div>
 
-                                {/* Solution Card Footer */}
-                                <div className="bg-white p-6 pt-0">
-                                    <div className="pt-4 border-t border-gray-100">
-                                        <a href={`/solutions#${solution.id}`} className="text-ph text-sm font-medium hover:text-ph-dark transition-colors flex items-center">
-                                            Explore details
-                                            <svg
-                                                width="16"
-                                                height="16"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                className="ml-1"
+                                        <div className="flex-1">
+                                            <h4 className={`font-medium transition-colors duration-300 ${activeSolution === solution.id ? 'text-[#4F6BFF]' : 'text-[#0A2540]'
+                                                }`}>
+                                                {solution.title}
+                                            </h4>
+
+                                            <p className="text-sm text-[#505c6e]/90 line-clamp-2 leading-relaxed">
+                                                {solution.description}
+                                            </p>
+                                        </div>
+
+                                        {/* Subtle arrow indicator */}
+                                        <div className="w-6 flex justify-center">
+                                            <motion.div
+                                                animate={{
+                                                    x: activeSolution === solution.id ? 3 : 0,
+                                                    opacity: activeSolution === solution.id ? 1 : 0.3
+                                                }}
+                                                transition={{ duration: 0.3 }}
                                             >
-                                                <path d="M5 12h14" />
-                                                <path d="m12 5 7 7-7 7" />
-                                            </svg>
-                                        </a>
+                                                <ArrowRight className={`w-4 h-4 ${activeSolution === solution.id ? 'text-[#4F6BFF]' : 'text-gray-400'
+                                                    }`} />
+                                            </motion.div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        <div className="mt-8 p-6 rounded-lg bg-gray-50 border border-gray-100">
+                            <h4 className="font-medium text-[#0A2540] mb-3">Not Sure Which to Choose?</h4>
+                            <p className="text-sm text-[#505c6e]/90 mb-4">
+                                Our team can help you determine the ideal solution based on your specific recruiting needs.
+                            </p>
+                            <a
+                                href="/contact"
+                                className="inline-flex items-center px-4 py-2 rounded-lg bg-white border border-gray-200 text-[#4F6BFF] font-medium text-sm hover:bg-[#4F6BFF]/5 transition-colors"
+                            >
+                                Schedule a consultation
+                                <ArrowRight className="ml-2 w-3 h-3" />
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Right side - Selected solution details */}
+                    <motion.div
+                        className="lg:col-span-8 h-full"
+                        variants={fadeInVariants}
+                        initial="hidden"
+                        animate="visible"
+                        key={activeSolution}
+                    >
+                        <div className="rounded-xl border border-gray-200 h-full overflow-hidden bg-white shadow-sm">
+                            {/* Header with elegant design */}
+                            <div className="px-8 py-6 border-b border-gray-200 bg-white">
+                                <div className="flex items-center gap-4">
+                                    <div
+                                        className="w-12 h-12 rounded-lg flex items-center justify-center shadow-sm"
+                                        style={{ color: activeSolutionData.color, backgroundColor: `${activeSolutionData.color}10` }}
+                                    >
+                                        {activeSolutionData.icon}
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-xl font-medium text-[#0A2540]">
+                                            {activeSolutionData.title}
+                                        </h3>
+                                        <p className="text-[#505c6e]/90 text-sm">{activeSolutionData.description}</p>
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
-                    ))}
-                </motion.div>
 
-                {/* Pricing Tier Indicator */}
+                            {/* Solution content */}
+                            <div className="p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* Features column */}
+                                    <div>
+                                        <h4 className="text-base font-medium text-[#0A2540] mb-5">Key Features</h4>
+                                        <ul className="space-y-4">
+                                            {activeSolutionData.details.map((detail, index) => (
+                                                <motion.li
+                                                    key={index}
+                                                    className="flex items-start gap-3"
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: 0.2 + index * 0.1 }}
+                                                >
+                                                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-[#0A2540] bg-gray-50 mt-0.5 shrink-0">
+                                                        <Check className="w-3 h-3" />
+                                                    </div>
+                                                    <span className="text-[#505c6e]/90 text-sm">{detail}</span>
+                                                </motion.li>
+                                            ))}
+                                        </ul>
+
+                                        <div className="mt-8">
+                                            <a
+                                                href={`/solutions/${activeSolutionData.id}`}
+                                                className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-200 bg-white text-[#4F6BFF] font-medium text-sm hover:bg-[#4F6BFF]/5 transition-colors"
+                                            >
+                                                Learn more about {activeSolutionData.title}
+                                                <ArrowRight className="ml-2 w-3 h-3" />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    {/* Pricing column */}
+                                    <div className="border-l border-gray-200 pl-8">
+                                        <h4 className="text-base font-medium text-[#0A2540] mb-5">Pricing</h4>
+
+                                        <div className="space-y-4">
+                                            {activeSolutionData.pricing.map((tier, index) => (
+                                                <motion.div
+                                                    key={index}
+                                                    className="rounded-lg border border-gray-100 p-4 bg-gray-50"
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 0.3 + index * 0.1 }}
+                                                >
+                                                    <div className="text-sm font-medium pb-2 mb-2 border-b border-gray-100 text-[#0A2540]">
+                                                        {tier.level}
+                                                    </div>
+                                                    <div className="text-[#505c6e]/90 text-sm">{tier.price}</div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+
+                                        <div className="mt-6 text-xs text-[#505c6e]/80">
+                                            <p>Success fee applies per hire. View our <a href="/pricing" className="text-[#4F6BFF] hover:underline">complete pricing details</a> for more information.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Salary-based pricing section */}
                 <motion.div
-                    className="mt-20 max-w-4xl mx-auto"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ delay: 0.4, duration: 0.6 }}
+                    className="max-w-5xl mx-auto"
+                    variants={fadeInUpVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.4 }}
                 >
-                    <div className="rounded-xl border border-gray-200 overflow-hidden">
-                        <div className="p-6 bg-gradient-to-r from-gray-50 to-white">
-                            <h3 className="text-xl font-semibold text-foreground mb-2">Transparent Value-Based Pricing</h3>
-                            <p className="text-muted-foreground">
+                    <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200">
+                        <div className="px-8 py-10 bg-gradient-to-r from-[#4F6BFF]/10 to-white border-b border-gray-200">
+                            <h3 className="text-2xl font-display font-light text-[#0A2540] mb-3">Transparent Value-Based Pricing</h3>
+                            <p className="text-[#505c6e]/90 max-w-3xl">
                                 Our pricing scales appropriately with role compensation, reflecting the effort required to source exceptional candidates at each level.
                             </p>
                         </div>
 
-                        <div className="p-6 bg-white grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <PricingTier
-                                title="Entry Level"
-                                range="0-60k"
-                                highlight={false}
-                            />
+                        <div className="bg-white p-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <PricingTier
+                                    title="Entry Level"
+                                    range="0-60k"
+                                    highlight={false}
+                                    successFee="$500"
+                                    description="Standard pricing for entry-level positions"
+                                />
 
-                            <PricingTier
-                                title="Mid-Level"
-                                range="60k-120k"
-                                highlight={true}
-                            />
+                                <PricingTier
+                                    title="Mid-Level"
+                                    range="60k-120k"
+                                    highlight={true}
+                                    successFee="$2,000"
+                                    description="Pricing doubles for mid-level roles"
+                                />
 
-                            <PricingTier
-                                title="Senior Level"
-                                range="120k-300k"
-                                highlight={false}
-                            />
+                                <PricingTier
+                                    title="Senior Level"
+                                    range="120k-300k"
+                                    highlight={false}
+                                    successFee="$6,000"
+                                    description="Pricing triples for senior positions"
+                                />
+                            </div>
+
+                            <div className="text-center mt-10">
+                                <a
+                                    href="/pricing"
+                                    className="inline-block px-8 py-3 rounded-lg bg-[#4F6BFF] text-white font-medium shadow-sm hover:shadow-md transition-all"
+                                >
+                                    View Complete Pricing Details
+                                </a>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="text-center mt-8">
-                        <motion.a
-                            href="/pricing"
-                            className="inline-flex items-center text-ph font-medium hover:text-ph-dark transition-colors"
-                            whileHover={{ x: 5 }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            View detailed pricing
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="ml-1"
-                            >
-                                <path d="M5 12h14" />
-                                <path d="m12 5 7 7-7 7" />
-                            </svg>
-                        </motion.a>
                     </div>
                 </motion.div>
             </div>
@@ -222,17 +388,56 @@ const TailoredSolutions = () => {
     );
 };
 
-// Helper component for pricing tiers
-const PricingTier = ({ title, range, highlight }) => {
+// Pricing Tier component
+const PricingTier = ({
+    title,
+    range,
+    highlight,
+    successFee,
+    description
+}: {
+    title: string;
+    range: string;
+    highlight: boolean;
+    successFee: string;
+    description: string;
+}) => {
     return (
-        <div className={`rounded-lg p-5 flex flex-col h-full ${highlight ? 'bg-ph/5 border border-ph/20' : 'bg-gray-50'
-            }`}>
-            <h4 className="text-lg font-medium text-foreground mb-1">{title}</h4>
-            <p className="text-sm text-muted-foreground mb-3">Roles paying {range}</p>
-            <div className={`text-sm ${highlight ? 'text-ph' : 'text-muted-foreground'}`}>
-                Custom-tailored recruiting solutions with transparent pricing
+        <motion.div
+            className={`rounded-lg overflow-hidden border ${highlight
+                    ? 'border-gray-200 shadow-sm'
+                    : 'border-gray-100'
+                }`}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.3 }}
+        >
+            <div className={`p-5 ${highlight ? 'bg-gray-50' : 'bg-white'}`}>
+                <div className="flex justify-between items-start mb-3">
+                    <h4 className="text-base font-medium text-[#0A2540]">{title}</h4>
+                    {highlight && (
+                        <span className="px-2 py-0.5 bg-gray-100 text-[#4F6BFF] text-xs font-medium rounded-full">
+                            Most Popular
+                        </span>
+                    )}
+                </div>
+
+                <p className="text-xs text-[#505c6e]/90 mb-3">Roles paying {range}</p>
+
+                <div className={`text-2xl font-light ${highlight ? 'text-[#4F6BFF]' : 'text-[#0A2540]'}`}>
+                    {successFee}
+                    <span className="text-xs font-normal text-[#505c6e]/80 ml-1">per hire</span>
+                </div>
+
+                <div className="mt-3 text-xs text-[#505c6e]/90">{description}</div>
             </div>
-        </div>
+
+            <div className={`px-5 py-3 border-t ${highlight ? 'border-gray-200 bg-gray-50' : 'border-gray-100 bg-white'}`}>
+                <div className="flex items-center">
+                    <Check className={`w-3 h-3 mr-2 ${highlight ? 'text-[#4F6BFF]' : 'text-gray-400'}`} />
+                    <span className="text-xs text-[#505c6e]/90">Access to all product features</span>
+                </div>
+            </div>
+        </motion.div>
     );
 };
 
