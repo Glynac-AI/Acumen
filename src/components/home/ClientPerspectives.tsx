@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Quote, Star, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { Quote, Star, ChevronLeft, ChevronRight, ArrowRight, User, Target, Clock } from "lucide-react";
 
 const ClientPerspectives = () => {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -64,7 +64,7 @@ const ClientPerspectives = () => {
         const interval = setInterval(() => {
             setDirection(1);
             setActiveIndex((prev) => (prev + 1) % testimonials.length);
-        }, 8000);
+        }, 6000); // 6 seconds per testimonial
 
         return () => clearInterval(interval);
     }, [isPaused, testimonials.length]);
@@ -177,123 +177,135 @@ const ClientPerspectives = () => {
                 {/* Refined Testimonial Carousel */}
                 <div
                     ref={containerRef}
-                    className="relative max-w-5xl mx-auto"
+                    className="relative max-w-6xl mx-auto mb-20"
                     onMouseEnter={() => setIsPaused(true)}
                     onMouseLeave={() => setIsPaused(false)}
                 >
-                    {/* Large quote marks with refined positioning */}
-                    <Quote className="absolute top-4 left-8 w-12 h-12 text-ph/10 transform -scale-x-100 z-10" />
-                    <Quote className="absolute bottom-4 right-8 w-12 h-12 text-ph/10 transform rotate-180 z-10" />
-
+                    
                     {/* Testimonial display area with proper sizing */}
-                    <div className="relative glass-card rounded-2xl overflow-hidden shadow-lg shadow-ph/5 border border-white/20">
-                        {/* Progress indicator */}
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gray-100 z-10">
-                            {testimonials.map((_, index) => (
-                                <motion.div
-                                    key={index}
-                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-ph to-ph-dark"
-                                    initial={{ width: index === 0 ? "0%" : "0%" }}
-                                    animate={{
-                                        width: index === activeIndex ? "100%" : "0%",
-                                        left: `${(index / testimonials.length) * 100}%`,
-                                        right: `${((testimonials.length - 1 - index) / testimonials.length) * 100}%`
-                                    }}
-                                    transition={index === activeIndex ? {
-                                        duration: 8,
-                                        ease: "linear",
-                                        repeatType: "loop"
-                                    } : { duration: 0.5 }}
-                                    style={{
-                                        width: index < activeIndex ? "100%" : "0%"
-                                    }}
-                                />
-                            ))}
-                        </div>
+                    <div className="lg:col-span-4 bg-white p-8 md:p-12 lg:p-16 relative overflow-hidden min-h-[400px] flex items-center">
+                        {/* Subtle accent elements */}
+                        <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-ph/30 to-transparent"></div>
+                        <div className="absolute -right-24 -top-24 w-48 h-48 rounded-full bg-gradient-to-br from-ph/5 to-transparent blur-3xl"></div>
 
-                        <div className="p-10 md:p-16 flex items-center justify-center min-h-[400px]">
-                            <AnimatePresence mode="wait" initial={false} custom={direction}>
-                                <motion.div
-                                    key={activeIndex}
-                                    custom={direction}
-                                    initial={{
-                                        opacity: 0,
-                                        x: direction > 0 ? 100 : -100,
-                                    }}
-                                    animate={{
-                                        opacity: 1,
-                                        x: 0,
-                                    }}
-                                    exit={{
-                                        opacity: 0,
-                                        x: direction > 0 ? -100 : 100,
-                                    }}
-                                    transition={{
-                                        type: "spring",
-                                        stiffness: 300,
-                                        damping: 30
-                                    }}
-                                    className="max-w-3xl mx-auto"
-                                >
-                                    {/* Rating stars with refined styling */}
-                                    <div className="flex justify-center mb-8">
-                                        {[...Array(5)].map((_, i) => (
-                                            <motion.div
-                                                key={i}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: 0.1 + i * 0.1, duration: 0.5 }}
-                                            >
-                                                <Star
-                                                    className={`w-5 h-5 mx-0.5 ${i < testimonials[activeIndex].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-                                                />
-                                            </motion.div>
-                                        ))}
+                        <AnimatePresence mode="wait" initial={false} custom={direction}>
+                            <motion.div
+                                key={activeIndex}
+                                custom={direction}
+                                initial={{
+                                    opacity: 0,
+                                    y: direction > 0 ? 30 : -30,
+                                }}
+                                animate={{
+                                    opacity: 1,
+                                    y: 0,
+                                }}
+                                exit={{
+                                    opacity: 0,
+                                    y: direction > 0 ? -30 : 30,
+                                }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 300,
+                                    damping: 30
+                                }}
+                                className="w-full"
+                            >
+                                <div className="max-w-2xl mx-auto">
+                                    {/* Open quote mark */}
+                                    <div className="mb-6">
+                                        <Quote className="w-10 h-10 text-ph/10" />
                                     </div>
 
-                                    {/* Quote text with sophisticated highlighting */}
-                                    <div className="mb-10">
-                                        <blockquote className="text-xl md:text-2xl text-center font-light leading-relaxed relative">
-                                            {testimonials[activeIndex].quote.split(testimonials[activeIndex].highlight)[0]}
-                                            <motion.span
-                                                className="font-medium relative inline-block"
-                                                style={{ color: testimonials[activeIndex].color }}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{ delay: 0.4, duration: 0.6 }}
-                                            >
-                                                {testimonials[activeIndex].highlight}
-                                                <motion.span
-                                                    className="absolute -bottom-1 left-0 right-0 h-[2px] bg-current"
-                                                    initial={{ scaleX: 0, originX: 0 }}
-                                                    animate={{ scaleX: 1 }}
-                                                    transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
-                                                />
-                                            </motion.span>
-                                            {testimonials[activeIndex].quote.split(testimonials[activeIndex].highlight)[1]}
-                                        </blockquote>
+                                    {/* Elegant quote display */}
+                                    <blockquote className="text-xl md:text-2xl font-light leading-relaxed text-foreground mb-8 relative pl-4 border-l-2" style={{ borderColor: `${testimonials[activeIndex].color}30` }}>
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.7 }}
+                                        >
+                                            {/* Quote text with sophisticated highlighting */}
+                                            {(() => {
+                                                const quote = testimonials[activeIndex].quote;
+                                                const highlight = testimonials[activeIndex].highlight;
+
+                                                if (!quote.includes(highlight)) return quote;
+
+                                                const parts = quote.split(highlight);
+
+                                                return (
+                                                    <>
+                                                        {parts[0]}
+                                                        <motion.span
+                                                            className="relative inline"
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: 1 }}
+                                                            transition={{ delay: 0.4, duration: 0.6 }}
+                                                        >
+                                                            <span className="relative inline-block">
+                                                                <span className="relative z-10 font-medium" style={{ color: testimonials[activeIndex].color }}>
+                                                                    {highlight}
+                                                                </span>
+                                                                <motion.span
+                                                                    className="absolute -bottom-0 left-0 right-0 h-[8px] opacity-10 rounded-sm"
+                                                                    style={{ backgroundColor: testimonials[activeIndex].color }}
+                                                                    initial={{ scaleX: 0, originX: 0 }}
+                                                                    animate={{ scaleX: 1 }}
+                                                                    transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
+                                                                />
+                                                            </span>
+                                                        </motion.span>
+                                                        {parts[1]}
+                                                    </>
+                                                );
+                                            })()}
+                                        </motion.div>
+                                    </blockquote>
+
+                                    {/* Rating stars with refined styling */}
+                                    <div className="flex items-center mb-6">
+                                        <div className="flex mr-3">
+                                            {[...Array(5)].map((_, i) => (
+                                                <motion.div
+                                                    key={i}
+                                                    initial={{ opacity: 0, scale: 0.8 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    transition={{ delay: 0.1 + i * 0.1, duration: 0.3 }}
+                                                >
+                                                    <Star
+                                                        className={`w-4 h-4 mr-1 ${i < testimonials[activeIndex].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                                                    />
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                        <div className="h-4 w-px bg-gray-200 mx-3"></div>
+                                        <div className="text-sm text-muted-foreground">Verified Client</div>
                                     </div>
 
                                     {/* Author information with elegant styling */}
                                     <motion.div
-                                        className="text-center"
-                                        initial={{ opacity: 0, y: 20 }}
+                                        className="flex items-center"
+                                        initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3, duration: 0.6 }}
+                                        transition={{ delay: 0.6, duration: 0.6 }}
                                     >
-                                        <div className="inline-flex flex-col items-center">
-                                            <div className="h-px w-10 bg-ph/30 mb-4"></div>
-                                            <div className="font-medium text-lg text-foreground">
+                                        <div className="p-px bg-gradient-to-r from-ph/30 to-transparent rounded-full mr-4">
+                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-ph/10 to-white flex items-center justify-center text-ph font-medium">
+                                                {testimonials[activeIndex].author.split(' ').map(name => name[0]).join('')}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-foreground">
                                                 {testimonials[activeIndex].author}
                                             </div>
-                                            <div className="text-sm text-muted-foreground mt-1 max-w-lg">
+                                            <div className="text-sm text-muted-foreground mt-0.5">
                                                 {testimonials[activeIndex].title}
                                             </div>
                                         </div>
                                     </motion.div>
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
+                                </div>
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
 
                     {/* Refined navigation controls */}
@@ -358,34 +370,37 @@ const ClientPerspectives = () => {
                     </div>
                 </div>
 
-                {/* Refined insights section instead of metrics */}
+                {/* Refined insights section */}
                 <motion.div
-                    className="mt-24 glass-card border border-white/20 rounded-xl p-10 shadow-sm"
+                    className="mt-24 rounded-2xl shadow-sm overflow-hidden"
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 0.8 }}
                 >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-3">
                         <InsightCard
                             title="Client Retention"
-                            description="Our clients experience significantly higher retention rates with candidates placed through our services."
+                            description="Higher retention rates with candidates placed through our refined selection process."
                             color="#4F6BFF"
+                            icon={<User className="w-5 h-5" />}
                         />
                         <InsightCard
                             title="Accelerated Process"
-                            description="The typical hiring timeline reduces from months to days, streamlining recruitment efficiency."
+                            description="Hiring timeline reduced from months to days through efficient workflows."
                             color="#6366F1"
+                            icon={<Clock className="w-5 h-5" />}
                         />
                         <InsightCard
                             title="Strategic Alignment"
-                            description="Candidates placed by Acumen demonstrate stronger cultural and strategic alignment with firms."
+                            description="Candidates demonstrate exceptional cultural and operational alignment."
                             color="#8B5CF6"
+                            icon={<Target className="w-5 h-5" />}
                         />
                     </div>
                 </motion.div>
 
-                {/* Refined CTA section */}
+                {/* CTA section */}
                 <motion.div
                     className="mt-20 text-center"
                     initial={{ opacity: 0, y: 20 }}
@@ -400,7 +415,7 @@ const ClientPerspectives = () => {
                         viewport={{ once: true }}
                         transition={{ delay: 0.7, duration: 0.7 }}
                     >
-                        Experience the Distinction
+                        Elevate Your Talent Strategy
                     </motion.h3>
 
                     <motion.p
@@ -410,7 +425,7 @@ const ClientPerspectives = () => {
                         viewport={{ once: true }}
                         transition={{ delay: 0.8, duration: 0.7 }}
                     >
-                        Discover how our bespoke approach to talent acquisition can enhance your wealth management practice.
+                        Refine your wealth management practice with precisely matched talent.
                     </motion.p>
 
                     <motion.div
@@ -467,19 +482,27 @@ const ClientPerspectives = () => {
 };
 
 // Elegant Insight Card Component without animations
-const InsightCard = ({ title, description, color }) => {
+const InsightCard = ({ title, description, color, icon }) => {
     return (
-        <div className="text-center px-6 py-8 relative">
-            {/* Accent line */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-16 h-1 rounded-full" style={{ backgroundColor: color }}></div>
+        <div className="px-8 py-12 relative group transition-all duration-300 hover:bg-white hover:shadow-md border-r border-b border-gray-100 last:border-r-0 md:last:border-r md:first:border-l-0 md:border-r-0">
+            <div className="flex flex-col items-center text-center">
+                {/* Icon with subtle background */}
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: `${color}10` }}>
+                    <div className="text-[#4F6BFF]">
+                        {icon}
+                    </div>
+                </div>
 
-            {/* Static title with elegant styling */}
-            <h4 className="text-lg font-medium text-foreground mb-3" style={{ color }}>
-                {title}
-            </h4>
+                {/* Title with subtle animation */}
+                <h4 className="text-lg font-medium text-foreground mb-3 relative">
+                    {title}
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 group-hover:w-full transition-all duration-300"
+                        style={{ backgroundColor: color }}></div>
+                </h4>
 
-            {/* Description */}
-            <p className="text-sm text-muted-foreground">{description}</p>
+                {/* Description */}
+                <p className="text-muted-foreground">{description}</p>
+            </div>
         </div>
     );
 };
