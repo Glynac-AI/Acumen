@@ -2,7 +2,7 @@
 import React from "react";
 import HeroSection from "@/components/home/HeroSection";
 import CTASection from "@/components/home/CTASection";
-import CuratedExpertise from "@/components/home/CuratedExpertise";
+import Expertise from "@/components/home/Expertise";
 import Philosophy from "@/components/home/Philosophy";
 import AcumenExperience from "@/components/home/AcumenExperience";
 import TailoredSolutions from "@/components/home/TailoredSolutions";
@@ -12,7 +12,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <HeroSection />
-      <CuratedExpertise />
+      <Expertise />
       <Philosophy />
       <AcumenExperience />
       <TailoredSolutions />

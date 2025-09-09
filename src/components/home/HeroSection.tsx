@@ -15,7 +15,7 @@ const HeroSection = () => {
 
     const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 100]);
     const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
-    const contentOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+    const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
     // Cursor follower
     useEffect(() => {
