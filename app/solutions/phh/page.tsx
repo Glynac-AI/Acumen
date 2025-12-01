@@ -7,15 +7,15 @@ import { Building2, TrendingUp, Shield, CheckCircle2 } from 'lucide-react';
 export default function PHH() {
     return (
         <div className="min-h-screen">
-            {/* Hero */}
+            {/* Hero - ADDED "Triple-Net Lease (NNN)" */}
             <Section background="gradient" padding="lg" className="text-white">
                 <Container maxWidth="lg">
                     <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
                         <Building2 className="h-5 w-5" />
-                        <span className="text-sm font-semibold">Institutional Real Estate</span>
+                        <span className="text-sm font-semibold">Institutional NNN Real Estate</span>
                     </div>
                     <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                        Prairie Hill Holdings — Institutional Triple-Net Lease Real Estate
+                        Prairie Hill Holdings — Institutional Triple-Net Lease (NNN) Real Estate Solutions
                     </h1>
                     <p className="text-xl leading-relaxed mb-8">
                         Access diversified, triple-net lease (NNN) real estate investments designed for yield and low volatility. Institutional-quality properties for wealth management clients.
@@ -46,7 +46,7 @@ export default function PHH() {
                 </Container>
             </Section>
 
-            {/* Key Features */}
+            {/* Key Features - UPDATED property types */}
             <Section background="muted" padding="lg">
                 <Container>
                     <div className="text-center mb-12">
@@ -58,7 +58,7 @@ export default function PHH() {
                             <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
                                 <Building2 className="h-6 w-6 text-accent" />
                             </div>
-                            <h3 className="text-lg font-bold text-primary">Triple-Net Lease Properties</h3>
+                            <h3 className="text-lg font-bold text-primary">Triple-Net Lease (NNN) Properties</h3>
                             <p className="text-sm text-primary/70 leading-relaxed">
                                 Tenant-responsible for taxes, insurance, and maintenance—reducing owner operational burden
                             </p>
@@ -78,9 +78,9 @@ export default function PHH() {
                             <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
                                 <Shield className="h-6 w-6 text-accent" />
                             </div>
-                            <h3 className="text-lg font-bold text-primary">Diversified Sectors</h3>
+                            <h3 className="text-lg font-bold text-primary">Diversified Property Types</h3>
                             <p className="text-sm text-primary/70 leading-relaxed">
-                                Exposure across logistics, warehouse/industrial, grocery-anchored retail, medical/healthcare retail, education retail, and quick-service restaurants
+                                Exposure across logistics and distribution facilities, warehouse/industrial, grocery-anchored retail, medical/healthcare retail, education retail, and quick-service restaurants
                             </p>
                         </Card>
 
@@ -117,8 +117,61 @@ export default function PHH() {
                 </Container>
             </Section>
 
-            {/* Who It's For */}
+            {/* NEW SECTION - Asset Classes per feedback */}
             <Section background="white" padding="lg">
+                <Container maxWidth="lg">
+                    <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Asset Classes</h2>
+                    <p className="text-lg text-primary/70 mb-8">
+                        PHH focuses exclusively on institutional-grade NNN properties across six core asset classes:
+                    </p>
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <Card className="space-y-3">
+                            <h3 className="text-xl font-bold text-primary">Logistics & Distribution Facilities</h3>
+                            <p className="text-primary/70 leading-relaxed">
+                                Modern distribution centers and fulfillment facilities with long-term credit tenants in strategic locations
+                            </p>
+                        </Card>
+
+                        <Card className="space-y-3">
+                            <h3 className="text-xl font-bold text-primary">Warehouse/Industrial</h3>
+                            <p className="text-primary/70 leading-relaxed">
+                                Class-A industrial properties in strategic locations with stable cash flows and institutional-grade tenants
+                            </p>
+                        </Card>
+
+                        <Card className="space-y-3">
+                            <h3 className="text-xl font-bold text-primary">Grocery-Anchored Retail</h3>
+                            <p className="text-primary/70 leading-relaxed">
+                                Essential retail centers anchored by major grocery chains in high-traffic, resilient markets
+                            </p>
+                        </Card>
+
+                        <Card className="space-y-3">
+                            <h3 className="text-xl font-bold text-primary">Medical/Healthcare Retail</h3>
+                            <p className="text-primary/70 leading-relaxed">
+                                Medical office buildings and healthcare facilities with long-term healthcare provider tenants
+                            </p>
+                        </Card>
+
+                        <Card className="space-y-3">
+                            <h3 className="text-xl font-bold text-primary">Education Retail</h3>
+                            <p className="text-primary/70 leading-relaxed">
+                                Facilities leased to educational institutions, training centers, and childcare providers
+                            </p>
+                        </Card>
+
+                        <Card className="space-y-3">
+                            <h3 className="text-xl font-bold text-primary">Quick-Service Restaurants</h3>
+                            <p className="text-primary/70 leading-relaxed">
+                                National QSR brands with corporate guarantees in high-visibility, high-traffic locations
+                            </p>
+                        </Card>
+                    </div>
+                </Container>
+            </Section>
+
+            {/* Who It's For */}
+            <Section background="muted" padding="lg">
                 <Container maxWidth="lg">
                     <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Ideal For</h2>
                     <div className="space-y-4">
@@ -127,7 +180,7 @@ export default function PHH() {
                             'Advisors looking to add alternative investments with tangible asset backing',
                             'Clients interested in 1031 exchange opportunities for tax deferral',
                             'Portfolios requiring low-volatility income with capital preservation focus',
-                            'Investors seeking institutional-grade real estate without direct property management',
+                            'Investors seeking institutional-grade NNN real estate without direct property management',
                         ].map((item, index) => (
                             <div key={index} className="flex items-start gap-3">
                                 <CheckCircle2 className="h-6 w-6 text-accent flex-shrink-0 mt-0.5" />
@@ -139,7 +192,7 @@ export default function PHH() {
             </Section>
 
             {/* CTA */}
-            <Section background="muted" padding="lg">
+            <Section background="white" padding="lg">
                 <Container maxWidth="lg" className="text-center">
                     <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
                         Interested in Adding PHH to Your Practice?

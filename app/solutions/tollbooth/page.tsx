@@ -7,7 +7,7 @@ import { TrendingUp, Shield, FileText, CheckCircle2 } from 'lucide-react';
 export default function Tollbooth() {
     return (
         <div className="min-h-screen">
-            {/* Hero */}
+            {/* Hero - COMPLETELY REWRITTEN per feedback */}
             <Section background="gradient" padding="lg" className="text-white">
                 <Container maxWidth="lg">
                     <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
@@ -18,7 +18,7 @@ export default function Tollbooth() {
                         Tollbooth — Advisor-Focused Options Strategy Automation
                     </h1>
                     <p className="text-xl leading-relaxed mb-8">
-                        Automate covered-call and options strategies across client accounts, generate systematic income, and preserve individual equity positions with rules-based execution.
+                        Automate covered-call and options strategies with rules-based execution. Preserve individual equity positions while generating systematic income through advisor-level portfolio overlays.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button href="/contact" variant="secondary" size="lg">
@@ -31,7 +31,7 @@ export default function Tollbooth() {
                 </Container>
             </Section>
 
-            {/* What It Does */}
+            {/* What It Does - REFOCUSED per feedback */}
             <Section background="white" padding="lg">
                 <Container maxWidth="lg">
                     <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">What Tollbooth Does</h2>
@@ -40,13 +40,13 @@ export default function Tollbooth() {
                             Tollbooth is a rules-based covered call and options automation platform designed for advisors seeking to generate systematic income for client portfolios without building an in-house trading desk.
                         </p>
                         <p>
-                            The platform executes advisor-defined option strategies across multiple accounts, maintains compliance documentation, and provides detailed performance reporting—all while preserving the underlying equity exposure clients expect.
+                            The platform delivers <strong>automated options execution</strong>, <strong>preservation of individual equity positions</strong>, <strong>rules-based trade automation</strong>, and <strong>advisor-level portfolio overlays</strong>—enabling advisors to implement sophisticated options strategies while maintaining full control over client holdings.
                         </p>
                     </div>
                 </Container>
             </Section>
 
-            {/* Features */}
+            {/* Features - COMPLETELY REWRITTEN per feedback */}
             <Section background="muted" padding="lg">
                 <Container>
                     <div className="text-center mb-12">
@@ -60,9 +60,9 @@ export default function Tollbooth() {
                                     <TrendingUp className="h-8 w-8 text-accent" />
                                 </div>
                             </div>
-                            <h3 className="text-xl font-bold text-primary">Systematic Income</h3>
+                            <h3 className="text-xl font-bold text-primary">Automated Options Execution</h3>
                             <p className="text-primary/70 leading-relaxed">
-                                Generate consistent premium income through covered calls and cash-secured puts
+                                Rules-based automation executes covered calls and cash-secured puts across multiple accounts with precision and consistency
                             </p>
                         </Card>
 
@@ -72,9 +72,9 @@ export default function Tollbooth() {
                                     <Shield className="h-8 w-8 text-primary" />
                                 </div>
                             </div>
-                            <h3 className="text-xl font-bold text-primary">Risk Management</h3>
+                            <h3 className="text-xl font-bold text-primary">Preserve Equity Positions</h3>
                             <p className="text-primary/70 leading-relaxed">
-                                Built-in controls for position sizing, strike selection, and portfolio concentration
+                                Maintain individual client equity positions and holdings while implementing systematic income strategies through advisor-level overlays
                             </p>
                         </Card>
 
@@ -84,9 +84,9 @@ export default function Tollbooth() {
                                     <FileText className="h-8 w-8 text-accent" />
                                 </div>
                             </div>
-                            <h3 className="text-xl font-bold text-primary">Compliance Ready</h3>
+                            <h3 className="text-xl font-bold text-primary">Rules-Based Trade Automation</h3>
                             <p className="text-primary/70 leading-relaxed">
-                                Complete execution logs, audit trails, and regulatory reporting for supervision
+                                Built-in controls for position sizing, strike selection, portfolio concentration, and integrated reporting FROM custodians
                             </p>
                         </Card>
                     </div>
@@ -100,9 +100,9 @@ export default function Tollbooth() {
                     <div className="space-y-4">
                         {[
                             'RIAs seeking to add income strategies without hiring dedicated options traders',
-                            'Advisors managing portfolios for yield-focused clients in low-rate environments',
-                            'Wealth management firms wanting systematic options execution with built-in supervision',
-                            'Practices looking to differentiate with specialized income strategies',
+                            'Advisors managing portfolios for yield-focused clients who want to maintain existing equity positions',
+                            'Wealth management firms wanting systematic options execution with rules-based automation',
+                            'Practices looking to differentiate with specialized income strategies and advisor-level portfolio overlays',
                         ].map((benefit, index) => (
                             <div key={index} className="flex items-start gap-3">
                                 <CheckCircle2 className="h-6 w-6 text-accent flex-shrink-0 mt-0.5" />
@@ -113,7 +113,7 @@ export default function Tollbooth() {
                 </Container>
             </Section>
 
-            {/* Deployment */}
+            {/* Deployment - FIXED "from custodians" */}
             <Section background="muted" padding="lg">
                 <Container>
                     <div className="text-center mb-12">
@@ -124,7 +124,7 @@ export default function Tollbooth() {
                         {[
                             { phase: 'Pilot', description: 'Test strategies with select accounts to establish rules and performance baselines' },
                             { phase: 'Managed', description: 'Roll out to additional accounts with ongoing strategy refinement and monitoring' },
-                            { phase: 'Scale', description: 'Expand across firm with full automation and integrated reporting from custodians' },
+                            { phase: 'Scale', description: 'Expand across firm with full automation and integrated reporting FROM custodians' },
                         ].map((step, index) => (
                             <Card key={step.phase} className="text-center space-y-4">
                                 <div className="text-6xl font-bold text-accent/20">{index + 1}</div>

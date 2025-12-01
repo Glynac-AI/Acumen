@@ -67,7 +67,7 @@ export default function Consulting() {
                 </Container>
             </Section>
 
-            {/* Service Areas */}
+            {/* Service Areas - REMOVED "tech stack evaluation" claim */}
             <Section background="muted" padding="lg">
                 <Container maxWidth="lg">
                     <div className="text-center mb-12">
@@ -86,9 +86,9 @@ export default function Consulting() {
                         </Card>
 
                         <Card>
-                            <h3 className="text-xl font-bold text-primary mb-3">Technology Selection & Implementation</h3>
+                            <h3 className="text-xl font-bold text-primary mb-3">Technology Integration & Implementation</h3>
                             <p className="text-primary/70 leading-relaxed">
-                                Evaluate, integrate, and optimize technology stacks for CRM, portfolio management, and communications.
+                                Integrate and optimize technology solutions for CRM, portfolio management, and communications through our Glynac platform.
                             </p>
                         </Card>
 
