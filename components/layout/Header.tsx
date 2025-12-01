@@ -1,3 +1,4 @@
+// components/layout/Header.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -22,48 +23,48 @@ export default function Header() {
 
     useEffect(() => {
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
+            setScrolled(window.scrollY > 50); // Trigger at 50px instead of 20px for smoother effect
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     return (
-        <header
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-white/95 backdrop-blur-md border-b border-primary/5 shadow-sm'
-                    : 'bg-transparent'
+        <motion.header
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${scrolled
+                ? 'bg-white/95 backdrop-blur-xl border-b border-primary/10 shadow-lg shadow-primary/5'
+                : 'bg-transparent'
                 }`}
         >
-            <nav className="container mx-auto px-6 h-24 flex items-center justify-between">
+            <nav className="container mx-auto px-6 h-20 flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center">
-                    <Image
-                        src={scrolled ? '/logo/logo-dark.png' : '/logo/logo-light.png'}
+                    <Image src={scrolled ? '/logo/logo-dark.png' : '/logo/logo-light.png'}
                         alt="Acumen Strategy"
-                        width={160}     // adjust this number to scale
+                        width={160}
                         height={50}
-                        className="object-contain"
-                        priority
-                    />
+                        className="object-contain" priority />
                 </Link>
 
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center gap-8">
                     <Link
                         href="/"
-                        className={`text-sm font-medium transition-colors ${scrolled
-                                ? 'text-primary/70 hover:text-primary'
-                                : 'text-white/80 hover:text-white'
+                        className={`text-sm font-medium transition-colors duration-300 ${scrolled
+                            ? 'text-primary/70 hover:text-primary'
+                            : 'text-white/80 hover:text-white'
                             }`}
                     >
                         Home
                     </Link>
                     <Link
                         href="/about"
-                        className={`text-sm font-medium transition-colors ${scrolled
-                                ? 'text-primary/70 hover:text-primary'
-                                : 'text-white/80 hover:text-white'
+                        className={`text-sm font-medium transition-colors duration-300 ${scrolled
+                            ? 'text-primary/70 hover:text-primary'
+                            : 'text-white/80 hover:text-white'
                             }`}
                     >
                         About
@@ -76,30 +77,33 @@ export default function Header() {
                         onMouseLeave={() => setSolutionsOpen(false)}
                     >
                         <button
-                            className={`flex items-center gap-1 text-sm font-medium transition-colors ${scrolled
-                                    ? 'text-primary/70 hover:text-primary'
-                                    : 'text-white/80 hover:text-white'
+                            className={`flex items-center gap-1 text-sm font-medium transition-colors duration-300 ${scrolled
+                                ? 'text-primary/70 hover:text-primary'
+                                : 'text-white/80 hover:text-white'
                                 }`}
                         >
                             Solutions
-                            <ChevronDown className={`w-4 h-4 transition-transform ${solutionsOpen ? 'rotate-180' : ''}`} />
+                            <ChevronDown
+                                className={`w-4 h-4 transition-transform duration-200 ${solutionsOpen ? 'rotate-180' : ''
+                                    }`}
+                            />
                         </button>
 
                         <AnimatePresence>
                             {solutionsOpen && (
                                 <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 10 }}
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
-                                    className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-primary/10 overflow-hidden"
+                                    className="absolute top-full left-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-primary/10 overflow-hidden"
                                 >
                                     <div className="p-2">
                                         {solutions.map((solution) => (
                                             <Link
                                                 key={solution.href}
                                                 href={solution.href}
-                                                className="block p-4 rounded-md hover:bg-muted/50 transition-colors group"
+                                                className="block p-4 rounded-lg hover:bg-muted/50 transition-colors group"
                                                 onClick={() => setSolutionsOpen(false)}
                                             >
                                                 <div className="text-sm font-semibold text-primary group-hover:text-accent transition-colors">
@@ -118,27 +122,27 @@ export default function Header() {
 
                     <Link
                         href="/use-cases"
-                        className={`text-sm font-medium transition-colors ${scrolled
-                                ? 'text-primary/70 hover:text-primary'
-                                : 'text-white/80 hover:text-white'
+                        className={`text-sm font-medium transition-colors duration-300 ${scrolled
+                            ? 'text-primary/70 hover:text-primary'
+                            : 'text-white/80 hover:text-white'
                             }`}
                     >
                         Use Cases
                     </Link>
                     <Link
                         href="/resources"
-                        className={`text-sm font-medium transition-colors ${scrolled
-                                ? 'text-primary/70 hover:text-primary'
-                                : 'text-white/80 hover:text-white'
+                        className={`text-sm font-medium transition-colors duration-300 ${scrolled
+                            ? 'text-primary/70 hover:text-primary'
+                            : 'text-white/80 hover:text-white'
                             }`}
                     >
                         Resources
                     </Link>
                     <Link
                         href="/pricing"
-                        className={`text-sm font-medium transition-colors ${scrolled
-                                ? 'text-primary/70 hover:text-primary'
-                                : 'text-white/80 hover:text-white'
+                        className={`text-sm font-medium transition-colors duration-300 ${scrolled
+                            ? 'text-primary/70 hover:text-primary'
+                            : 'text-white/80 hover:text-white'
                             }`}
                     >
                         Pricing
@@ -149,9 +153,9 @@ export default function Header() {
                 <div className="hidden lg:block">
                     <Link
                         href="/contact"
-                        className={`px-6 py-2.5 text-sm font-medium rounded-md transition-all ${scrolled
-                                ? 'bg-accent text-white hover:bg-accent/90'
-                                : 'bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm'
+                        className={`px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${scrolled
+                            ? 'bg-accent text-white hover:bg-accent/90 shadow-lg hover:shadow-xl'
+                            : 'bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm'
                             }`}
                     >
                         Book a Consultation
@@ -161,7 +165,7 @@ export default function Header() {
                 {/* Mobile Menu Button */}
                 <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className={`lg:hidden p-2 transition-colors ${scrolled ? 'text-primary' : 'text-white'
+                    className={`lg:hidden p-2 transition-colors duration-300 ${scrolled ? 'text-primary' : 'text-white'
                         }`}
                     aria-label="Toggle menu"
                 >
@@ -177,7 +181,7 @@ export default function Header() {
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="lg:hidden bg-white border-t border-primary/5 overflow-hidden"
+                        className="lg:hidden bg-white border-t border-primary/10 overflow-hidden"
                     >
                         <div className="container mx-auto px-6 py-6 space-y-1">
                             <Link
@@ -241,7 +245,7 @@ export default function Header() {
                                 <Link
                                     href="/contact"
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="block text-center py-3 text-sm font-medium text-white bg-accent rounded-md hover:bg-accent/90 transition-colors"
+                                    className="block text-center py-3 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent/90 transition-colors"
                                 >
                                     Book a Consultation
                                 </Link>
@@ -250,6 +254,6 @@ export default function Header() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </header>
+        </motion.header>
     );
 }

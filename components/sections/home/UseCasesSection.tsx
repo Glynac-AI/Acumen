@@ -1,30 +1,31 @@
+// components/sections/home/UseCasesSection.tsx
 'use client';
 
 import Link from 'next/link';
 import Container from '@/components/ui/Container';
 import Section from '@/components/ui/Section';
 import Button from '@/components/ui/Button';
-import { TrendingUp, Shield, Users, Zap, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function UseCasesSection() {
     const useCases = [
         {
-            icon: TrendingUp,
             title: 'RIA Growth & Scaling',
             challenge: 'Mid-sized RIA struggling to scale operations while maintaining compliance oversight across expanding advisor team.',
-            result: 'Improved compliance oversight, 40+ advisors onboarded with unified supervision, and enhanced client value proposition through systematic yield strategies.'
+            result: 'Improved compliance oversight, 40+ advisors onboarded with unified supervision, and enhanced client value proposition through systematic yield strategies.',
+            accent: 'accent'
         },
         {
-            icon: Shield,
             title: 'Compliance Modernization',
             challenge: 'Legacy wealth management firm facing audit challenges due to fragmented communication systems and manual compliance processes.',
-            result: '100% improvement in audit readiness, reduced supervisory burden, and automated risk detection across client communications.'
+            result: '100% improvement in audit readiness, reduced supervisory burden, and automated risk detection across client communications.',
+            accent: 'primary'
         },
         {
-            icon: Users,
             title: 'Advisor Enablement',
             challenge: 'Independent broker-dealer seeking to differentiate value proposition and retain top-producing advisors amid competitive pressures.',
-            result: 'Enhanced advisor loyalty through differentiated product offerings, improved recruiting success, and strengthened brand positioning.'
+            result: 'Enhanced advisor loyalty through differentiated product offerings, improved recruiting success, and strengthened brand positioning.',
+            accent: 'accent'
         }
     ];
 
@@ -41,39 +42,48 @@ export default function UseCasesSection() {
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8 mb-12">
-                    {useCases.map((useCase) => {
-                        const IconComponent = useCase.icon;
-                        return (
-                            <div
-                                key={useCase.title}
-                                className="p-8 rounded-lg border border-primary/10"
-                            >
-                                <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-6">
-                                    <IconComponent className="h-6 w-6 text-accent" />
+                    {useCases.map((useCase, index) => (
+                        <div
+                            key={useCase.title}
+                            className="group"
+                        >
+                            <div className="h-full p-8 rounded-xl border border-primary/10 hover:border-accent/30 hover:bg-muted/20 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                                {/* Number indicator instead of icon */}
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className={`w-8 h-8 rounded-full bg-${useCase.accent}/10 border-2 border-${useCase.accent}/20 flex items-center justify-center`}>
+                                        <span className={`text-sm font-bold text-${useCase.accent}`}>
+                                            {index + 1}
+                                        </span>
+                                    </div>
+                                    <div className={`flex-1 h-px bg-gradient-to-r from-${useCase.accent}/30 to-transparent`}></div>
                                 </div>
 
-                                <h3 className="text-xl font-bold text-primary mb-4">
+                                <h3 className="text-xl font-bold text-primary mb-4 group-hover:text-accent transition-colors duration-300">
                                     {useCase.title}
                                 </h3>
 
                                 <div className="space-y-4">
                                     <div>
-                                        <p className="text-sm font-semibold text-primary/50 mb-2">Challenge</p>
+                                        <p className="text-sm font-semibold text-primary/50 mb-2 uppercase tracking-wide">
+                                            Challenge
+                                        </p>
                                         <p className="text-sm text-primary/70 leading-relaxed">
                                             {useCase.challenge}
                                         </p>
                                     </div>
 
                                     <div>
-                                        <p className="text-sm font-semibold text-primary/50 mb-2">Outcome</p>
+                                        <p className="text-sm font-semibold text-primary/50 mb-2 uppercase tracking-wide">
+                                            Outcome
+                                        </p>
                                         <p className="text-sm text-primary/70 leading-relaxed">
                                             {useCase.result}
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                        );
-                    })}
+                        </div>
+                    ))}
                 </div>
 
                 <div className="text-center">
