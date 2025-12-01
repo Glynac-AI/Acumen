@@ -1,21 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-silver-blue: #49648c;
+  --color-deep-navy: #0b1f3b;
+  --color-palladian-cream: #eee9df;
+  
+  --color-primary: var(--color-deep-navy);
+  --color-accent: var(--color-silver-blue);
+  --color-background: #ffffff;
+  --color-muted: var(--color-palladian-cream);
+  
+  --font-family-display: 'Perpetua Titling MT', serif;
+  --font-family-sans: 'Aeonik', system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-background text-primary;
+    font-family: var(--font-family-sans);
   }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-display);
+  }
 }

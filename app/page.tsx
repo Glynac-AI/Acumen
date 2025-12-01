@@ -1,101 +1,202 @@
-import Image from "next/image";
+import Link from 'next/link';
+import Button from '@/components/ui/Button';
+import Container from '@/components/ui/Container';
+import Section from '@/components/ui/Section';
+import Card from '@/components/ui/Card';
+import { Target, Zap, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen">
+      {/* Hero Section - Fixed duplication issue */}
+      <Section background="gradient" padding="lg" className="text-white">
+        <Container>
+          <div className="max-w-4xl space-y-8">
+            <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+              Strategy. Compliance. Execution.
+            </h1>
+            <p className="text-xl leading-relaxed text-white/90">
+              A single partner for advisory-led transformation and compliant product activation for wealth managers.
+            </p>
+            <p className="text-lg leading-relaxed text-white/80">
+              We diagnose your business challenges, design a regulatory-aligned roadmap, and activate proven technology, product, and marketing capabilities to deliver measurable impact.
+            </p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button href="/contact" variant="secondary" size="lg">
+                Book a Consultation
+              </Button>
+              <Button href="/solutions" variant="accent" size="lg">
+                View Solutions
+              </Button>
+            </div>
+
+            {/* Key Benefits */}
+            <div className="flex flex-wrap gap-6 pt-6 text-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-accent" />
+                <span>Compliance-first</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-accent" />
+                <span>Advisor-credible</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-accent" />
+                <span>Measurable outcomes</span>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* Value Propositions */}
+      <Section background="muted" padding="lg">
+        <Container>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
+              Comprehensive Solutions for Wealth Management
+            </h2>
+            <p className="text-lg text-primary/70 max-w-3xl mx-auto">
+              From strategic consulting to cutting-edge technology and innovative products
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Strategy First */}
+            <Card hover>
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                  <Target className="h-6 w-6 text-accent" />
+                </div>
+                <h3 className="text-2xl font-bold text-primary">Strategy First</h3>
+                <p className="text-sm font-semibold text-accent">Consulting & Strategic Advisory</p>
+                <p className="text-primary/70 leading-relaxed">
+                  Diagnose core challenges. Design roadmaps. Prioritize execution for compliance and growth.
+                </p>
+                <Link
+                  href="/solutions/consulting"
+                  className="inline-flex items-center text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+                >
+                  Learn more <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </Card>
+
+            {/* Technology & Automation */}
+            <Card hover>
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Zap className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold text-primary">Technology & Automation</h3>
+                <p className="text-sm font-semibold text-primary">Glynac — Compliance-first AI</p>
+                <p className="text-primary/70 leading-relaxed">
+                  Unified CRM, communications, and portfolio data with supervised AI agents that automate workflows and surface regulatory risk.
+                </p>
+                <Link
+                  href="/solutions/glynac"
+                  className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                >
+                  Learn more <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </Card>
+
+            {/* Products & Distribution */}
+            <Card hover>
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                  <Shield className="h-6 w-6 text-accent" />
+                </div>
+                <h3 className="text-2xl font-bold text-primary">Products & Distribution</h3>
+                <p className="text-sm font-semibold text-accent">Tollbooth • PHH • ATS</p>
+                <p className="text-primary/70 leading-relaxed">
+                  Income-generation automation, institutional real estate products, and talent solutions to scale advisors and product distribution.
+                </p>
+                <Link
+                  href="/solutions"
+                  className="inline-flex items-center text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+                >
+                  Explore products <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </Card>
+          </div>
+        </Container>
+      </Section>
+
+      {/* How We Work */}
+      <Section background="white" padding="lg">
+        <Container>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
+              How We Work
+            </h2>
+            <p className="text-lg text-primary/70 max-w-3xl mx-auto">
+              A proven three-step approach to transformation
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+            <div className="text-center space-y-4">
+              <div className="text-7xl font-bold text-accent/20">01</div>
+              <h3 className="text-2xl font-bold text-primary">Diagnose</h3>
+              <p className="text-primary/70 leading-relaxed">
+                Deep discovery across compliance, operations, and technology.
+              </p>
+            </div>
+
+            <div className="text-center space-y-4">
+              <div className="text-7xl font-bold text-accent/20">02</div>
+              <h3 className="text-2xl font-bold text-primary">Design</h3>
+              <p className="text-primary/70 leading-relaxed">
+                Roadmap and operating model aligned to regulation.
+              </p>
+            </div>
+
+            <div className="text-center space-y-4">
+              <div className="text-7xl font-bold text-accent/20">03</div>
+              <h3 className="text-2xl font-bold text-primary">Deliver</h3>
+              <p className="text-primary/70 leading-relaxed">
+                Activate the right Acumen products and measure results.
+              </p>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* Proof Section */}
+      <Section background="muted" padding="lg">
+        <Container maxWidth="lg">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
+              Proven Results
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <Card className="text-center">
+              <div className="text-5xl font-bold text-accent mb-2">~40</div>
+              <p className="text-sm text-primary/70">Advisors per compliance agent adoption</p>
+            </Card>
+            <Card className="text-center">
+              <div className="text-5xl font-bold text-primary mb-2">100%</div>
+              <p className="text-sm text-primary/70">Improved audit readiness</p>
+            </Card>
+            <Card className="text-center">
+              <div className="text-5xl font-bold text-accent mb-2">X%</div>
+              <p className="text-sm text-primary/70">Increased advisor revenue potential</p>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <Button href="/contact" variant="accent" size="lg">
+              Book a Consultation
+            </Button>
+          </div>
+        </Container>
+      </Section>
     </div>
   );
 }
