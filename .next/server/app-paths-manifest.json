@@ -1,8 +1,0 @@
-{
-  "/use-cases/page": "app/use-cases/page.js",
-  "/solutions/phh/page": "app/solutions/phh/page.js",
-  "/solutions/consulting/page": "app/solutions/consulting/page.js",
-  "/page": "app/page.js",
-  "/resources/page": "app/resources/page.js",
-  "/contact/page": "app/contact/page.js"
-}
