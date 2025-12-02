@@ -66,15 +66,15 @@ export default function Pricing() {
                                 </p>
                                 <ul className="space-y-3">
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Discovery & diagnosis</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Strategic roadmap</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Implementation plan</span>
                                     </li>
                                 </ul>
@@ -92,21 +92,21 @@ export default function Pricing() {
                                 </p>
                                 <ul className="space-y-3">
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Continuous support</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Priority access</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Product integration</span>
                                     </li>
                                 </ul>
 
                                 {/* Popular Badge Glow */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-accent/5 to-transparent opacity-50 pointer-events-none"></div>
+                                <div className="absolute inset-0 bg-linear-to-r from-accent/5 to-transparent opacity-50 pointer-events-none"></div>
                             </Card>
                         </motion.div>
 
@@ -120,15 +120,15 @@ export default function Pricing() {
                                 </p>
                                 <ul className="space-y-3">
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Full-service support</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Dedicated team</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                                         <span className="text-sm text-primary/70">Custom solutions</span>
                                     </li>
                                 </ul>
@@ -202,7 +202,7 @@ export default function Pricing() {
                                     </div>
 
                                     {/* Hover Gradient */}
-                                    <div className={`absolute inset-0 bg-gradient-to-r from-${product.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                    <div className={`absolute inset-0 bg-linear-to-r from-${product.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
                                 </Card>
                             </motion.div>
                         ))}

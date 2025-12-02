@@ -73,7 +73,7 @@ export default function About() {
                                 <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden relative h-full">
                                     <div className="flex items-start gap-6 p-8">
                                         {/* Large Number */}
-                                        <div className="flex-shrink-0">
+                                        <div className="shrink-0">
                                             <div className={`text-5xl font-bold text-${approach.accent}/20 group-hover:text-${approach.accent}/30 transition-colors duration-300`}>
                                                 {approach.number}
                                             </div>
@@ -92,7 +92,7 @@ export default function About() {
                                     </div>
 
                                     {/* Hover Gradient */}
-                                    <div className={`absolute inset-0 bg-gradient-to-r from-${approach.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
+                                    <div className={`absolute inset-0 bg-linear-to-r from-${approach.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
                                 </Card>
                             </motion.div>
                         ))}
@@ -112,7 +112,7 @@ export default function About() {
                                 <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden relative">
                                     <div className="flex items-start gap-6 p-8">
                                         {/* Large Number */}
-                                        <div className="flex-shrink-0">
+                                        <div className="shrink-0">
                                             <div className={`text-5xl font-bold text-${approach.accent}/20 group-hover:text-${approach.accent}/30 transition-colors duration-300`}>
                                                 {approach.number}
                                             </div>
@@ -131,7 +131,7 @@ export default function About() {
                                     </div>
 
                                     {/* Hover Gradient */}
-                                    <div className={`absolute inset-0 bg-gradient-to-r from-${approach.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
+                                    <div className={`absolute inset-0 bg-linear-to-r from-${approach.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
                                 </Card>
                             </motion.div>
                         ))}
@@ -178,7 +178,7 @@ export default function About() {
                                     </p>
 
                                     {/* Subtle background animation */}
-                                    <div className={`absolute inset-0 bg-gradient-to-br from-${value.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                    <div className={`absolute inset-0 bg-linear-to-br from-${value.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
                                 </Card>
                             </motion.div>
                         ))}
@@ -228,8 +228,8 @@ export default function About() {
                                     <div className="p-8">
                                         <div className="flex flex-col md:flex-row gap-8">
                                             {/* Visual Element */}
-                                            <div className="flex-shrink-0">
-                                                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-${leader.accent}/10 to-${leader.accent}/20 group-hover:from-${leader.accent}/20 group-hover:to-${leader.accent}/30 transition-all duration-300 flex items-center justify-center`}>
+                                            <div className="shrink-0">
+                                                <div className={`w-20 h-20 rounded-2xl bg-linear-to-br from-${leader.accent}/10 to-${leader.accent}/20 group-hover:from-${leader.accent}/20 group-hover:to-${leader.accent}/30 transition-all duration-300 flex items-center justify-center`}>
                                                     <div className={`w-8 h-8 rounded-lg bg-${leader.accent} group-hover:scale-110 transition-transform duration-300`}></div>
                                                 </div>
                                             </div>
@@ -251,7 +251,7 @@ export default function About() {
                                     </div>
 
                                     {/* Hover Effect */}
-                                    <div className={`absolute inset-0 bg-gradient-to-r from-${leader.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                    <div className={`absolute inset-0 bg-linear-to-r from-${leader.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
                                 </Card>
                             </motion.div>
                         ))}

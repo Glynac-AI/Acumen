@@ -96,7 +96,7 @@ export default function UseCases() {
                                     <div className="p-8 lg:p-12">
                                         <div className="flex flex-col lg:flex-row gap-8">
                                             {/* Visual Element & Number */}
-                                            <div className="flex-shrink-0 lg:w-32">
+                                            <div className="shrink-0 lg:w-32">
                                                 <div className="flex flex-col items-start lg:items-center space-y-6">
                                                     {/* Large Number */}
                                                     <div className={`text-6xl lg:text-7xl font-bold text-${useCase.accent}/20 group-hover:text-${useCase.accent}/30 transition-colors duration-300`}>
@@ -104,7 +104,7 @@ export default function UseCases() {
                                                     </div>
 
                                                     {/* Visual Icon */}
-                                                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br from-${useCase.accent}/10 to-${useCase.accent}/20 group-hover:from-${useCase.accent}/20 group-hover:to-${useCase.accent}/30 transition-all duration-300 flex items-center justify-center`}>
+                                                    <div className={`w-16 h-16 rounded-2xl bg-linear-to-br from-${useCase.accent}/10 to-${useCase.accent}/20 group-hover:from-${useCase.accent}/20 group-hover:to-${useCase.accent}/30 transition-all duration-300 flex items-center justify-center`}>
                                                         <div className={`w-6 h-6 rounded-lg bg-${useCase.accent} group-hover:scale-110 transition-transform duration-300`}></div>
                                                     </div>
                                                 </div>
@@ -142,7 +142,7 @@ export default function UseCases() {
                                     </div>
 
                                     {/* Hover Gradient */}
-                                    <div className={`absolute inset-0 bg-gradient-to-r from-${useCase.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                    <div className={`absolute inset-0 bg-linear-to-r from-${useCase.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
                                 </Card>
                             </motion.div>
                         ))}

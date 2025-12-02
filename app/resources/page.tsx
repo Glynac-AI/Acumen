@@ -100,7 +100,7 @@ export default function Resources() {
                                         <div className="p-8">
                                             <div className="flex items-start gap-6">
                                                 {/* Icon */}
-                                                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br from-${resource.accent}/10 to-${resource.accent}/20 group-hover:from-${resource.accent}/20 group-hover:to-${resource.accent}/30 transition-all duration-300 flex items-center justify-center flex-shrink-0`}>
+                                                <div className={`w-16 h-16 rounded-2xl bg-linear-to-br from-${resource.accent}/10 to-${resource.accent}/20 group-hover:from-${resource.accent}/20 group-hover:to-${resource.accent}/30 transition-all duration-300 flex items-center justify-center shrink-0`}>
                                                     <Icon className={`h-8 w-8 text-${resource.accent} group-hover:scale-110 transition-transform duration-300`} />
                                                 </div>
 
@@ -132,7 +132,7 @@ export default function Resources() {
                                         </div>
 
                                         {/* Hover Gradient */}
-                                        <div className={`absolute inset-0 bg-gradient-to-r from-${resource.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                        <div className={`absolute inset-0 bg-linear-to-r from-${resource.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
                                     </Card>
                                 </motion.div>
                             );
@@ -160,7 +160,7 @@ export default function Resources() {
                             </div>
 
                             {/* Hover Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                            <div className="absolute inset-0 bg-linear-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                         </Card>
                     </AnimatedSection>
                 </Container>

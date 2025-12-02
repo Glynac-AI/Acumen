@@ -129,7 +129,7 @@ export default function Solutions() {
                                         </div>
 
                                         {/* Hover Gradient */}
-                                        <div className={`absolute inset-0 bg-gradient-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                        <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
                                     </Card>
                                 </Link>
                             </motion.div>
@@ -157,7 +157,7 @@ export default function Solutions() {
                             </div>
 
                             {/* Hover Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                            <div className="absolute inset-0 bg-linear-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                         </Card>
                     </AnimatedSection>
                 </Container>

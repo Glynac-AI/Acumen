@@ -88,7 +88,7 @@ export default function Contact() {
                                 <motion.div variants={fadeInUp}>
                                     <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                         <div className="flex items-start gap-4 p-6">
-                                            <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 transition-colors duration-300">
+                                            <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-accent/20 transition-colors duration-300">
                                                 <Mail className="h-6 w-6 text-accent group-hover:scale-110 transition-transform duration-300" />
                                             </div>
                                             <div>
@@ -107,7 +107,7 @@ export default function Contact() {
                                 <motion.div variants={fadeInUp}>
                                     <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                         <div className="flex items-start gap-4 p-6">
-                                            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
+                                            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
                                                 <Phone className="h-6 w-6 text-primary group-hover:scale-110 transition-transform duration-300" />
                                             </div>
                                             <div>
@@ -121,7 +121,7 @@ export default function Contact() {
                                 <motion.div variants={fadeInUp}>
                                     <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                         <div className="flex items-start gap-4 p-6">
-                                            <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 transition-colors duration-300">
+                                            <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-accent/20 transition-colors duration-300">
                                                 <MapPin className="h-6 w-6 text-accent group-hover:scale-110 transition-transform duration-300" />
                                             </div>
                                             <div>

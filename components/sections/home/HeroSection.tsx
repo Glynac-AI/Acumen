@@ -12,7 +12,7 @@ export default function HeroSection() {
         <Section
             background="gradient"
             padding="lg"
-            className="text-white relative overflow-hidden min-h-screen flex items-center pt-24" // Added pt-24 for header spacing
+            className="text-white relative overflow-hidden min-h-screen flex items-center pt-24"
         >
             <Container className="relative z-10">
                 <div className="max-w-4xl">
@@ -27,11 +27,7 @@ export default function HeroSection() {
                         </h1>
 
                         <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-3xl">
-                            A single partner for advisory-led transformation and compliant product activation for wealth managers.
-                        </p>
-
-                        <p className="text-lg text-white/80 leading-relaxed max-w-3xl">
-                            We diagnose your business challenges, design a regulatory-aligned roadmap, and activate proven technology, product, and marketing capabilities to deliver measurable impact.
+                            Strategy, compliance, technology, and growth solutions for wealth management firms.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">

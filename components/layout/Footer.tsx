@@ -1,5 +1,6 @@
 // components/layout/Footer.tsx
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, Phone, MapPin, Linkedin } from 'lucide-react';
 
 export default function Footer() {
@@ -8,13 +9,22 @@ export default function Footer() {
     return (
         <footer className="bg-primary text-white relative overflow-hidden">
             {/* Subtle top border */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent"></div>
+            <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-accent/30 to-transparent"></div>
 
             <div className="container mx-auto px-6 py-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-                    {/* Company Info */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-bold tracking-tight">ACUMEN STRATEGY</h3>
+                    {/* Company Info with Logo */}
+                    <div className="space-y-2 -mt-4">
+                        <Link href="/" className="inline-block">
+                            <Image
+                                src="/logo/logo-light.png"
+                                alt="Acumen Strategy"
+                                width={240}
+                                height={84}
+                                className="object-contain mb-1"
+                            />
+                        </Link>
+
                         <p className="text-sm text-white/70 leading-relaxed max-w-xs">
                             Compliance-first transformation for wealth managers. Strategy, execution, results.
                         </p>
@@ -95,7 +105,7 @@ export default function Footer() {
                         <h4 className="text-sm font-semibold tracking-wide text-accent">Contact</h4>
                         <ul className="space-y-3">
                             <li className="flex items-start gap-3">
-                                <Mail className="w-4 h-4 mt-0.5 flex-shrink-0 text-white/60" />
+                                <Mail className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <a
                                     href="mailto:info@acumen-strategy.com"
                                     className="text-sm text-white/70 hover:text-accent transition-colors duration-300"
@@ -104,11 +114,11 @@ export default function Footer() {
                                 </a>
                             </li>
                             <li className="flex items-start gap-3">
-                                <Phone className="w-4 h-4 mt-0.5 flex-shrink-0 text-white/60" />
+                                <Phone className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <span className="text-sm text-white/70">+1 (555) 123-4567</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-white/60" />
+                                <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <span className="text-sm text-white/70">
                                     123 Financial District<br />
                                     New York, NY 10004

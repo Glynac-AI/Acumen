@@ -23,7 +23,7 @@ export default function Header() {
 
     useEffect(() => {
         const handleScroll = () => {
-            setScrolled(window.scrollY > 50); // Trigger at 50px instead of 20px for smoother effect
+            setScrolled(window.scrollY > 50);
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -70,13 +70,14 @@ export default function Header() {
                         About
                     </Link>
 
-                    {/* Solutions Dropdown */}
+                    {/* Solutions Dropdown - FIXED: Now clickable AND has dropdown */}
                     <div
                         className="relative"
                         onMouseEnter={() => setSolutionsOpen(true)}
                         onMouseLeave={() => setSolutionsOpen(false)}
                     >
-                        <button
+                        <Link
+                            href="/solutions"
                             className={`flex items-center gap-1 text-sm font-medium transition-colors duration-300 ${scrolled
                                 ? 'text-primary/70 hover:text-primary'
                                 : 'text-white/80 hover:text-white'
@@ -87,7 +88,7 @@ export default function Header() {
                                 className={`w-4 h-4 transition-transform duration-200 ${solutionsOpen ? 'rotate-180' : ''
                                     }`}
                             />
-                        </button>
+                        </Link>
 
                         <AnimatePresence>
                             {solutionsOpen && (
@@ -99,6 +100,20 @@ export default function Header() {
                                     className="absolute top-full left-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-primary/10 overflow-hidden"
                                 >
                                     <div className="p-2">
+                                        {/* View All Solutions Link */}
+                                        <Link
+                                            href="/solutions"
+                                            className="block p-4 rounded-lg hover:bg-accent/10 transition-colors group border-b border-primary/5"
+                                            onClick={() => setSolutionsOpen(false)}
+                                        >
+                                            <div className="text-sm font-semibold text-accent group-hover:text-accent/80 transition-colors">
+                                                View All Solutions
+                                            </div>
+                                            <div className="text-xs text-primary/50 mt-1">
+                                                Complete solutions portfolio
+                                            </div>
+                                        </Link>
+
                                         {solutions.map((solution) => (
                                             <Link
                                                 key={solution.href}
@@ -201,9 +216,13 @@ export default function Header() {
 
                             {/* Solutions in Mobile */}
                             <div className="py-3">
-                                <div className="text-sm font-medium text-primary mb-2">
+                                <Link
+                                    href="/solutions"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="text-sm font-medium text-primary hover:text-accent transition-colors mb-2 block"
+                                >
                                     Solutions
-                                </div>
+                                </Link>
                                 <div className="pl-4 space-y-2">
                                     {solutions.map((solution) => (
                                         <Link
