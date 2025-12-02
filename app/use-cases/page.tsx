@@ -16,34 +16,23 @@ export default function UseCases() {
         {
             title: 'RIA Growth & Scaling',
             challenge: 'Mid-sized RIA struggling to scale operations while maintaining compliance oversight across expanding advisor team.',
-            solution: 'Acumen Strategy deployed Glynac for centralized supervision, implemented Tollbooth for systematic income generation, and provided consulting on operational structure.',
-            outcome: 'Improved compliance oversight, 40+ advisors onboarded with unified supervision, and enhanced client value proposition through systematic yield strategies.',
+            result: 'Improved compliance oversight, 40+ advisors onboarded with unified supervision, and enhanced client value proposition through systematic yield strategies.',
             accent: 'accent',
             number: '01'
         },
         {
             title: 'Compliance Modernization',
             challenge: 'Legacy wealth management firm facing audit challenges due to fragmented communication systems and manual compliance processes.',
-            solution: 'Strategic consulting to diagnose gaps, followed by Glynac implementation to unify CRM, email, and portfolio data with AI-powered compliance monitoring.',
-            outcome: '100% improvement in audit readiness, reduced supervisory burden, and automated risk detection across client communications.',
+            result: '100% improvement in audit readiness, reduced supervisory burden, and automated risk detection across client communications.',
             accent: 'primary',
             number: '02'
         },
         {
-            title: 'Advisor Enablement & Retention',
+            title: 'Advisor Enablement',
             challenge: 'Independent broker-dealer seeking to differentiate value proposition and retain top-producing advisors amid competitive pressures.',
-            solution: 'Acumen Labs developed advisor marketing materials, ATS recruited senior advisors, and Tollbooth provided exclusive income-generation capabilities.',
-            outcome: 'Enhanced advisor loyalty through differentiated product offerings, improved recruiting success, and strengthened brand positioning.',
+            result: 'Enhanced advisor loyalty through differentiated product offerings, improved recruiting success, and strengthened brand positioning.',
             accent: 'accent',
             number: '03'
-        },
-        {
-            title: 'Product Partner Onboarding',
-            challenge: 'Asset manager launching new strategy needing rapid distribution through wealth management channel with compliance alignment.',
-            solution: 'Consulting on distribution strategy, Glynac integration for seamless data flow, and ATS for relationship management with key RIA partners.',
-            outcome: 'Accelerated time-to-market, compliance-ready distribution infrastructure, and scalable partner onboarding process.',
-            accent: 'primary',
-            number: '04'
         }
     ];
 
@@ -62,20 +51,7 @@ export default function UseCases() {
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="space-y-8"
                         >
-                            {/* Animated Badge */}
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.6, delay: 0.2 }}
-                                className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20"
-                            >
-                                <motion.div
-                                    className="w-2 h-2 bg-accent rounded-full"
-                                    animate={{ scale: [1, 1.2, 1] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                />
-                                <span className="text-sm font-semibold">Real-World Results</span>
-                            </motion.div>
+                            
 
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
                                 Use Cases
@@ -142,10 +118,10 @@ export default function UseCases() {
                                                     {useCase.title}
                                                 </h3>
 
-                                                <div className="grid md:grid-cols-3 gap-6">
+                                                <div className="grid md:grid-cols-2 gap-6">
                                                     <div className="space-y-3">
                                                         <h4 className="text-sm font-semibold text-primary/50 uppercase tracking-wide">
-                                                            Business Challenge
+                                                            Challenge
                                                         </h4>
                                                         <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
                                                             {useCase.challenge}
@@ -154,19 +130,10 @@ export default function UseCases() {
 
                                                     <div className="space-y-3">
                                                         <h4 className="text-sm font-semibold text-primary/50 uppercase tracking-wide">
-                                                            Acumen Solution
-                                                        </h4>
-                                                        <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
-                                                            {useCase.solution}
-                                                        </p>
-                                                    </div>
-
-                                                    <div className="space-y-3">
-                                                        <h4 className="text-sm font-semibold text-primary/50 uppercase tracking-wide">
                                                             Outcome
                                                         </h4>
                                                         <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
-                                                            {useCase.outcome}
+                                                            {useCase.result}
                                                         </p>
                                                     </div>
                                                 </div>
