@@ -48,15 +48,8 @@ export default function UseCasesSection() {
                             className="group"
                         >
                             <div className="h-full p-8 rounded-xl border border-primary/10 hover:border-accent/30 hover:bg-muted/20 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                                {/* Number indicator instead of icon */}
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className={`w-8 h-8 rounded-full bg-${useCase.accent}/10 border-2 border-${useCase.accent}/20 flex items-center justify-center`}>
-                                        <span className={`text-sm font-bold text-${useCase.accent}`}>
-                                            {index + 1}
-                                        </span>
-                                    </div>
-                                    <div className={`flex-1 h-px bg-gradient-to-r from-${useCase.accent}/30 to-transparent`}></div>
-                                </div>
+                                {/* Subtle accent bar */}
+                                <div className={`w-12 h-1 bg-${useCase.accent} rounded-full mb-6 group-hover:w-16 transition-all duration-300`}></div>
 
                                 <h3 className="text-xl font-bold text-primary mb-4 group-hover:text-accent transition-colors duration-300">
                                     {useCase.title}

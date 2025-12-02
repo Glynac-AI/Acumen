@@ -1,101 +1,203 @@
+// app/use-cases/page.tsx
+'use client';
+
+import { motion } from 'framer-motion';
 import Container from '@/components/ui/Container';
 import Section from '@/components/ui/Section';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { TrendingUp, Shield, Users, Zap } from 'lucide-react';
-
-const useCases = [
-    {
-        icon: TrendingUp,
-        title: 'RIA Growth & Scaling',
-        problem: 'Mid-sized RIA struggling to scale operations while maintaining compliance oversight across expanding advisor team.',
-        solution: 'Acumen Strategy deployed Glynac for centralized supervision, implemented Tollbooth for systematic income generation, and provided consulting on operational structure.',
-        outcome: 'Improved compliance oversight, 40+ advisors onboarded with unified supervision, and enhanced client value proposition through systematic yield strategies.',
-        color: 'accent',
-    },
-    {
-        icon: Shield,
-        title: 'Compliance Modernization',
-        problem: 'Legacy wealth management firm facing audit challenges due to fragmented communication systems and manual compliance processes.',
-        solution: 'Strategic consulting to diagnose gaps, followed by Glynac implementation to unify CRM, email, and portfolio data with AI-powered compliance monitoring.',
-        outcome: '100% improvement in audit readiness, reduced supervisory burden, and automated risk detection across client communications.',
-        color: 'primary',
-    },
-    {
-        icon: Users,
-        title: 'Advisor Enablement & Retention',
-        problem: 'Independent broker-dealer seeking to differentiate value proposition and retain top-producing advisors amid competitive pressures.',
-        solution: 'Acumen Labs developed advisor marketing materials, ATS recruited senior advisors, and Tollbooth provided exclusive income-generation capabilities.',
-        outcome: 'Enhanced advisor loyalty through differentiated product offerings, improved recruiting success, and strengthened brand positioning.',
-        color: 'accent',
-    },
-    {
-        icon: Zap,
-        title: 'Product Partner Onboarding',
-        problem: 'Asset manager launching new strategy needing rapid distribution through wealth management channel with compliance alignment.',
-        solution: 'Consulting on distribution strategy, Glynac integration for seamless data flow, and ATS for relationship management with key RIA partners.',
-        outcome: 'Accelerated time-to-market, compliance-ready distribution infrastructure, and scalable partner onboarding process.',
-        color: 'primary',
-    },
-];
+import AnimatedSection from '@/components/ui/AnimatedSection';
+import StaggerContainer from '@/components/ui/StaggerContainer';
+import { ArrowRight } from 'lucide-react';
+import { fadeInUp } from '@/lib/animations';
 
 export default function UseCases() {
+    const useCases = [
+        {
+            title: 'RIA Growth & Scaling',
+            challenge: 'Mid-sized RIA struggling to scale operations while maintaining compliance oversight across expanding advisor team.',
+            solution: 'Acumen Strategy deployed Glynac for centralized supervision, implemented Tollbooth for systematic income generation, and provided consulting on operational structure.',
+            outcome: 'Improved compliance oversight, 40+ advisors onboarded with unified supervision, and enhanced client value proposition through systematic yield strategies.',
+            accent: 'accent',
+            number: '01'
+        },
+        {
+            title: 'Compliance Modernization',
+            challenge: 'Legacy wealth management firm facing audit challenges due to fragmented communication systems and manual compliance processes.',
+            solution: 'Strategic consulting to diagnose gaps, followed by Glynac implementation to unify CRM, email, and portfolio data with AI-powered compliance monitoring.',
+            outcome: '100% improvement in audit readiness, reduced supervisory burden, and automated risk detection across client communications.',
+            accent: 'primary',
+            number: '02'
+        },
+        {
+            title: 'Advisor Enablement & Retention',
+            challenge: 'Independent broker-dealer seeking to differentiate value proposition and retain top-producing advisors amid competitive pressures.',
+            solution: 'Acumen Labs developed advisor marketing materials, ATS recruited senior advisors, and Tollbooth provided exclusive income-generation capabilities.',
+            outcome: 'Enhanced advisor loyalty through differentiated product offerings, improved recruiting success, and strengthened brand positioning.',
+            accent: 'accent',
+            number: '03'
+        },
+        {
+            title: 'Product Partner Onboarding',
+            challenge: 'Asset manager launching new strategy needing rapid distribution through wealth management channel with compliance alignment.',
+            solution: 'Consulting on distribution strategy, Glynac integration for seamless data flow, and ATS for relationship management with key RIA partners.',
+            outcome: 'Accelerated time-to-market, compliance-ready distribution infrastructure, and scalable partner onboarding process.',
+            accent: 'primary',
+            number: '04'
+        }
+    ];
+
     return (
         <div className="min-h-screen">
-            {/* Hero */}
-            <Section background="gradient" padding="lg" className="text-white">
-                <Container maxWidth="lg">
-                    <h1 className="text-5xl md:text-6xl font-bold mb-6">Use Cases</h1>
-                    <p className="text-xl leading-relaxed">
-                        Real-world applications of Acumen Strategy's integrated consulting and product solutions across wealth management challenges.
-                    </p>
+            {/* Hero - Full Screen Height */}
+            <Section background="gradient" padding="lg" className="text-white relative overflow-hidden min-h-screen flex items-center">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
+
+                <Container className="relative z-10">
+                    <div className="max-w-4xl">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="space-y-8"
+                        >
+                            {/* Animated Badge */}
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.6, delay: 0.2 }}
+                                className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20"
+                            >
+                                <motion.div
+                                    className="w-2 h-2 bg-accent rounded-full"
+                                    animate={{ scale: [1, 1.2, 1] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                />
+                                <span className="text-sm font-semibold">Real-World Results</span>
+                            </motion.div>
+
+                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
+                                Use Cases
+                            </h1>
+
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                className="text-xl md:text-2xl text-white/90 leading-relaxed"
+                            >
+                                Real-world applications of Acumen Strategy's integrated consulting and product solutions across wealth management challenges.
+                            </motion.p>
+
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.6 }}
+                                className="text-lg text-white/80 leading-relaxed max-w-3xl"
+                            >
+                                See how firms like yours have transformed their operations, enhanced compliance, and achieved measurable growth through our strategic advisory and integrated solutions.
+                            </motion.p>
+                        </motion.div>
+                    </div>
                 </Container>
             </Section>
 
-            {/* Use Cases */}
-            <Section background="muted" padding="lg">
+            {/* Use Cases - Premium Layout */}
+            <Section background="white" padding="lg">
                 <Container>
-                    <div className="space-y-12 max-w-6xl mx-auto">
-                        {useCases.map((useCase, index) => {
-                            const Icon = useCase.icon;
-                            return (
-                                <Card key={useCase.title} className="space-y-6">
-                                    <div className="flex items-start gap-6">
-                                        <div className={`w-16 h-16 bg-${useCase.color}/10 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                                            <Icon className={`h-8 w-8 text-${useCase.color}`} />
-                                        </div>
-                                        <div className="flex-1 space-y-4">
-                                            <h3 className="text-3xl font-bold text-primary">{useCase.title}</h3>
+                    <AnimatedSection animation="fadeInUp" className="mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8 text-center">Proven Results Across the Industry</h2>
+                        <p className="text-xl text-primary/70 max-w-3xl mx-auto text-center">
+                            Each engagement demonstrates our commitment to compliance-first transformation and measurable outcomes.
+                        </p>
+                    </AnimatedSection>
 
-                                            <div>
-                                                <h4 className="font-semibold text-primary/70 mb-2">Business Challenge</h4>
-                                                <p className="text-primary/70 leading-relaxed">{useCase.problem}</p>
+                    <StaggerContainer className="space-y-12">
+                        {useCases.map((useCase, index) => (
+                            <motion.div key={useCase.title} variants={fadeInUp}>
+                                <Card className="group hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 overflow-hidden relative">
+                                    <div className="p-8 lg:p-12">
+                                        <div className="flex flex-col lg:flex-row gap-8">
+                                            {/* Visual Element & Number */}
+                                            <div className="flex-shrink-0 lg:w-32">
+                                                <div className="flex flex-col items-start lg:items-center space-y-6">
+                                                    {/* Large Number */}
+                                                    <div className={`text-6xl lg:text-7xl font-bold text-${useCase.accent}/20 group-hover:text-${useCase.accent}/30 transition-colors duration-300`}>
+                                                        {useCase.number}
+                                                    </div>
+
+                                                    {/* Visual Icon */}
+                                                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br from-${useCase.accent}/10 to-${useCase.accent}/20 group-hover:from-${useCase.accent}/20 group-hover:to-${useCase.accent}/30 transition-all duration-300 flex items-center justify-center`}>
+                                                        <div className={`w-6 h-6 rounded-lg bg-${useCase.accent} group-hover:scale-110 transition-transform duration-300`}></div>
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            <div>
-                                                <h4 className="font-semibold text-primary/70 mb-2">Acumen Solution</h4>
-                                                <p className="text-primary/70 leading-relaxed">{useCase.solution}</p>
-                                            </div>
+                                            {/* Content */}
+                                            <div className="flex-1 space-y-6">
+                                                <div className={`w-16 h-1 bg-${useCase.accent} rounded-full group-hover:w-24 transition-all duration-300`}></div>
 
-                                            <div>
-                                                <h4 className="font-semibold text-primary/70 mb-2">Outcome</h4>
-                                                <p className="text-primary/70 leading-relaxed">{useCase.outcome}</p>
+                                                <h3 className={`text-3xl font-bold text-primary mb-6 group-hover:text-${useCase.accent} transition-colors duration-300`}>
+                                                    {useCase.title}
+                                                </h3>
+
+                                                <div className="grid md:grid-cols-3 gap-6">
+                                                    <div className="space-y-3">
+                                                        <h4 className="text-sm font-semibold text-primary/50 uppercase tracking-wide">
+                                                            Business Challenge
+                                                        </h4>
+                                                        <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                                            {useCase.challenge}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="space-y-3">
+                                                        <h4 className="text-sm font-semibold text-primary/50 uppercase tracking-wide">
+                                                            Acumen Solution
+                                                        </h4>
+                                                        <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                                            {useCase.solution}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="space-y-3">
+                                                        <h4 className="text-sm font-semibold text-primary/50 uppercase tracking-wide">
+                                                            Outcome
+                                                        </h4>
+                                                        <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                                            {useCase.outcome}
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </Card>
-                            );
-                        })}
-                    </div>
 
-                    <div className="text-center mt-16">
-                        <p className="text-lg text-primary/70 mb-6">
-                            Ready to solve your firm's unique challenges?
+                                    {/* Hover Gradient */}
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-${useCase.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+                </Container>
+            </Section>
+
+            {/* CTA Section */}
+            <Section background="muted" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp" className="text-center">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
+                            Ready to Solve Your Firm's Unique Challenges?
+                        </h2>
+                        <p className="text-xl text-primary/70 mb-8 max-w-3xl mx-auto">
+                            Every firm faces different challenges. Schedule a consultation to discuss how Acumen Strategy can create a custom solution for your specific needs.
                         </p>
                         <Button href="/contact" variant="accent" size="lg">
                             Book a Consultation
+                            <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
-                    </div>
+                    </AnimatedSection>
                 </Container>
             </Section>
         </div>

@@ -1,3 +1,4 @@
+// app/solutions/labs/page.tsx
 import Container from '@/components/ui/Container';
 import Section from '@/components/ui/Section';
 import Card from '@/components/ui/Card';
@@ -29,9 +30,7 @@ export default function Labs() {
 
                     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         <Card className="space-y-4">
-                            <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                                <Globe className="h-8 w-8 text-accent" />
-                            </div>
+                            <div className="w-12 h-1 bg-accent rounded-full mb-6"></div>
                             <h3 className="text-xl font-bold text-primary">Website Development</h3>
                             <p className="text-primary/70 leading-relaxed">
                                 Custom websites designed for wealth management firms with compliance-friendly content management and lead capture.
@@ -39,9 +38,7 @@ export default function Labs() {
                         </Card>
 
                         <Card className="space-y-4">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <Palette className="h-8 w-8 text-primary" />
-                            </div>
+                            <div className="w-12 h-1 bg-primary rounded-full mb-6"></div>
                             <h3 className="text-xl font-bold text-primary">Brand Development</h3>
                             <p className="text-primary/70 leading-relaxed">
                                 Logo design, brand guidelines, and visual identity systems that build trust and credibility.
@@ -49,9 +46,7 @@ export default function Labs() {
                         </Card>
 
                         <Card className="space-y-4">
-                            <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                                <FileText className="h-8 w-8 text-accent" />
-                            </div>
+                            <div className="w-12 h-1 bg-accent rounded-full mb-6"></div>
                             <h3 className="text-xl font-bold text-primary">Content Creation</h3>
                             <p className="text-primary/70 leading-relaxed">
                                 Whitepapers, case studies, blog posts, and educational content to position your firm as a thought leader.
@@ -59,9 +54,7 @@ export default function Labs() {
                         </Card>
 
                         <Card className="space-y-4">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <Video className="h-8 w-8 text-primary" />
-                            </div>
+                            <div className="w-12 h-1 bg-primary rounded-full mb-6"></div>
                             <h3 className="text-xl font-bold text-primary">Advisor Enablement</h3>
                             <p className="text-primary/70 leading-relaxed">
                                 Sales collateral, presentation templates, and marketing materials designed for advisor use and compliance review.

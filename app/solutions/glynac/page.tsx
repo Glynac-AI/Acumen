@@ -1,3 +1,4 @@
+// app/solutions/glynac/page.tsx
 import Container from '@/components/ui/Container';
 import Section from '@/components/ui/Section';
 import Card from '@/components/ui/Card';
@@ -50,7 +51,7 @@ export default function Glynac() {
             <Section background="muted" padding="lg">
                 <Container>
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">The Glynac Solution</h2>
+                        <h2 className="text-4xl font-bold text-primary mb-4">The Glynac Solution</h2>
                         <p className="text-lg text-primary/70 max-w-2xl mx-auto">
                             AI agents that work within your compliance framework, not around it
                         </p>
@@ -58,9 +59,7 @@ export default function Glynac() {
 
                     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         <Card className="space-y-4">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <Brain className="h-6 w-6 text-primary" />
-                            </div>
+                            <div className="w-12 h-1 bg-accent rounded-full mb-6"></div>
                             <h3 className="text-xl font-bold text-primary">Knowledge Agent</h3>
                             <p className="text-primary/70 leading-relaxed">
                                 Contextual AI that understands your firm's policies, procedures, and compliance requirements
@@ -68,9 +67,7 @@ export default function Glynac() {
                         </Card>
 
                         <Card className="space-y-4">
-                            <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                                <Shield className="h-6 w-6 text-accent" />
-                            </div>
+                            <div className="w-12 h-1 bg-primary rounded-full mb-6"></div>
                             <h3 className="text-xl font-bold text-primary">Compliance Monitor</h3>
                             <p className="text-primary/70 leading-relaxed">
                                 Real-time supervision of communications and transactions with automatic flagging of regulatory risks
@@ -78,9 +75,7 @@ export default function Glynac() {
                         </Card>
 
                         <Card className="space-y-4">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <FileText className="h-6 w-6 text-primary" />
-                            </div>
+                            <div className="w-12 h-1 bg-accent rounded-full mb-6"></div>
                             <h3 className="text-xl font-bold text-primary">CRM Automation</h3>
                             <p className="text-primary/70 leading-relaxed">
                                 Intelligent data capture and client record management that reduces manual entry by 80%
@@ -88,9 +83,7 @@ export default function Glynac() {
                         </Card>
 
                         <Card className="space-y-4">
-                            <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                                <AlertCircle className="h-6 w-6 text-accent" />
-                            </div>
+                            <div className="w-12 h-1 bg-primary rounded-full mb-6"></div>
                             <h3 className="text-xl font-bold text-primary">Risk Alerting</h3>
                             <p className="text-primary/70 leading-relaxed">
                                 Proactive identification of compliance gaps and regulatory exposure before audits

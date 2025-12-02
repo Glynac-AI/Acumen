@@ -1,136 +1,261 @@
+// app/about/page.tsx
+'use client';
+
+import { motion } from 'framer-motion';
 import Container from '@/components/ui/Container';
 import Section from '@/components/ui/Section';
 import Card from '@/components/ui/Card';
-import { Target, Users, Award } from 'lucide-react';
+import AnimatedSection from '@/components/ui/AnimatedSection';
+import StaggerContainer from '@/components/ui/StaggerContainer';
+import { fadeInUp } from '@/lib/animations';
 
 export default function About() {
     return (
         <div className="min-h-screen">
-            {/* Hero */}
-            <Section background="gradient" padding="lg" className="text-white">
-                <Container maxWidth="lg">
-                    <h1 className="text-5xl md:text-6xl font-bold mb-6">About Acumen Strategy</h1>
-                    <p className="text-xl leading-relaxed">
-                        Acumen Strategy is the strategic advisory and consulting arm of the Acumen ecosystem. We partner with wealth management firms to diagnose challenges, design roadmaps, and deploy integrated solutions across strategy, compliance, technology, and growth.
-                    </p>
-                </Container>
-            </Section>
+            {/* Hero - Enhanced with Background Pattern */}
+            <Section background="gradient" padding="lg" className="text-white relative overflow-hidden min-h-screen flex items-center">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
 
-            {/* Our Approach */}
-            <Section background="white" padding="lg">
-                <Container maxWidth="lg">
-                    <h2 className="text-4xl md:text-5xl font-bold text-primary mb-12">Our Approach</h2>
+                <Container className="relative z-10">
+                    <div className="max-w-4xl">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="space-y-8"
+                        >
+                            
 
-                    <div className="space-y-12">
-                        <div>
-                            <h3 className="text-3xl font-bold text-accent mb-4">Strategy-Led Transformation</h3>
-                            <p className="text-lg text-primary/70 leading-relaxed">
-                                We begin every engagement with deep discovery to understand your firm's unique challenges, regulatory requirements, and growth objectives. Our consultants work alongside your leadership team to diagnose operational gaps, technology inefficiencies, and compliance risks before recommending solutions.
-                            </p>
-                        </div>
+                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
+                                About Acumen Strategy
+                            </h1>
 
-                        <div>
-                            <h3 className="text-3xl font-bold text-primary mb-4">Compliance-First Design</h3>
-                            <p className="text-lg text-primary/70 leading-relaxed">
-                                Every roadmap we design is built with regulatory alignment at its core. Whether implementing new technology, launching products, or scaling operations, we ensure your transformation maintains audit readiness and reduces supervisory burden while enabling growth.
-                            </p>
-                        </div>
-
-                        <div>
-                            <h3 className="text-3xl font-bold text-accent mb-4">Measured Execution</h3>
-                            <p className="text-lg text-primary/70 leading-relaxed">
-                                We don't just deliver recommendations—we activate solutions and measure results. By deploying the right combination of Acumen products (Glynac, Tollbooth, PHH, Labs, ATS), we help you execute on strategy with confidence and track measurable outcomes.
-                            </p>
-                        </div>
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                className="text-xl md:text-2xl text-white/90 leading-relaxed"
+                            >
+                                Acumen Strategy is the strategic advisory and consulting arm of the Acumen ecosystem. We partner with wealth management firms to diagnose challenges, design roadmaps, and deploy integrated solutions across strategy, compliance, technology, and growth.
+                            </motion.p>
+                        </motion.div>
                     </div>
                 </Container>
             </Section>
 
-            {/* Values */}
+            {/* Our Approach - Interactive Cards */}
+            <Section background="white" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp" className="mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Our Approach</h2>
+                        <p className="text-xl text-primary/70 max-w-3xl">
+                            We don't just deliver recommendations—we activate solutions and measure results.
+                        </p>
+                    </AnimatedSection>
+
+                    <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-8">
+                        {[
+                            {
+                                title: "Strategy-Led Transformation",
+                                description: "We begin every engagement with deep discovery to understand your firm's unique challenges, regulatory requirements, and growth objectives. Our consultants work alongside your leadership team to diagnose operational gaps, technology inefficiencies, and compliance risks before recommending solutions.",
+                                accent: "accent",
+                                number: "01"
+                            },
+                            {
+                                title: "Compliance-First Design",
+                                description: "Every roadmap we design is built with regulatory alignment at its core. Whether implementing new technology, launching products, or scaling operations, we ensure your transformation maintains audit readiness and reduces supervisory burden while enabling growth.",
+                                accent: "primary",
+                                number: "02"
+                            }
+                        ].map((approach, index) => (
+                            <motion.div key={approach.title} variants={fadeInUp}>
+                                <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden relative h-full">
+                                    <div className="flex items-start gap-6 p-8">
+                                        {/* Large Number */}
+                                        <div className="flex-shrink-0">
+                                            <div className={`text-5xl font-bold text-${approach.accent}/20 group-hover:text-${approach.accent}/30 transition-colors duration-300`}>
+                                                {approach.number}
+                                            </div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="flex-1">
+                                            <div className={`w-16 h-1 bg-${approach.accent} rounded-full mb-6 group-hover:w-24 transition-all duration-300`}></div>
+                                            <h3 className={`text-2xl font-bold text-primary mb-4 group-hover:text-${approach.accent} transition-colors duration-300`}>
+                                                {approach.title}
+                                            </h3>
+                                            <p className="text-lg text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                                {approach.description}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Hover Gradient */}
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-${approach.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+
+                    {/* Third card - full width */}
+                    <StaggerContainer className="max-w-6xl mx-auto">
+                        {[
+                            {
+                                title: "Measured Execution",
+                                description: "We don't just deliver recommendations—we activate solutions and measure results. By deploying the right combination of Acumen products (Glynac, Tollbooth, PHH, Labs, ATS), we help you execute on strategy with confidence and track measurable outcomes.",
+                                accent: "accent",
+                                number: "03"
+                            }
+                        ].map((approach, index) => (
+                            <motion.div key={approach.title} variants={fadeInUp}>
+                                <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden relative">
+                                    <div className="flex items-start gap-6 p-8">
+                                        {/* Large Number */}
+                                        <div className="flex-shrink-0">
+                                            <div className={`text-5xl font-bold text-${approach.accent}/20 group-hover:text-${approach.accent}/30 transition-colors duration-300`}>
+                                                {approach.number}
+                                            </div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="flex-1">
+                                            <div className={`w-16 h-1 bg-${approach.accent} rounded-full mb-6 group-hover:w-24 transition-all duration-300`}></div>
+                                            <h3 className={`text-2xl font-bold text-primary mb-4 group-hover:text-${approach.accent} transition-colors duration-300`}>
+                                                {approach.title}
+                                            </h3>
+                                            <p className="text-lg text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                                {approach.description}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Hover Gradient */}
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-${approach.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+                </Container>
+            </Section>
+
+            {/* Values - Enhanced Grid */}
             <Section background="muted" padding="lg">
                 <Container>
-                    <div className="text-center mb-16">
+                    <AnimatedSection animation="fadeInUp" className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Our Values</h2>
-                    </div>
+                        <p className="text-xl text-primary/70">
+                            The principles that guide every engagement and solution we deliver
+                        </p>
+                    </AnimatedSection>
 
-                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                        <Card className="text-center">
-                            <div className="flex justify-center mb-6">
-                                <div className="w-16 h-16 bg-accent/10 rounded-lg flex items-center justify-center">
-                                    <Target className="h-8 w-8 text-accent" />
-                                </div>
-                            </div>
-                            <h3 className="text-xl font-bold text-primary mb-4">Client-First</h3>
-                            <p className="text-primary/70 leading-relaxed">
-                                Your success is our measure. We align our incentives with your outcomes and build solutions that scale with your firm.
-                            </p>
-                        </Card>
+                    <StaggerContainer className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        {[
+                            {
+                                title: "Client-First",
+                                description: "Your success is our measure. We align our incentives with your outcomes and build solutions that scale with your firm.",
+                                accent: "accent"
+                            },
+                            {
+                                title: "Excellence",
+                                description: "We bring institutional-grade expertise to every engagement, from regulatory compliance to technology implementation.",
+                                accent: "primary"
+                            },
+                            {
+                                title: "Partnership",
+                                description: "We work as an extension of your team, embedding ourselves in your operations to drive sustainable change.",
+                                accent: "accent"
+                            }
+                        ].map((value, index) => (
+                            <motion.div key={value.title} variants={fadeInUp}>
+                                <Card className="space-y-6 h-full group hover:shadow-xl hover:-translate-y-4 transition-all duration-500 relative overflow-hidden">
+                                    <div className={`w-16 h-1 bg-${value.accent} rounded-full group-hover:w-20 transition-all duration-300`}></div>
+                                    <h3 className={`text-xl font-bold text-primary group-hover:text-${value.accent} transition-colors duration-300`}>
+                                        {value.title}
+                                    </h3>
+                                    <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                        {value.description}
+                                    </p>
 
-                        <Card className="text-center">
-                            <div className="flex justify-center mb-6">
-                                <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
-                                    <Award className="h-8 w-8 text-primary" />
-                                </div>
-                            </div>
-                            <h3 className="text-xl font-bold text-primary mb-4">Excellence</h3>
-                            <p className="text-primary/70 leading-relaxed">
-                                We bring institutional-grade expertise to every engagement, from regulatory compliance to technology implementation.
-                            </p>
-                        </Card>
-
-                        <Card className="text-center">
-                            <div className="flex justify-center mb-6">
-                                <div className="w-16 h-16 bg-accent/10 rounded-lg flex items-center justify-center">
-                                    <Users className="h-8 w-8 text-accent" />
-                                </div>
-                            </div>
-                            <h3 className="text-xl font-bold text-primary mb-4">Partnership</h3>
-                            <p className="text-primary/70 leading-relaxed">
-                                We work as an extension of your team, embedding ourselves in your operations to drive sustainable change.
-                            </p>
-                        </Card>
-                    </div>
+                                    {/* Subtle background animation */}
+                                    <div className={`absolute inset-0 bg-gradient-to-br from-${value.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
                 </Container>
             </Section>
 
-            {/* Leadership */}
+            {/* Leadership Team - Premium Cards */}
             <Section background="white" padding="lg">
                 <Container maxWidth="lg">
-                    <h2 className="text-4xl md:text-5xl font-bold text-primary mb-16 text-center">Leadership Team</h2>
+                    <AnimatedSection animation="fadeInUp" className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Leadership Team</h2>
+                        <p className="text-xl text-primary/70 max-w-3xl mx-auto">
+                            Our team brings together strategic consulting, regulatory expertise, technology innovation, and product development experience from across the wealth management industry.
+                        </p>
+                    </AnimatedSection>
 
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <Card>
-                            <h3 className="text-xl font-bold text-primary mb-1">Sebastian Pantoja</h3>
-                            <p className="text-accent font-semibold mb-4">Founder & CEO</p>
-                            <p className="text-primary/70 leading-relaxed">
-                                15+ years building wealth management technology and advisory practices with deep expertise in regulatory compliance and product development.
-                            </p>
-                        </Card>
+                    <StaggerContainer className="space-y-6">
+                        {[
+                            {
+                                name: "Sebastian Pantoja",
+                                role: "Founder & CEO",
+                                expertise: "15+ years building wealth management technology and advisory practices with deep expertise in regulatory compliance and product development.",
+                                accent: "accent"
+                            },
+                            {
+                                name: "Gurinder Khera",
+                                role: "Chief Strategy Officer",
+                                expertise: "Former senior executive at leading RIA firms, specializing in operational transformation and advisor enablement strategies.",
+                                accent: "primary"
+                            },
+                            {
+                                name: "Miguel Rodriguez",
+                                role: "Head of Technology",
+                                expertise: "Fintech innovator with expertise in AI/ML applications for compliance and data integration across financial services platforms.",
+                                accent: "accent"
+                            },
+                            {
+                                name: "Andrew Chen",
+                                role: "Managing Director, Product",
+                                expertise: "Product leader with track record of launching institutional-grade investment solutions for wealth advisors and family offices.",
+                                accent: "primary"
+                            }
+                        ].map((leader, index) => (
+                            <motion.div key={leader.name} variants={fadeInUp}>
+                                <Card className="group hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 overflow-hidden relative">
+                                    <div className="p-8">
+                                        <div className="flex flex-col md:flex-row gap-8">
+                                            {/* Visual Element */}
+                                            <div className="flex-shrink-0">
+                                                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-${leader.accent}/10 to-${leader.accent}/20 group-hover:from-${leader.accent}/20 group-hover:to-${leader.accent}/30 transition-all duration-300 flex items-center justify-center`}>
+                                                    <div className={`w-8 h-8 rounded-lg bg-${leader.accent} group-hover:scale-110 transition-transform duration-300`}></div>
+                                                </div>
+                                            </div>
 
-                        <Card>
-                            <h3 className="text-xl font-bold text-primary mb-1">Gurinder Khera</h3>
-                            <p className="text-accent font-semibold mb-4">Chief Strategy Officer</p>
-                            <p className="text-primary/70 leading-relaxed">
-                                Former senior executive at leading RIA firms, specializing in operational transformation and advisor enablement strategies.
-                            </p>
-                        </Card>
+                                            {/* Content */}
+                                            <div className="flex-1">
+                                                <div className={`w-16 h-1 bg-${leader.accent} rounded-full mb-4 group-hover:w-24 transition-all duration-300`}></div>
+                                                <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${leader.accent} transition-colors duration-300`}>
+                                                    {leader.name}
+                                                </h3>
+                                                <p className={`text-${leader.accent} font-semibold mb-4 text-lg`}>
+                                                    {leader.role}
+                                                </p>
+                                                <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                                    {leader.expertise}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                        <Card>
-                            <h3 className="text-xl font-bold text-primary mb-1">Miguel Rodriguez</h3>
-                            <p className="text-accent font-semibold mb-4">Head of Technology</p>
-                            <p className="text-primary/70 leading-relaxed">
-                                Fintech innovator with expertise in AI/ML applications for compliance and data integration across financial services platforms.
-                            </p>
-                        </Card>
-
-                        <Card>
-                            <h3 className="text-xl font-bold text-primary mb-1">Andrew Chen</h3>
-                            <p className="text-accent font-semibold mb-4">Managing Director, Product</p>
-                            <p className="text-primary/70 leading-relaxed">
-                                Product leader with track record of launching institutional-grade investment solutions for wealth advisors and family offices.
-                            </p>
-                        </Card>
-                    </div>
+                                    {/* Hover Effect */}
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-${leader.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
                 </Container>
             </Section>
         </div>
