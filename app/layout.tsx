@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layout/Header";
@@ -5,8 +6,8 @@ import Footer from "@/components/layout/Footer";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 
 export const metadata: Metadata = {
-  title: "Acumen Strategy - Compliance-First Transformation for Wealth Managers",
-  description: "A single partner for advisory-led transformation and compliant product activation for wealth managers.",
+  title: "Acumen Strategy - Modern Compliance Solutions for Wealth Management",
+  description: "Software, products, and services designed to help wealth management firms navigate compliance requirements and scale their operations.",
 };
 
 export default function RootLayout({
