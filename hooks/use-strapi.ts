@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
-interface UseStrapiOptions {
-    initialData?: any;
+interface UseStrapiOptions<T = unknown> {
+    initialData?: T | null;
     revalidate?: boolean;
 }
 
@@ -15,9 +15,9 @@ interface UseStrapiOptions {
  * @param options - Optional configuration
  * @returns Object with data, loading state, and error
  */
-export function useStrapi<T = any>(
+export function useStrapi<T = unknown>(
     endpoint: string | null,
-    options: UseStrapiOptions = {}
+    options: UseStrapiOptions<T> = {}
 ) {
     const { initialData = null, revalidate = false } = options;
 
@@ -81,22 +81,32 @@ export function useStrapi<T = any>(
     return { data, loading, error };
 }
 
+// Type definitions for Strapi v4 API responses
+interface StrapiResponseData {
+    id: number;
+    attributes: Record<string, unknown>;
+}
+
+interface StrapiResponse {
+    data: StrapiResponseData | StrapiResponseData[];
+}
+
 /**
  * Format Strapi v4 API response
  */
-function formatResponse<T>(response: any): T {
-    if (!response) return response;
+function formatResponse<T>(response: StrapiResponse | null | undefined): T {
+    if (!response) return response as T;
 
     // Handle array responses
     if (response.data && Array.isArray(response.data)) {
-        return response.data.map((item: any) => ({
+        return response.data.map((item: StrapiResponseData) => ({
             id: item.id,
             ...item.attributes,
         })) as T;
     }
 
     // Handle single object responses
-    if (response.data && response.data.attributes) {
+    if (response.data && 'attributes' in response.data) {
         return {
             id: response.data.id,
             ...response.data.attributes,

@@ -61,23 +61,33 @@ export function getStrapiMedia(url: string | null | undefined): string {
     return `${STRAPI_URL}${url}`;
 }
 
+// Type definitions for Strapi v4 API responses
+interface StrapiResponseData {
+    id: number;
+    attributes: Record<string, unknown>;
+}
+
+interface StrapiResponse {
+    data: StrapiResponseData | StrapiResponseData[];
+}
+
 /**
  * Format Strapi API response to get the data
  * Strapi v4 returns data in a nested structure
  */
-export function formatStrapiData<T>(response: any): T {
-    if (!response) return response;
+export function formatStrapiData<T>(response: StrapiResponse | null | undefined): T {
+    if (!response) return response as T;
 
     // Handle array responses
     if (response.data && Array.isArray(response.data)) {
-        return response.data.map((item: any) => ({
+        return response.data.map((item: StrapiResponseData) => ({
             id: item.id,
             ...item.attributes,
         })) as T;
     }
 
     // Handle single object responses
-    if (response.data && response.data.attributes) {
+    if (response.data && 'attributes' in response.data) {
         return {
             id: response.data.id,
             ...response.data.attributes,
@@ -91,7 +101,7 @@ export function formatStrapiData<T>(response: any): T {
  * Helper to build query string for Strapi API
  * @param params - Query parameters
  */
-export function buildQueryString(params: Record<string, any>): string {
+export function buildQueryString(params: Record<string, string | number | boolean | object | null | undefined>): string {
     const searchParams = new URLSearchParams();
 
     Object.keys(params).forEach((key) => {
