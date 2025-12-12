@@ -1,4 +1,3 @@
-// components/sections/home/CTASection.tsx
 'use client';
 
 import Container from '@/components/ui/Container';
@@ -12,13 +11,13 @@ export default function CTASection() {
             <Container maxWidth="lg">
                 <div className="text-center max-w-3xl mx-auto">
                     <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-                        Ready to Modernize Your Operations?
+                        Let's Discuss Your Needs
                     </h2>
                     <p className="text-xl text-primary/70 mb-8 leading-relaxed">
-                        Request platform access to see how our technology solutions can transform your wealth management practice.
+                        Schedule a conversation to explore how our solutions can address your firm's compliance and operational challenges.
                     </p>
                     <Button href="/contact" variant="accent" size="lg">
-                        Request Platform Access
+                        Get in Touch
                         <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                 </div>

@@ -1,4 +1,3 @@
-// components/sections/home/SolutionsSection.tsx
 'use client';
 
 import Link from 'next/link';
@@ -43,10 +42,10 @@ export default function SolutionsSection() {
             <Container>
                 <div className="max-w-3xl mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-                        Technology Solutions
+                        Solutions
                     </h2>
                     <p className="text-xl text-primary/70 leading-relaxed">
-                        Integrated technology platform and institutional-grade products that work seamlessly together to power modern wealth management operations.
+                        Specialized software, products, and services that address different aspects of wealth management operations.
                     </p>
                 </div>
 
