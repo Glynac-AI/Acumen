@@ -35,7 +35,7 @@ export default function About() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                We are a technology company building the intelligence layer for wealth management. Our platform combines advanced diagnostics, AI-powered compliance tools, and institutional-grade investment products.
+                                We build software and products that help wealth management firms navigate the intersection of regulatory compliance, operational efficiency, and growth.
                             </motion.p>
                         </motion.div>
                     </div>
@@ -46,23 +46,23 @@ export default function About() {
             <Section background="white" padding="lg">
                 <Container maxWidth="lg">
                     <AnimatedSection animation="fadeInUp" className="mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Technology-First Approach</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Our Approach</h2>
                         <p className="text-xl text-primary/70 max-w-3xl">
-                            We believe the future of wealth management lies in intelligent technology that enhances human decision-making rather than replacing it.
+                            We combine deep regulatory expertise with modern software development to create solutions that actually work in practice.
                         </p>
                     </AnimatedSection>
 
                     <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-8">
                         {[
                             {
-                                title: "Advanced Diagnostics",
-                                description: "Our platform analyzes compliance posture, operational efficiency, and technology infrastructure through sophisticated diagnostic tools that provide real-time insights into firm health and regulatory risk.",
+                                title: "Diagnostic Intelligence",
+                                description: "Our platform helps firms understand their compliance posture through comprehensive analysis of policies, procedures, and operational workflows—identifying gaps before they become problems.",
                                 accent: "accent",
                                 number: "01"
                             },
                             {
-                                title: "AI-Powered Intelligence",
-                                description: "Supervised artificial intelligence agents automate workflows, surface compliance risks, and provide actionable recommendations—all within a framework designed for regulated environments.",
+                                title: "Purpose-Built Solutions",
+                                description: "Rather than force-fitting generic tools, we've built specialized software for wealth management's unique compliance challenges—from supervised AI to automated options execution.",
                                 accent: "primary",
                                 number: "02"
                             }
@@ -100,8 +100,8 @@ export default function About() {
                     <StaggerContainer className="max-w-6xl mx-auto">
                         {[
                             {
-                                title: "Integrated Solutions",
-                                description: "Beyond technology, we provide institutional-grade investment products and professional education through our compliance institute—creating a comprehensive ecosystem for modern wealth management.",
+                                title: "Beyond Software",
+                                description: "While software is our foundation, we also provide institutional investment products and professional education—creating a comprehensive ecosystem that addresses the full spectrum of wealth management needs.",
                                 accent: "accent",
                                 number: "03"
                             }
@@ -143,25 +143,25 @@ export default function About() {
                     <AnimatedSection animation="fadeInUp" className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Our Values</h2>
                         <p className="text-xl text-primary/70">
-                            The principles that guide our technology development and client partnerships
+                            The principles that guide how we build and who we serve
                         </p>
                     </AnimatedSection>
 
                     <StaggerContainer className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         {[
                             {
-                                title: "Innovation",
-                                description: "We push the boundaries of what's possible with AI and compliance technology while maintaining the highest standards of security and regulatory alignment.",
+                                title: "Practical Innovation",
+                                description: "We push boundaries with AI and automation, but only where it genuinely solves real problems. New technology for its own sake doesn't interest us.",
                                 accent: "accent"
                             },
                             {
-                                title: "Excellence",
-                                description: "Every line of code, every algorithm, every product is built to institutional-grade standards with precision and attention to detail.",
+                                title: "Built for Regulation",
+                                description: "Every product we ship is designed with compliance at its core—not bolted on as an afterthought. We understand the regulatory environment because we live in it.",
                                 accent: "primary"
                             },
                             {
-                                title: "Partnership",
-                                description: "We succeed when our clients succeed. Our technology is designed to amplify human expertise, not replace it.",
+                                title: "Long-Term Partnerships",
+                                description: "We succeed when our clients succeed. Our solutions are built to grow with your firm, not lock you into rigid systems that become obstacles.",
                                 accent: "accent"
                             }
                         ].map((value, index) => (
@@ -190,7 +190,7 @@ export default function About() {
                     <AnimatedSection animation="fadeInUp" className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Leadership Team</h2>
                         <p className="text-xl text-primary/70 max-w-3xl mx-auto">
-                            Technologists, innovators, and industry experts building the future of wealth management compliance.
+                            Engineers, product leaders, and industry veterans building the next generation of compliance infrastructure.
                         </p>
                     </AnimatedSection>
 
@@ -199,25 +199,25 @@ export default function About() {
                             {
                                 name: "Lubna",
                                 role: "Founder & CEO",
-                                expertise: "Technology leader with 15+ years building AI-powered compliance platforms and wealth management solutions for regulated environments.",
+                                expertise: "Built AI-powered compliance platforms for 15+ years. Previously led product development at leading wealth management technology firms.",
                                 accent: "accent"
                             },
                             {
                                 name: "Gurinder Khera",
                                 role: "Chief Technology Officer",
-                                expertise: "Former senior architect at leading fintech firms, specializing in AI/ML systems and enterprise-scale platform development.",
+                                expertise: "Former senior architect at fintech companies. Specializes in building scalable systems for regulated industries.",
                                 accent: "primary"
                             },
                             {
                                 name: "Miguel Rodriguez",
                                 role: "Head of Product",
-                                expertise: "Product innovator with deep expertise in regulatory technology and user experience design for financial services applications.",
+                                expertise: "Product leader with expertise in regulatory technology. Previously designed compliance software for enterprise financial institutions.",
                                 accent: "accent"
                             },
                             {
                                 name: "Andrew Chen",
                                 role: "Managing Director, Investments",
-                                expertise: "Investment professional with track record of launching institutional-grade products for wealth advisors and family offices.",
+                                expertise: "Investment professional who has launched institutional-grade products for advisors and family offices throughout his career.",
                                 accent: "primary"
                             }
                         ].map((leader, index) => (

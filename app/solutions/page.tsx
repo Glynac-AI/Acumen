@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import AnimatedSection from '@/components/ui/AnimatedSection';
 import StaggerContainer from '@/components/ui/StaggerContainer';
-import { ArrowRight, Brain, TrendingUp, Building2, GraduationCap } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { fadeInUp } from '@/lib/animations';
 
 export default function Solutions() {
@@ -19,32 +19,28 @@ export default function Solutions() {
             tagline: 'Compliance-First AI Workspace',
             description: 'Unified CRM, communications, and portfolio data with supervised AI agents that automate workflows and surface regulatory risk.',
             href: '/solutions/glynac',
-            accent: 'primary',
-            icon: Brain
+            accent: 'primary'
         },
         {
             name: 'Tollbooth',
             tagline: 'Automated Options Execution',
             description: 'Rules-based covered call and options automation that generates systematic income while preserving individual equity positions.',
             href: '/solutions/tollbooth',
-            accent: 'accent',
-            icon: TrendingUp
+            accent: 'accent'
         },
         {
             name: 'Prairie Hill Holdings',
             tagline: 'Institutional NNN Real Estate',
             description: 'Institutional-quality triple-net lease (NNN) real estate solutions for advisors and high-net-worth clients with tax-efficient structures.',
             href: '/solutions/phh',
-            accent: 'primary',
-            icon: Building2
+            accent: 'primary'
         },
         {
             name: 'Acumen Compliance Institute',
             tagline: 'Education & Certification',
             description: 'Professional development, compliance training, and certification programs designed for wealth management professionals.',
             href: '/solutions/aci',
-            accent: 'accent',
-            icon: GraduationCap
+            accent: 'accent'
         }
     ];
 
@@ -64,7 +60,7 @@ export default function Solutions() {
                             className="space-y-8"
                         >
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
-                                Technology Solutions
+                                Solutions
                             </h1>
 
                             <motion.p
@@ -73,82 +69,188 @@ export default function Solutions() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                Integrated platform combining AI-powered compliance technology, institutional-grade investment products, and professional education.
+                                Software, products, and services designed to help wealth management firms navigate compliance requirements and scale their operations.
                             </motion.p>
                         </motion.div>
                     </div>
                 </Container>
             </Section>
 
-            {/* Solutions Grid */}
+            {/* Why Different Section */}
+            <Section background="white" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Built for Wealth Management</h2>
+                        <div className="space-y-6 text-lg text-primary/70 leading-relaxed">
+                            <p>
+                                Every product we build is designed specifically for wealth management firms—RIAs, broker-dealers, and family offices. This focus allows us to solve problems that generic platforms ignore, from supervised AI that understands advisor-client communications to options automation that preserves individual client holdings.
+                            </p>
+                            <p>
+                                Our solutions work together when needed, but each stands on its own. You're not forced into an all-or-nothing platform decision.
+                            </p>
+                        </div>
+                    </AnimatedSection>
+                </Container>
+            </Section>
+
+            {/* Solutions Grid - NO ICONS */}
             <Section background="muted" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Integrated Technology Platform</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Our Solutions</h2>
                         <p className="text-xl text-primary/70 max-w-3xl mx-auto">
-                            Four specialized solutions that work together to modernize wealth management operations, enhance compliance, and drive growth.
+                            Four specialized solutions that address different aspects of wealth management operations—from compliance automation to institutional products.
                         </p>
                     </AnimatedSection>
 
                     <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                        {solutions.map((solution, index) => {
-                            const Icon = solution.icon;
-                            return (
-                                <motion.div key={solution.name} variants={fadeInUp}>
-                                    <Link href={solution.href} className="group block">
-                                        <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
-                                            <div className="p-8 space-y-6">
-                                                {/* Icon */}
-                                                <div className={`w-14 h-14 rounded-xl bg-${solution.accent}/10 flex items-center justify-center group-hover:bg-${solution.accent}/20 transition-all duration-300`}>
-                                                    <Icon className={`h-7 w-7 text-${solution.accent} group-hover:scale-110 transition-transform duration-300`} />
-                                                </div>
+                        {solutions.map((solution, index) => (
+                            <motion.div key={solution.name} variants={fadeInUp}>
+                                <Link href={solution.href} className="group block">
+                                    <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
+                                        <div className="p-8 space-y-6">
+                                            {/* Accent Bar */}
+                                            <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
 
-                                                {/* Accent Bar */}
-                                                <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
-
-                                                {/* Content */}
-                                                <div>
-                                                    <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
-                                                        {solution.name}
-                                                    </h3>
-                                                    <p className={`text-${solution.accent} font-semibold mb-3 text-sm uppercase tracking-wide`}>
-                                                        {solution.tagline}
-                                                    </p>
-                                                    <p className="text-primary/70 leading-relaxed mb-6 group-hover:text-primary/80 transition-colors duration-300">
-                                                        {solution.description}
-                                                    </p>
-                                                    <div className={`inline-flex items-center text-sm font-medium text-${solution.accent} group-hover:gap-2 transition-all duration-300`}>
-                                                        Learn more
-                                                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                                                    </div>
+                                            {/* Content */}
+                                            <div>
+                                                <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
+                                                    {solution.name}
+                                                </h3>
+                                                <p className={`text-${solution.accent} font-semibold mb-3 text-sm uppercase tracking-wide`}>
+                                                    {solution.tagline}
+                                                </p>
+                                                <p className="text-primary/70 leading-relaxed mb-6 group-hover:text-primary/80 transition-colors duration-300">
+                                                    {solution.description}
+                                                </p>
+                                                <div className={`inline-flex items-center text-sm font-medium text-${solution.accent} group-hover:gap-2 transition-all duration-300`}>
+                                                    Learn more
+                                                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            {/* Hover Gradient */}
-                                            <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
-                                        </Card>
-                                    </Link>
-                                </motion.div>
-                            );
-                        })}
+                                        {/* Hover Gradient */}
+                                        <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                    </Card>
+                                </Link>
+                            </motion.div>
+                        ))}
                     </StaggerContainer>
+                </Container>
+            </Section>
 
-                    {/* CTA Section */}
-                    <AnimatedSection animation="fadeInUp" className="text-center mt-16">
-                        <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative max-w-4xl mx-auto">
+            {/* Key Benefits - NO ICONS */}
+            <Section background="white" padding="lg">
+                <Container>
+                    <AnimatedSection animation="fadeInUp" className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Why Firms Choose Acumen</h2>
+                        <p className="text-xl text-primary/70 max-w-3xl mx-auto">
+                            Benefits that matter when selecting compliance and operational solutions
+                        </p>
+                    </AnimatedSection>
+
+                    <StaggerContainer className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        {[
+                            {
+                                title: "Regulatory Expertise",
+                                description: "Built by people who understand SEC, FINRA, and state requirements. Our solutions reflect real-world compliance workflows, not theoretical frameworks.",
+                                accent: "accent"
+                            },
+                            {
+                                title: "Rapid Deployment",
+                                description: "Most implementations take weeks, not months. We prioritize getting you operational quickly with incremental improvements over time.",
+                                accent: "primary"
+                            },
+                            {
+                                title: "Dedicated Support",
+                                description: "You work with people who know your firm and understand your challenges. No generic help desk tickets or offshore support centers.",
+                                accent: "accent"
+                            }
+                        ].map((benefit, index) => (
+                            <motion.div key={benefit.title} variants={fadeInUp}>
+                                <Card className="space-y-6 h-full group hover:shadow-xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+                                    <div className={`w-16 h-1 bg-${benefit.accent} rounded-full group-hover:w-20 transition-all duration-300`}></div>
+
+                                    <h3 className={`text-xl font-bold text-primary group-hover:text-${benefit.accent} transition-colors duration-300`}>
+                                        {benefit.title}
+                                    </h3>
+
+                                    <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                        {benefit.description}
+                                    </p>
+
+                                    <div className={`absolute inset-0 bg-linear-to-br from-${benefit.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+                </Container>
+            </Section>
+
+            {/* Implementation Approach */}
+            <Section background="muted" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Implementation Approach</h2>
+                        <div className="space-y-8">
+                            <div className="grid md:grid-cols-3 gap-8">
+                                {[
+                                    {
+                                        number: "01",
+                                        title: "Discovery",
+                                        description: "We start by understanding your current compliance workflows, technology stack, and operational constraints. This helps us identify where our solutions provide the most value.",
+                                        accent: "accent"
+                                    },
+                                    {
+                                        number: "02",
+                                        title: "Pilot",
+                                        description: "Deploy with a small group—typically your compliance team or a subset of advisors. This validates the approach and builds internal champions before broader rollout.",
+                                        accent: "primary"
+                                    },
+                                    {
+                                        number: "03",
+                                        title: "Scale",
+                                        description: "Expand to additional users and integrate with existing systems. We provide ongoing training, support, and updates as your needs evolve.",
+                                        accent: "accent"
+                                    }
+                                ].map((step) => (
+                                    <div key={step.number} className="group">
+                                        <div className="text-6xl font-bold text-accent/10 mb-4 group-hover:text-accent/20 transition-colors duration-300">
+                                            {step.number}
+                                        </div>
+                                        <h3 className="text-xl font-bold text-primary mb-3 group-hover:text-accent transition-colors duration-300">
+                                            {step.title}
+                                        </h3>
+                                        <p className="text-primary/70 leading-relaxed">
+                                            {step.description}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </AnimatedSection>
+                </Container>
+            </Section>
+
+            {/* CTA Section */}
+            <Section background="white" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp" className="text-center">
+                        <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative">
                             <div className="p-12 text-center space-y-6">
                                 <div className="w-16 h-1 bg-accent rounded-full mx-auto group-hover:w-20 transition-all duration-300"></div>
 
                                 <h3 className="text-3xl font-bold text-primary group-hover:text-accent transition-colors duration-300">
-                                    Ready to Modernize Your Operations?
+                                    Need Help Choosing?
                                 </h3>
 
                                 <p className="text-lg text-primary/70 leading-relaxed max-w-2xl mx-auto group-hover:text-primary/80 transition-colors duration-300">
-                                    Request platform access to see how our integrated technology solutions can transform your wealth management practice.
+                                    Not sure which solutions are right for your firm? Schedule a conversation to discuss your specific needs and operational constraints.
                                 </p>
 
                                 <Button href="/contact" variant="accent" size="lg" className="group-hover:scale-105 transition-transform duration-300">
-                                    Request Platform Access
+                                    Get in Touch
                                     <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </div>

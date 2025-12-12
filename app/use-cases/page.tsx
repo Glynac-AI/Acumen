@@ -14,23 +14,23 @@ import { fadeInUp } from '@/lib/animations';
 export default function UseCases() {
     const useCases = [
         {
-            title: 'AI-Powered Compliance Automation',
-            challenge: 'Mid-sized RIA struggling with manual compliance workflows and fragmented communication systems across 40+ advisors.',
-            result: 'Implemented Glynac platform with automated supervision, real-time risk detection, and unified communications—reducing compliance burden by 70% while improving audit readiness.',
+            title: 'Scaling Compliance Operations',
+            challenge: 'Mid-sized RIA managing compliance oversight across 40+ advisors with manual review processes and fragmented communication systems.',
+            result: 'Implemented unified supervision platform with automated workflows, improving audit readiness while reducing administrative time spent on compliance reviews.',
             accent: 'accent',
             number: '01'
         },
         {
-            title: 'Systematic Income Generation',
-            challenge: 'Independent broker-dealer seeking to differentiate advisor value proposition with institutional-grade options strategies while preserving individual client holdings.',
-            result: 'Deployed Tollbooth automation platform generating consistent income through rules-based covered calls—enhanced advisor retention and attracted $200M+ in new assets.',
+            title: 'Systematic Income Strategies',
+            challenge: 'Independent broker-dealer seeking to offer institutional-grade options strategies while maintaining individual client equity positions and avoiding operational complexity.',
+            result: 'Deployed automated covered call platform with rules-based execution, enhancing advisor value proposition and attracting significant new assets under management.',
             accent: 'primary',
             number: '02'
         },
         {
-            title: 'Technology-Driven Growth',
-            challenge: 'Legacy wealth management firm facing competitive pressures from modern fintech-enabled competitors and struggling to scale operations efficiently.',
-            result: 'Integrated Glynac AI workspace with institutional products—modernized technology stack, reduced operational costs 40%, and accelerated advisor onboarding by 60%.',
+            title: 'Modernizing Legacy Operations',
+            challenge: 'Established wealth management firm facing rising operational costs and competitive pressure from technology-enabled competitors.',
+            result: 'Integrated compliance software and streamlined workflows, reducing overhead while improving scalability and advisor satisfaction.',
             accent: 'accent',
             number: '03'
         }
@@ -61,7 +61,7 @@ export default function UseCases() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                Real-world applications of our technology platform solving critical challenges in wealth management compliance and operations.
+                                How wealth management firms use our solutions to address specific operational and compliance challenges.
                             </motion.p>
 
                             <motion.p
@@ -70,7 +70,7 @@ export default function UseCases() {
                                 transition={{ duration: 0.8, delay: 0.6 }}
                                 className="text-lg text-white/80 leading-relaxed max-w-3xl"
                             >
-                                See how firms leverage our AI-powered platform, automated execution systems, and institutional products to achieve measurable results.
+                                Real examples from RIAs, broker-dealers, and wealth management firms that have implemented our platform to improve efficiency and reduce risk.
                             </motion.p>
                         </motion.div>
                     </div>
@@ -81,9 +81,9 @@ export default function UseCases() {
             <Section background="white" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8 text-center">Technology-Driven Transformation</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8 text-center">Client Results</h2>
                         <p className="text-xl text-primary/70 max-w-3xl mx-auto text-center">
-                            Each implementation demonstrates measurable improvements in compliance efficiency, operational capacity, and business growth.
+                            Each engagement demonstrates measurable improvements in operational efficiency and regulatory compliance.
                         </p>
                     </AnimatedSection>
 
@@ -153,13 +153,13 @@ export default function UseCases() {
                 <Container maxWidth="lg">
                     <AnimatedSection animation="fadeInUp" className="text-center">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-                            Ready to Transform Your Operations?
+                            Discuss Your Specific Challenges
                         </h2>
                         <p className="text-xl text-primary/70 mb-8 max-w-3xl mx-auto">
-                            Request platform access to see how our technology can solve your firm's specific challenges and drive measurable results.
+                            Every firm faces different operational constraints. Schedule a conversation to explore how our solutions can address your specific needs.
                         </p>
                         <Button href="/contact" variant="accent" size="lg">
-                            Request Platform Access
+                            Get in Touch
                             <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
                     </AnimatedSection>
