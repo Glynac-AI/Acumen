@@ -1,0 +1,250 @@
+// app/solutions/phh/page.tsx
+'use client';
+
+import { motion } from 'framer-motion';
+import Container from '@/components/ui/Container';
+import Section from '@/components/ui/Section';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import AnimatedSection from '@/components/ui/AnimatedSection';
+import StaggerContainer from '@/components/ui/StaggerContainer';
+import { CheckCircle2 } from 'lucide-react';
+import { fadeInUp } from '@/lib/animations';
+
+export default function PHH() {
+    return (
+        <div className="min-h-screen">
+            {/* Hero - Full Screen Height */}
+            <Section background="gradient" padding="lg" className="text-white relative overflow-hidden min-h-screen flex items-center">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
+
+                <Container className="relative z-10">
+                    <div className="max-w-4xl">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="space-y-8"
+                        >
+
+                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
+                                Prairie Hill Holdings — Institutional Triple-Net Lease (NNN) Real Estate Solutions
+                            </h1>
+
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                className="text-xl md:text-2xl text-white/90 leading-relaxed"
+                            >
+                                Access diversified, triple-net lease (NNN) real estate investments designed for yield and low volatility. Institutional-quality properties for wealth management clients.
+                            </motion.p>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.6 }}
+                                className="flex flex-col sm:flex-row gap-4 pt-4"
+                            >
+                                <Button href="/contact" variant="secondary" size="lg">
+                                    Learn About the Fund
+                                </Button>
+                                <Button href="/resources" variant="accent" size="lg">
+                                    Download Overview
+                                </Button>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                </Container>
+            </Section>
+
+            {/* Overview */}
+            <Section background="white" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">About Prairie Hill Holdings</h2>
+                        <div className="space-y-6 text-lg text-primary/70 leading-relaxed">
+                            <p>
+                                Prairie Hill Holdings (PHH) provides advisors and their high-net-worth clients access to institutional-quality commercial real estate through a diversified portfolio of triple-net lease (NNN) properties.
+                            </p>
+                            <p>
+                                Each investment is structured for tax efficiency, predictable income, and capital preservation—offering an alternative to traditional fixed income with tangible asset backing.
+                            </p>
+                        </div>
+                    </AnimatedSection>
+                </Container>
+            </Section>
+
+            {/* Key Features */}
+            <Section background="muted" padding="lg">
+                <Container>
+                    <AnimatedSection animation="fadeInUp" className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Key Features</h2>
+                    </AnimatedSection>
+
+                    <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        {[
+                            {
+                                title: "Triple-Net Lease (NNN) Properties",
+                                description: "Tenant-responsible for taxes, insurance, and maintenance—reducing owner operational burden",
+                                accent: "accent"
+                            },
+                            {
+                                title: "Target Returns",
+                                description: "Competitive yields with focus on cash flow stability and capital appreciation potential",
+                                accent: "primary"
+                            },
+                            {
+                                title: "Diversified Property Types",
+                                description: "Exposure across logistics and distribution facilities, warehouse/industrial, grocery-anchored retail, medical/healthcare retail, education retail, and quick-service restaurants",
+                                accent: "accent"
+                            },
+                            {
+                                title: "Tax-Efficient Structure",
+                                description: "Designed to optimize tax treatment with 1031 exchange compatibility for qualified investors",
+                                accent: "primary"
+                            },
+                            {
+                                title: "Institutional Quality",
+                                description: "Grade-A properties in prime locations with credit-rated tenants and long-term leases",
+                                accent: "accent"
+                            },
+                            {
+                                title: "Regular Distributions",
+                                description: "Quarterly income distributions with transparent reporting and performance tracking",
+                                accent: "primary"
+                            }
+                        ].map((feature, index) => (
+                            <motion.div key={feature.title} variants={fadeInUp}>
+                                <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 space-y-6 h-full overflow-hidden relative">
+                                    <div className={`w-12 h-1 bg-${feature.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
+
+                                    <h3 className={`text-lg font-bold text-primary group-hover:text-${feature.accent} transition-colors duration-300`}>
+                                        {feature.title}
+                                    </h3>
+
+                                    <p className="text-sm text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                        {feature.description}
+                                    </p>
+
+                                    {/* Hover Gradient */}
+                                    <div className={`absolute inset-0 bg-linear-to-r from-${feature.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+                </Container>
+            </Section>
+
+            {/* Asset Classes */}
+            <Section background="white" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp" className="mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Asset Classes</h2>
+                        <p className="text-xl text-primary/70 mb-8">
+                            PHH focuses exclusively on institutional-grade NNN properties across six core asset classes:
+                        </p>
+                    </AnimatedSection>
+
+                    <StaggerContainer className="grid md:grid-cols-2 gap-6">
+                        {[
+                            {
+                                title: "Logistics & Distribution Facilities",
+                                description: "Modern distribution centers and fulfillment facilities with long-term credit tenants in strategic locations",
+                                accent: "accent"
+                            },
+                            {
+                                title: "Warehouse/Industrial",
+                                description: "Class-A industrial properties in strategic locations with stable cash flows and institutional-grade tenants",
+                                accent: "primary"
+                            },
+                            {
+                                title: "Grocery-Anchored Retail",
+                                description: "Essential retail centers anchored by major grocery chains in high-traffic, resilient markets",
+                                accent: "accent"
+                            },
+                            {
+                                title: "Medical/Healthcare Retail",
+                                description: "Medical office buildings and healthcare facilities with long-term healthcare provider tenants",
+                                accent: "primary"
+                            },
+                            {
+                                title: "Education Retail",
+                                description: "Facilities leased to educational institutions, training centers, and childcare providers",
+                                accent: "accent"
+                            },
+                            {
+                                title: "Quick-Service Restaurants",
+                                description: "National QSR brands with corporate guarantees in high-visibility, high-traffic locations",
+                                accent: "primary"
+                            }
+                        ].map((asset, index) => (
+                            <motion.div key={asset.title} variants={fadeInUp}>
+                                <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 space-y-4 h-full overflow-hidden relative">
+                                    <div className={`w-12 h-1 bg-${asset.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
+
+                                    <h3 className={`text-xl font-bold text-primary group-hover:text-${asset.accent} transition-colors duration-300`}>
+                                        {asset.title}
+                                    </h3>
+
+                                    <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                        {asset.description}
+                                    </p>
+
+                                    {/* Hover Gradient */}
+                                    <div className={`absolute inset-0 bg-linear-to-r from-${asset.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+                </Container>
+            </Section>
+
+            {/* Who It's For */}
+            <Section background="muted" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Ideal For</h2>
+                        <div className="space-y-4">
+                            {[
+                                'High-net-worth individuals seeking income and diversification beyond equities and bonds',
+                                'Advisors looking to add alternative investments with tangible asset backing',
+                                'Clients interested in 1031 exchange opportunities for tax deferral',
+                                'Portfolios requiring low-volatility income with capital preservation focus',
+                                'Investors seeking institutional-grade NNN real estate without direct property management',
+                            ].map((item, index) => (
+                                <div key={index} className="flex items-start gap-3">
+                                    <CheckCircle2 className="h-6 w-6 text-accent shrink-0 mt-0.5" />
+                                    <span className="text-lg text-primary/70">{item}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </AnimatedSection>
+                </Container>
+            </Section>
+
+            {/* CTA */}
+            <Section background="white" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp" className="text-center">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
+                            Interested in Adding PHH to Your Practice?
+                        </h2>
+                        <p className="text-xl text-primary/70 mb-8 max-w-3xl mx-auto">
+                            Contact us for detailed investor materials, performance data, and advisor partnership opportunities.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Button href="/contact" variant="accent" size="lg" className="hover:scale-105 transition-transform duration-300">
+                                Learn About the Fund
+                            </Button>
+                            <Button href="/resources" variant="secondary" size="lg">
+                                Download Overview
+                            </Button>
+                        </div>
+                    </AnimatedSection>
+                </Container>
+            </Section>
+        </div>
+    );
+}
