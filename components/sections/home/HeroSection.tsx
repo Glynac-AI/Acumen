@@ -23,19 +23,19 @@ export default function HeroSection() {
                         className="space-y-8"
                     >
                         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
-                            Compliance-First Transformation for Wealth Managers
+                            Intelligence-Driven Technology for Wealth Management
                         </h1>
 
                         <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-3xl">
-                            Strategy, compliance, technology, and growth solutions for wealth management firms.
+                            Advanced diagnostic platform, AI-powered compliance solutions, and institutional-grade products built for modern wealth managers.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">
                             <Button href="/contact" variant="secondary" size="lg">
-                                Book a Consultation
+                                Request Platform Access
                             </Button>
                             <Button href="/solutions" variant="accent" size="lg">
-                                Explore Solutions
+                                Explore Technology
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                         </div>

@@ -27,9 +27,8 @@ export default function Pricing() {
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="space-y-8"
                         >
-
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
-                                Pricing & Engagements
+                                Pricing
                             </h1>
 
                             <motion.p
@@ -38,113 +37,20 @@ export default function Pricing() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                Flexible engagement models designed to align with your firm's needs and growth trajectory.
+                                Flexible pricing models designed to scale with your firm's growth and technology needs.
                             </motion.p>
                         </motion.div>
                     </div>
                 </Container>
             </Section>
 
-            {/* Consulting Engagements */}
+            {/* Platform Pricing */}
             <Section background="white" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Advisory & Consulting</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Platform Solutions</h2>
                         <p className="text-xl text-primary/70">
-                            Strategic engagements tailored to your transformation goals
-                        </p>
-                    </AnimatedSection>
-
-                    <StaggerContainer className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        <motion.div variants={fadeInUp}>
-                            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 space-y-6 h-full">
-                                <div className="w-12 h-1 bg-accent rounded-full group-hover:w-16 transition-all duration-300"></div>
-                                <h3 className="text-xl font-bold text-primary group-hover:text-accent transition-colors duration-300">Project-Based</h3>
-                                <div className="text-4xl font-bold text-accent">$25k–$75k</div>
-                                <p className="text-sm text-primary/70 group-hover:text-primary/80 transition-colors duration-300">
-                                    Defined scope, timeline, and deliverables
-                                </p>
-                                <ul className="space-y-3">
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Discovery & diagnosis</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Strategic roadmap</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Implementation plan</span>
-                                    </li>
-                                </ul>
-                            </Card>
-                        </motion.div>
-
-                        <motion.div variants={fadeInUp}>
-                            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border-2 border-accent space-y-6 h-full relative overflow-hidden">
-                                <div className="text-xs font-semibold text-accent uppercase tracking-wide bg-accent/10 px-3 py-1 rounded-full inline-block">Most Popular</div>
-                                <div className="w-12 h-1 bg-accent rounded-full group-hover:w-16 transition-all duration-300"></div>
-                                <h3 className="text-xl font-bold text-primary group-hover:text-accent transition-colors duration-300">Retainer</h3>
-                                <div className="text-4xl font-bold text-accent">$10k–$25k/mo</div>
-                                <p className="text-sm text-primary/70 group-hover:text-primary/80 transition-colors duration-300">
-                                    Ongoing strategic advisory
-                                </p>
-                                <ul className="space-y-3">
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Continuous support</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Priority access</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Product integration</span>
-                                    </li>
-                                </ul>
-
-                                {/* Popular Badge Glow */}
-                                <div className="absolute inset-0 bg-linear-to-r from-accent/5 to-transparent opacity-50 pointer-events-none"></div>
-                            </Card>
-                        </motion.div>
-
-                        <motion.div variants={fadeInUp}>
-                            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 space-y-6 h-full">
-                                <div className="w-12 h-1 bg-primary rounded-full group-hover:w-16 transition-all duration-300"></div>
-                                <h3 className="text-xl font-bold text-primary group-hover:text-primary/80 transition-colors duration-300">Enterprise</h3>
-                                <div className="text-4xl font-bold text-accent">Custom</div>
-                                <p className="text-sm text-primary/70 group-hover:text-primary/80 transition-colors duration-300">
-                                    Comprehensive transformation programs
-                                </p>
-                                <ul className="space-y-3">
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Full-service support</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Dedicated team</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                                        <span className="text-sm text-primary/70">Custom solutions</span>
-                                    </li>
-                                </ul>
-                            </Card>
-                        </motion.div>
-                    </StaggerContainer>
-                </Container>
-            </Section>
-
-            {/* Product Pricing */}
-            <Section background="muted" padding="lg">
-                <Container>
-                    <AnimatedSection animation="fadeInUp" className="mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Product Solutions</h2>
-                        <p className="text-xl text-primary/70">
-                            Subscription-based pricing scaled to your firm size
+                            Subscription-based pricing for our technology platform and products
                         </p>
                     </AnimatedSection>
 
@@ -154,50 +60,87 @@ export default function Pricing() {
                                 name: "Glynac",
                                 description: "Compliance-first AI workspace",
                                 price: "Contact for pricing",
-                                detail: "Based on firm size & user count",
-                                accent: "accent"
+                                detail: "Based on firm size, user count, and feature requirements",
+                                accent: "accent",
+                                features: [
+                                    "AI-powered compliance monitoring",
+                                    "Unified CRM and communications",
+                                    "Real-time risk assessment",
+                                    "Integrated reporting and analytics"
+                                ]
                             },
                             {
                                 name: "Tollbooth",
                                 description: "Automated options execution",
                                 price: "Custom pricing",
-                                detail: "Per-account or revenue-share models",
-                                accent: "primary"
+                                detail: "Per-account fees or revenue-share models available",
+                                accent: "primary",
+                                features: [
+                                    "Rules-based automation",
+                                    "Individual position preservation",
+                                    "Advisor-level overlays",
+                                    "Custodian integration"
+                                ]
                             },
                             {
                                 name: "Prairie Hill Holdings",
                                 description: "Institutional real estate investments",
                                 price: "Investment-based",
-                                detail: "Contact for offering details",
-                                accent: "accent"
+                                detail: "Minimum investment requirements apply",
+                                accent: "accent",
+                                features: [
+                                    "Triple-net lease properties",
+                                    "Tax-efficient structures",
+                                    "Quarterly distributions",
+                                    "Institutional-grade assets"
+                                ]
                             },
                             {
-                                name: "Labs & ATS",
-                                description: "Marketing and talent services",
-                                price: "Project-based",
-                                detail: "Custom quotes per engagement",
-                                accent: "primary"
+                                name: "Acumen Compliance Institute",
+                                description: "Education and certification programs",
+                                price: "Program-based",
+                                detail: "Contact for course catalog and pricing",
+                                accent: "primary",
+                                features: [
+                                    "Professional certifications",
+                                    "Compliance training",
+                                    "Technology workshops",
+                                    "Continuing education credits"
+                                ]
                             }
                         ].map((product, index) => (
                             <motion.div key={product.name} variants={fadeInUp}>
                                 <Card className="group hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden relative">
-                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 p-8">
-                                        <div className="flex-1">
-                                            <div className={`w-12 h-1 bg-${product.accent} rounded-full mb-4 group-hover:w-16 transition-all duration-300`}></div>
-                                            <h3 className={`text-xl font-bold text-primary mb-2 group-hover:text-${product.accent} transition-colors duration-300`}>
-                                                {product.name}
-                                            </h3>
-                                            <p className="text-primary/70 group-hover:text-primary/80 transition-colors duration-300">
-                                                {product.description}
-                                            </p>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-2xl font-bold text-accent group-hover:scale-105 transition-transform duration-300">
-                                                {product.price}
+                                    <div className="p-8">
+                                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                                            <div className="flex-1">
+                                                <div className={`w-12 h-1 bg-${product.accent} rounded-full mb-4 group-hover:w-16 transition-all duration-300`}></div>
+                                                <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${product.accent} transition-colors duration-300`}>
+                                                    {product.name}
+                                                </h3>
+                                                <p className="text-primary/70 mb-6 group-hover:text-primary/80 transition-colors duration-300">
+                                                    {product.description}
+                                                </p>
+
+                                                {/* Features */}
+                                                <ul className="space-y-2">
+                                                    {product.features.map((feature, idx) => (
+                                                        <li key={idx} className="flex items-center gap-2 text-sm text-primary/70">
+                                                            <CheckCircle2 className={`h-4 w-4 text-${product.accent} shrink-0`} />
+                                                            <span>{feature}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             </div>
-                                            <p className="text-sm text-primary/70 mt-1">
-                                                {product.detail}
-                                            </p>
+
+                                            <div className="lg:text-right shrink-0">
+                                                <div className="text-3xl font-bold text-accent group-hover:scale-105 transition-transform duration-300 mb-2">
+                                                    {product.price}
+                                                </div>
+                                                <p className="text-sm text-primary/70 max-w-xs">
+                                                    {product.detail}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -210,8 +153,41 @@ export default function Pricing() {
 
                     <AnimatedSection animation="fadeInUp" className="text-center mt-16">
                         <Button href="/contact" variant="accent" size="lg" className="hover:scale-105 transition-transform duration-300">
-                            Discuss Pricing
+                            Request Custom Quote
                         </Button>
+                    </AnimatedSection>
+                </Container>
+            </Section>
+
+            {/* Enterprise Solutions */}
+            <Section background="muted" padding="lg">
+                <Container maxWidth="lg">
+                    <AnimatedSection animation="fadeInUp">
+                        <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative">
+                            <div className="p-12 text-center space-y-6">
+                                <div className="w-16 h-1 bg-accent rounded-full mx-auto group-hover:w-20 transition-all duration-300"></div>
+
+                                <h3 className="text-3xl font-bold text-primary group-hover:text-accent transition-colors duration-300">
+                                    Enterprise & Custom Solutions
+                                </h3>
+
+                                <p className="text-lg text-primary/70 leading-relaxed max-w-2xl mx-auto group-hover:text-primary/80 transition-colors duration-300">
+                                    Need a custom integration, multi-product deployment, or enterprise-wide implementation? We offer tailored solutions with dedicated support, custom development, and volume pricing.
+                                </p>
+
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                                    <Button href="/contact" variant="accent" size="lg" className="group-hover:scale-105 transition-transform duration-300">
+                                        Contact Sales
+                                    </Button>
+                                    <Button href="/solutions" variant="secondary" size="lg">
+                                        View Platform
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Hover Gradient */}
+                            <div className="absolute inset-0 bg-linear-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                        </Card>
                     </AnimatedSection>
                 </Container>
             </Section>

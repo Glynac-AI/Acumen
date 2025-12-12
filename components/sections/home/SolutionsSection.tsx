@@ -9,13 +9,6 @@ import { ArrowRight } from 'lucide-react';
 export default function SolutionsSection() {
     const solutions = [
         {
-            name: 'Consulting',
-            tagline: 'Strategic Advisory & Execution',
-            description: 'Diagnose challenges, design compliant roadmaps, and prioritize execution across strategy, compliance, technology, and growth.',
-            href: '/solutions/consulting',
-            accent: 'accent'
-        },
-        {
             name: 'Glynac',
             tagline: 'Compliance-First AI Workspace',
             description: 'Unified CRM, communications, and portfolio data with supervised AI agents that automate workflows and surface regulatory risk.',
@@ -37,18 +30,11 @@ export default function SolutionsSection() {
             accent: 'primary'
         },
         {
-            name: 'Acumen Labs',
-            tagline: 'Marketing & Brand Implementation',
-            description: 'Full-service marketing execution including websites, brand development, content creation, and advisor enablement materials.',
-            href: '/solutions/labs',
+            name: 'Acumen Compliance Institute',
+            tagline: 'Education & Certification',
+            description: 'Professional development, compliance training, and certification programs designed for wealth management professionals.',
+            href: '/solutions/aci',
             accent: 'accent'
-        },
-        {
-            name: 'Acumen Talent Solutions',
-            tagline: 'Recruiting & Executive Search',
-            description: 'Specialized talent acquisition for wealth management firms, from advisor recruiting to C-suite executive placements.',
-            href: '/solutions/ats',
-            accent: 'primary'
         }
     ];
 
@@ -57,14 +43,14 @@ export default function SolutionsSection() {
             <Container>
                 <div className="max-w-3xl mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-                        Solutions
+                        Technology Solutions
                     </h2>
                     <p className="text-xl text-primary/70 leading-relaxed">
-                        Acumen Strategy activates a suite of products and services only when your strategy requires them. Each solution is designed to integrate seamlessly with your existing operations while maintaining regulatory compliance.
+                        Integrated technology platform and institutional-grade products that work seamlessly together to power modern wealth management operations.
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 gap-6">
                     {solutions.map((solution) => (
                         <Link
                             key={solution.name}

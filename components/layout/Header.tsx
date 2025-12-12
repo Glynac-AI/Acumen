@@ -8,12 +8,10 @@ import { Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const solutions = [
-    { name: 'Consulting', href: '/solutions/consulting', description: 'Strategic advisory & execution' },
     { name: 'Glynac', href: '/solutions/glynac', description: 'Compliance-first AI workspace' },
     { name: 'Tollbooth', href: '/solutions/tollbooth', description: 'Automated options execution' },
     { name: 'Prairie Hill Holdings', href: '/solutions/phh', description: 'Institutional NNN real estate' },
-    { name: 'Acumen Labs', href: '/solutions/labs', description: 'Marketing & brand implementation' },
-    { name: 'Acumen Talent Solutions', href: '/solutions/ats', description: 'Recruiting & executive search' },
+    { name: 'Acumen Compliance Institute', href: '/solutions/aci', description: 'Education & certification' },
 ];
 
 export default function Header() {
@@ -70,7 +68,7 @@ export default function Header() {
                         About
                     </Link>
 
-                    {/* Solutions Dropdown - FIXED: Now clickable AND has dropdown */}
+                    {/* Solutions Dropdown */}
                     <div
                         className="relative"
                         onMouseEnter={() => setSolutionsOpen(true)}
@@ -83,7 +81,7 @@ export default function Header() {
                                 : 'text-white/80 hover:text-white'
                                 }`}
                         >
-                            Solutions
+                            Technology
                             <ChevronDown
                                 className={`w-4 h-4 transition-transform duration-200 ${solutionsOpen ? 'rotate-180' : ''
                                     }`}
@@ -110,7 +108,7 @@ export default function Header() {
                                                 View All Solutions
                                             </div>
                                             <div className="text-xs text-primary/50 mt-1">
-                                                Complete solutions portfolio
+                                                Complete technology platform
                                             </div>
                                         </Link>
 
@@ -173,7 +171,7 @@ export default function Header() {
                             : 'bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm'
                             }`}
                     >
-                        Book a Consultation
+                        Request Platform Access
                     </Link>
                 </div>
 
@@ -221,7 +219,7 @@ export default function Header() {
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="text-sm font-medium text-primary hover:text-accent transition-colors mb-2 block"
                                 >
-                                    Solutions
+                                    Technology
                                 </Link>
                                 <div className="pl-4 space-y-2">
                                     {solutions.map((solution) => (
@@ -266,7 +264,7 @@ export default function Header() {
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="block text-center py-3 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent/90 transition-colors"
                                 >
-                                    Book a Consultation
+                                    Request Platform Access
                                 </Link>
                             </div>
                         </div>

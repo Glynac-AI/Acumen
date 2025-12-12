@@ -26,7 +26,7 @@ export default function Footer() {
                         </Link>
 
                         <p className="text-sm text-white/70 leading-relaxed max-w-xs">
-                            Compliance-first transformation for wealth managers. Strategy, execution, results.
+                            Technology-first compliance platform for wealth management. Intelligence-driven solutions for modern firms.
                         </p>
                         <div className="flex gap-4 pt-2">
                             <a
@@ -52,7 +52,7 @@ export default function Footer() {
                             </li>
                             <li>
                                 <Link href="/solutions" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
-                                    Solutions
+                                    Technology
                                 </Link>
                             </li>
                             <li>
@@ -73,11 +73,6 @@ export default function Footer() {
                         <h4 className="text-sm font-semibold tracking-wide text-accent">Solutions</h4>
                         <ul className="space-y-3">
                             <li>
-                                <Link href="/solutions/consulting" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
-                                    Consulting
-                                </Link>
-                            </li>
-                            <li>
                                 <Link href="/solutions/glynac" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
                                     Glynac
                                 </Link>
@@ -93,8 +88,8 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/solutions/labs" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
-                                    Acumen Labs
+                                <Link href="/solutions/aci" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
+                                    Compliance Institute
                                 </Link>
                             </li>
                         </ul>

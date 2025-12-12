@@ -9,24 +9,18 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import AnimatedSection from '@/components/ui/AnimatedSection';
 import StaggerContainer from '@/components/ui/StaggerContainer';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Brain, TrendingUp, Building2, GraduationCap } from 'lucide-react';
 import { fadeInUp } from '@/lib/animations';
 
 export default function Solutions() {
     const solutions = [
-        {
-            name: 'Consulting',
-            tagline: 'Strategic Advisory & Execution',
-            description: 'Diagnose challenges, design compliant roadmaps, and prioritize execution across strategy, compliance, technology, and growth.',
-            href: '/solutions/consulting',
-            accent: 'accent',
-        },
         {
             name: 'Glynac',
             tagline: 'Compliance-First AI Workspace',
             description: 'Unified CRM, communications, and portfolio data with supervised AI agents that automate workflows and surface regulatory risk.',
             href: '/solutions/glynac',
             accent: 'primary',
+            icon: Brain
         },
         {
             name: 'Tollbooth',
@@ -34,6 +28,7 @@ export default function Solutions() {
             description: 'Rules-based covered call and options automation that generates systematic income while preserving individual equity positions.',
             href: '/solutions/tollbooth',
             accent: 'accent',
+            icon: TrendingUp
         },
         {
             name: 'Prairie Hill Holdings',
@@ -41,21 +36,16 @@ export default function Solutions() {
             description: 'Institutional-quality triple-net lease (NNN) real estate solutions for advisors and high-net-worth clients with tax-efficient structures.',
             href: '/solutions/phh',
             accent: 'primary',
+            icon: Building2
         },
         {
-            name: 'Acumen Labs',
-            tagline: 'Marketing & Brand Implementation',
-            description: 'Full-service marketing execution including websites, brand development, content creation, and advisor enablement materials.',
-            href: '/solutions/labs',
+            name: 'Acumen Compliance Institute',
+            tagline: 'Education & Certification',
+            description: 'Professional development, compliance training, and certification programs designed for wealth management professionals.',
+            href: '/solutions/aci',
             accent: 'accent',
-        },
-        {
-            name: 'Acumen Talent Solutions',
-            tagline: 'Recruiting & Executive Search',
-            description: 'Specialized talent acquisition for wealth management firms, from advisor recruiting to C-suite executive placements.',
-            href: '/solutions/ats',
-            accent: 'primary',
-        },
+            icon: GraduationCap
+        }
     ];
 
     return (
@@ -73,9 +63,8 @@ export default function Solutions() {
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="space-y-8"
                         >
-
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
-                                Solutions
+                                Technology Solutions
                             </h1>
 
                             <motion.p
@@ -84,7 +73,7 @@ export default function Solutions() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                Acumen Strategy activates a suite of products and services only when your strategy requires them. Each solution is designed to integrate seamlessly with your existing operations while maintaining regulatory compliance.
+                                Integrated platform combining AI-powered compliance technology, institutional-grade investment products, and professional education.
                             </motion.p>
                         </motion.div>
                     </div>
@@ -95,45 +84,53 @@ export default function Solutions() {
             <Section background="muted" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Integrated Solutions Portfolio</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Integrated Technology Platform</h2>
                         <p className="text-xl text-primary/70 max-w-3xl mx-auto">
-                            Six specialized solutions that work together to transform wealth management operations, enhance compliance, and drive sustainable growth.
+                            Four specialized solutions that work together to modernize wealth management operations, enhance compliance, and drive growth.
                         </p>
                     </AnimatedSection>
 
                     <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                        {solutions.map((solution, index) => (
-                            <motion.div key={solution.name} variants={fadeInUp}>
-                                <Link href={solution.href} className="group block">
-                                    <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
-                                        <div className="p-8 space-y-6">
-                                            {/* Accent Bar */}
-                                            <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
+                        {solutions.map((solution, index) => {
+                            const Icon = solution.icon;
+                            return (
+                                <motion.div key={solution.name} variants={fadeInUp}>
+                                    <Link href={solution.href} className="group block">
+                                        <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
+                                            <div className="p-8 space-y-6">
+                                                {/* Icon */}
+                                                <div className={`w-14 h-14 rounded-xl bg-${solution.accent}/10 flex items-center justify-center group-hover:bg-${solution.accent}/20 transition-all duration-300`}>
+                                                    <Icon className={`h-7 w-7 text-${solution.accent} group-hover:scale-110 transition-transform duration-300`} />
+                                                </div>
 
-                                            {/* Content */}
-                                            <div>
-                                                <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
-                                                    {solution.name}
-                                                </h3>
-                                                <p className={`text-${solution.accent} font-semibold mb-3 text-sm uppercase tracking-wide`}>
-                                                    {solution.tagline}
-                                                </p>
-                                                <p className="text-primary/70 leading-relaxed mb-6 group-hover:text-primary/80 transition-colors duration-300">
-                                                    {solution.description}
-                                                </p>
-                                                <div className={`inline-flex items-center text-sm font-medium text-${solution.accent} group-hover:gap-2 transition-all duration-300`}>
-                                                    Learn more
-                                                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                                                {/* Accent Bar */}
+                                                <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
+
+                                                {/* Content */}
+                                                <div>
+                                                    <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
+                                                        {solution.name}
+                                                    </h3>
+                                                    <p className={`text-${solution.accent} font-semibold mb-3 text-sm uppercase tracking-wide`}>
+                                                        {solution.tagline}
+                                                    </p>
+                                                    <p className="text-primary/70 leading-relaxed mb-6 group-hover:text-primary/80 transition-colors duration-300">
+                                                        {solution.description}
+                                                    </p>
+                                                    <div className={`inline-flex items-center text-sm font-medium text-${solution.accent} group-hover:gap-2 transition-all duration-300`}>
+                                                        Learn more
+                                                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {/* Hover Gradient */}
-                                        <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
-                                    </Card>
-                                </Link>
-                            </motion.div>
-                        ))}
+                                            {/* Hover Gradient */}
+                                            <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                        </Card>
+                                    </Link>
+                                </motion.div>
+                            );
+                        })}
                     </StaggerContainer>
 
                     {/* CTA Section */}
@@ -143,15 +140,15 @@ export default function Solutions() {
                                 <div className="w-16 h-1 bg-accent rounded-full mx-auto group-hover:w-20 transition-all duration-300"></div>
 
                                 <h3 className="text-3xl font-bold text-primary group-hover:text-accent transition-colors duration-300">
-                                    Not Sure Which Solutions Are Right for Your Firm?
+                                    Ready to Modernize Your Operations?
                                 </h3>
 
                                 <p className="text-lg text-primary/70 leading-relaxed max-w-2xl mx-auto group-hover:text-primary/80 transition-colors duration-300">
-                                    Schedule a consultation to discuss how Acumen Strategy can create a custom combination of solutions tailored to your specific needs and growth objectives.
+                                    Request platform access to see how our integrated technology solutions can transform your wealth management practice.
                                 </p>
 
                                 <Button href="/contact" variant="accent" size="lg" className="group-hover:scale-105 transition-transform duration-300">
-                                    Book a Consultation
+                                    Request Platform Access
                                     <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </div>

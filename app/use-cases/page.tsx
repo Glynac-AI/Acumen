@@ -14,23 +14,23 @@ import { fadeInUp } from '@/lib/animations';
 export default function UseCases() {
     const useCases = [
         {
-            title: 'RIA Growth & Scaling',
-            challenge: 'Mid-sized RIA struggling to scale operations while maintaining compliance oversight across expanding advisor team.',
-            result: 'Improved compliance oversight, 40+ advisors onboarded with unified supervision, and enhanced client value proposition through systematic yield strategies.',
+            title: 'AI-Powered Compliance Automation',
+            challenge: 'Mid-sized RIA struggling with manual compliance workflows and fragmented communication systems across 40+ advisors.',
+            result: 'Implemented Glynac platform with automated supervision, real-time risk detection, and unified communications—reducing compliance burden by 70% while improving audit readiness.',
             accent: 'accent',
             number: '01'
         },
         {
-            title: 'Compliance Modernization',
-            challenge: 'Legacy wealth management firm facing audit challenges due to fragmented communication systems and manual compliance processes.',
-            result: '100% improvement in audit readiness, reduced supervisory burden, and automated risk detection across client communications.',
+            title: 'Systematic Income Generation',
+            challenge: 'Independent broker-dealer seeking to differentiate advisor value proposition with institutional-grade options strategies while preserving individual client holdings.',
+            result: 'Deployed Tollbooth automation platform generating consistent income through rules-based covered calls—enhanced advisor retention and attracted $200M+ in new assets.',
             accent: 'primary',
             number: '02'
         },
         {
-            title: 'Advisor Enablement',
-            challenge: 'Independent broker-dealer seeking to differentiate value proposition and retain top-producing advisors amid competitive pressures.',
-            result: 'Enhanced advisor loyalty through differentiated product offerings, improved recruiting success, and strengthened brand positioning.',
+            title: 'Technology-Driven Growth',
+            challenge: 'Legacy wealth management firm facing competitive pressures from modern fintech-enabled competitors and struggling to scale operations efficiently.',
+            result: 'Integrated Glynac AI workspace with institutional products—modernized technology stack, reduced operational costs 40%, and accelerated advisor onboarding by 60%.',
             accent: 'accent',
             number: '03'
         }
@@ -51,8 +51,6 @@ export default function UseCases() {
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="space-y-8"
                         >
-                            
-
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
                                 Use Cases
                             </h1>
@@ -63,7 +61,7 @@ export default function UseCases() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                Real-world applications of Acumen Strategy's integrated consulting and product solutions across wealth management challenges.
+                                Real-world applications of our technology platform solving critical challenges in wealth management compliance and operations.
                             </motion.p>
 
                             <motion.p
@@ -72,7 +70,7 @@ export default function UseCases() {
                                 transition={{ duration: 0.8, delay: 0.6 }}
                                 className="text-lg text-white/80 leading-relaxed max-w-3xl"
                             >
-                                See how firms like yours have transformed their operations, enhanced compliance, and achieved measurable growth through our strategic advisory and integrated solutions.
+                                See how firms leverage our AI-powered platform, automated execution systems, and institutional products to achieve measurable results.
                             </motion.p>
                         </motion.div>
                     </div>
@@ -83,9 +81,9 @@ export default function UseCases() {
             <Section background="white" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8 text-center">Proven Results Across the Industry</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8 text-center">Technology-Driven Transformation</h2>
                         <p className="text-xl text-primary/70 max-w-3xl mx-auto text-center">
-                            Each engagement demonstrates our commitment to compliance-first transformation and measurable outcomes.
+                            Each implementation demonstrates measurable improvements in compliance efficiency, operational capacity, and business growth.
                         </p>
                     </AnimatedSection>
 
@@ -155,13 +153,13 @@ export default function UseCases() {
                 <Container maxWidth="lg">
                     <AnimatedSection animation="fadeInUp" className="text-center">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-                            Ready to Solve Your Firm's Unique Challenges?
+                            Ready to Transform Your Operations?
                         </h2>
                         <p className="text-xl text-primary/70 mb-8 max-w-3xl mx-auto">
-                            Every firm faces different challenges. Schedule a consultation to discuss how Acumen Strategy can create a custom solution for your specific needs.
+                            Request platform access to see how our technology can solve your firm's specific challenges and drive measurable results.
                         </p>
                         <Button href="/contact" variant="accent" size="lg">
-                            Book a Consultation
+                            Request Platform Access
                             <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
                     </AnimatedSection>

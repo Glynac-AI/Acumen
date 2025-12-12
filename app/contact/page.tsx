@@ -258,27 +258,27 @@ export default function Contact() {
                                                     </div>
                                                 </div>
 
-                                                <div>
-                                                    <label className="block text-sm font-medium text-primary mb-2">
-                                                        Area of Interest *
-                                                    </label>
-                                                    <select
-                                                        name="interest"
-                                                        value={formData.interest}
-                                                        onChange={handleChange}
-                                                        required
-                                                        className="w-full px-4 py-3 border border-primary/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent hover:border-accent/30 transition-colors"
-                                                    >
-                                                        <option value="">Select area</option>
-                                                        <option value="consulting">Consulting</option>
-                                                        <option value="glynac">Glynac</option>
-                                                        <option value="tollbooth">Tollbooth</option>
-                                                        <option value="phh">Prairie Hill Holdings</option>
-                                                        <option value="labs">Acumen Labs</option>
-                                                        <option value="ats">Acumen Talent Solutions</option>
-                                                        <option value="multiple">Multiple Solutions</option>
-                                                    </select>
-                                                </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-primary mb-2">
+                                                            Area of Interest *
+                                                        </label>
+                                                        <select
+                                                            name="interest"
+                                                            value={formData.interest}
+                                                            onChange={handleChange}
+                                                            required
+                                                            className="w-full px-4 py-3 border border-primary/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent hover:border-accent/30 transition-colors"
+                                                        >
+                                                            <option value="">Select area</option>
+                                                            <option value="glynac">Glynac (AI Workspace)</option>
+                                                            <option value="tollbooth">Tollbooth (Options Automation)</option>
+                                                            <option value="phh">Prairie Hill Holdings (Real Estate)</option>
+                                                            <option value="aci">Acumen Compliance Institute (Education)</option>
+                                                            <option value="platform">Platform Access</option>
+                                                            <option value="multiple">Multiple Solutions</option>
+                                                            <option value="enterprise">Enterprise Implementation</option>
+                                                        </select>
+                                                    </div>
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-primary mb-2">

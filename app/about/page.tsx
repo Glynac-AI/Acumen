@@ -25,8 +25,6 @@ export default function About() {
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="space-y-8"
                         >
-                            
-
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
                                 About Acumen Strategy
                             </h1>
@@ -37,7 +35,7 @@ export default function About() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                Acumen Strategy is the strategic advisory and consulting arm of the Acumen ecosystem. We partner with wealth management firms to diagnose challenges, design roadmaps, and deploy integrated solutions across strategy, compliance, technology, and growth.
+                                We are a technology company building the intelligence layer for wealth management. Our platform combines advanced diagnostics, AI-powered compliance tools, and institutional-grade investment products.
                             </motion.p>
                         </motion.div>
                     </div>
@@ -48,23 +46,23 @@ export default function About() {
             <Section background="white" padding="lg">
                 <Container maxWidth="lg">
                     <AnimatedSection animation="fadeInUp" className="mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Our Approach</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Technology-First Approach</h2>
                         <p className="text-xl text-primary/70 max-w-3xl">
-                            We don't just deliver recommendations—we activate solutions and measure results.
+                            We believe the future of wealth management lies in intelligent technology that enhances human decision-making rather than replacing it.
                         </p>
                     </AnimatedSection>
 
                     <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-8">
                         {[
                             {
-                                title: "Strategy-Led Transformation",
-                                description: "We begin every engagement with deep discovery to understand your firm's unique challenges, regulatory requirements, and growth objectives. Our consultants work alongside your leadership team to diagnose operational gaps, technology inefficiencies, and compliance risks before recommending solutions.",
+                                title: "Advanced Diagnostics",
+                                description: "Our platform analyzes compliance posture, operational efficiency, and technology infrastructure through sophisticated diagnostic tools that provide real-time insights into firm health and regulatory risk.",
                                 accent: "accent",
                                 number: "01"
                             },
                             {
-                                title: "Compliance-First Design",
-                                description: "Every roadmap we design is built with regulatory alignment at its core. Whether implementing new technology, launching products, or scaling operations, we ensure your transformation maintains audit readiness and reduces supervisory burden while enabling growth.",
+                                title: "AI-Powered Intelligence",
+                                description: "Supervised artificial intelligence agents automate workflows, surface compliance risks, and provide actionable recommendations—all within a framework designed for regulated environments.",
                                 accent: "primary",
                                 number: "02"
                             }
@@ -102,8 +100,8 @@ export default function About() {
                     <StaggerContainer className="max-w-6xl mx-auto">
                         {[
                             {
-                                title: "Measured Execution",
-                                description: "We don't just deliver recommendations—we activate solutions and measure results. By deploying the right combination of Acumen products (Glynac, Tollbooth, PHH, Labs, ATS), we help you execute on strategy with confidence and track measurable outcomes.",
+                                title: "Integrated Solutions",
+                                description: "Beyond technology, we provide institutional-grade investment products and professional education through our compliance institute—creating a comprehensive ecosystem for modern wealth management.",
                                 accent: "accent",
                                 number: "03"
                             }
@@ -145,25 +143,25 @@ export default function About() {
                     <AnimatedSection animation="fadeInUp" className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Our Values</h2>
                         <p className="text-xl text-primary/70">
-                            The principles that guide every engagement and solution we deliver
+                            The principles that guide our technology development and client partnerships
                         </p>
                     </AnimatedSection>
 
                     <StaggerContainer className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         {[
                             {
-                                title: "Client-First",
-                                description: "Your success is our measure. We align our incentives with your outcomes and build solutions that scale with your firm.",
+                                title: "Innovation",
+                                description: "We push the boundaries of what's possible with AI and compliance technology while maintaining the highest standards of security and regulatory alignment.",
                                 accent: "accent"
                             },
                             {
                                 title: "Excellence",
-                                description: "We bring institutional-grade expertise to every engagement, from regulatory compliance to technology implementation.",
+                                description: "Every line of code, every algorithm, every product is built to institutional-grade standards with precision and attention to detail.",
                                 accent: "primary"
                             },
                             {
                                 title: "Partnership",
-                                description: "We work as an extension of your team, embedding ourselves in your operations to drive sustainable change.",
+                                description: "We succeed when our clients succeed. Our technology is designed to amplify human expertise, not replace it.",
                                 accent: "accent"
                             }
                         ].map((value, index) => (
@@ -192,34 +190,34 @@ export default function About() {
                     <AnimatedSection animation="fadeInUp" className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Leadership Team</h2>
                         <p className="text-xl text-primary/70 max-w-3xl mx-auto">
-                            Our team brings together strategic consulting, regulatory expertise, technology innovation, and product development experience from across the wealth management industry.
+                            Technologists, innovators, and industry experts building the future of wealth management compliance.
                         </p>
                     </AnimatedSection>
 
                     <StaggerContainer className="space-y-6">
                         {[
                             {
-                                name: "Sebastian Pantoja",
+                                name: "Lubna",
                                 role: "Founder & CEO",
-                                expertise: "15+ years building wealth management technology and advisory practices with deep expertise in regulatory compliance and product development.",
+                                expertise: "Technology leader with 15+ years building AI-powered compliance platforms and wealth management solutions for regulated environments.",
                                 accent: "accent"
                             },
                             {
                                 name: "Gurinder Khera",
-                                role: "Chief Strategy Officer",
-                                expertise: "Former senior executive at leading RIA firms, specializing in operational transformation and advisor enablement strategies.",
+                                role: "Chief Technology Officer",
+                                expertise: "Former senior architect at leading fintech firms, specializing in AI/ML systems and enterprise-scale platform development.",
                                 accent: "primary"
                             },
                             {
                                 name: "Miguel Rodriguez",
-                                role: "Head of Technology",
-                                expertise: "Fintech innovator with expertise in AI/ML applications for compliance and data integration across financial services platforms.",
+                                role: "Head of Product",
+                                expertise: "Product innovator with deep expertise in regulatory technology and user experience design for financial services applications.",
                                 accent: "accent"
                             },
                             {
                                 name: "Andrew Chen",
-                                role: "Managing Director, Product",
-                                expertise: "Product leader with track record of launching institutional-grade investment solutions for wealth advisors and family offices.",
+                                role: "Managing Director, Investments",
+                                expertise: "Investment professional with track record of launching institutional-grade products for wealth advisors and family offices.",
                                 accent: "primary"
                             }
                         ].map((leader, index) => (

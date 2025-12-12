@@ -10,21 +10,21 @@ import { ArrowRight } from 'lucide-react';
 export default function UseCasesSection() {
     const useCases = [
         {
-            title: 'RIA Growth & Scaling',
-            challenge: 'Mid-sized RIA struggling to scale operations while maintaining compliance oversight across expanding advisor team.',
-            result: 'Improved compliance oversight, 40+ advisors onboarded with unified supervision, and enhanced client value proposition through systematic yield strategies.',
+            title: 'AI-Powered Compliance Automation',
+            challenge: 'Mid-sized RIA struggling with manual compliance workflows and fragmented communication systems.',
+            result: 'Implemented AI workspace reducing compliance burden by 70% while improving audit readiness.',
             accent: 'accent'
         },
         {
-            title: 'Compliance Modernization',
-            challenge: 'Legacy wealth management firm facing audit challenges due to fragmented communication systems and manual compliance processes.',
-            result: '100% improvement in audit readiness, reduced supervisory burden, and automated risk detection across client communications.',
+            title: 'Systematic Income Generation',
+            challenge: 'Broker-dealer seeking differentiated options strategies while preserving individual client holdings.',
+            result: 'Deployed automated platform generating consistent income and attracting $200M+ in new assets.',
             accent: 'primary'
         },
         {
-            title: 'Advisor Enablement',
-            challenge: 'Independent broker-dealer seeking to differentiate value proposition and retain top-producing advisors amid competitive pressures.',
-            result: 'Enhanced advisor loyalty through differentiated product offerings, improved recruiting success, and strengthened brand positioning.',
+            title: 'Technology-Driven Growth',
+            challenge: 'Legacy firm facing competitive pressures from modern fintech-enabled competitors.',
+            result: 'Integrated technology platform reducing operational costs 40% and accelerating growth 60%.',
             accent: 'accent'
         }
     ];
@@ -37,7 +37,7 @@ export default function UseCasesSection() {
                         Real-World Impact
                     </h2>
                     <p className="text-xl text-primary/70 leading-relaxed">
-                        How wealth management firms use Acumen Strategy to solve complex challenges
+                        How wealth management firms use our technology platform to solve complex operational and compliance challenges
                     </p>
                 </div>
 
