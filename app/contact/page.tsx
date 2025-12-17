@@ -127,8 +127,8 @@ export default function Contact() {
                                             <div>
                                                 <h3 className="font-semibold text-primary mb-1">Office</h3>
                                                 <p className="text-primary/70">
-                                                    123 Financial District<br />
-                                                    New York, NY 10004
+                                                    272 Market Sq , Lake Forest<br />
+                                                    Chicago, IL 60045
                                                 </p>
                                             </div>
                                         </div>
