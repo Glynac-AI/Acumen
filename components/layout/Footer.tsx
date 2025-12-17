@@ -115,8 +115,8 @@ export default function Footer() {
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <span className="text-sm text-white/70">
-                                    123 Financial District<br />
-                                    New York, NY 10004
+                                    272 Market Sq , Lake Forest<br />
+                                    Chicago, IL 60045
                                 </span>
                             </li>
                         </ul>
