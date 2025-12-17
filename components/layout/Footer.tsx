@@ -108,10 +108,12 @@ export default function Footer() {
                                     info@acumen-strategy.com
                                 </a>
                             </li>
+                            {/*
                             <li className="flex items-start gap-3">
                                 <Phone className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <span className="text-sm text-white/70">+1 (555) 123-4567</span>
                             </li>
+                            */}
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <span className="text-sm text-white/70">
