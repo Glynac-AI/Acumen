@@ -197,29 +197,30 @@ export default function About() {
                     <StaggerContainer className="space-y-6">
                         {[
                             {
+                                name: "Andrew Chen",
+                                role: "Co-Founder",
+                                expertise: "Investment professional with extensive experience launching institutional-grade products for wealth advisors and family offices. Leads investment product strategy and client relationships.",
+                                accent: "primary"
+                            },
+                            {
+                                name: "Alisa",
+                                role: "Co-Founder",
+                                expertise: "Strategic leader specializing in operational excellence and business development. Drives growth initiatives and partnership development across the organization.",
+                                accent: "accent"
+                            },
+                            {
                                 name: "Lubna",
-                                role: "Founder & CEO",
-                                expertise: "Built AI-powered compliance platforms for 15+ years. Previously led product development at leading wealth management technology firms.",
+                                role: "Managing Director",
+                                expertise: "Operations leader managing day-to-day execution, client success, and team coordination. Ensures seamless delivery and implementation of solutions across client engagements.",
                                 accent: "accent"
                             },
                             {
                                 name: "Gurinder Khera",
-                                role: "Chief Technology Officer",
-                                expertise: "Former senior architect at fintech companies. Specializes in building scalable systems for regulated industries.",
+                                role: "Chief Marketing Officer",
+                                expertise: "Marketing strategist with deep expertise in fintech and financial services. Leads brand positioning, market strategy, and client engagement initiatives.",
                                 accent: "primary"
                             },
-                            {
-                                name: "Miguel Rodriguez",
-                                role: "Head of Product",
-                                expertise: "Product leader with expertise in regulatory technology. Previously designed compliance software for enterprise financial institutions.",
-                                accent: "accent"
-                            },
-                            {
-                                name: "Andrew Chen",
-                                role: "Managing Director, Investments",
-                                expertise: "Investment professional who has launched institutional-grade products for advisors and family offices throughout his career.",
-                                accent: "primary"
-                            }
+                            
                         ].map((leader, index) => (
                             <motion.div key={leader.name} variants={fadeInUp}>
                                 <Card className="group hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 overflow-hidden relative">
