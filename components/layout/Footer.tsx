@@ -26,7 +26,7 @@ export default function Footer() {
                         </Link>
 
                         <p className="text-sm text-white/70 leading-relaxed max-w-xs">
-                            Technology-first compliance platform for wealth management. Intelligence-driven solutions for modern firms.
+                            Software, products, and services for wealth management firms.
                         </p>
                         <div className="flex gap-4 pt-2">
                             <a
@@ -52,7 +52,7 @@ export default function Footer() {
                             </li>
                             <li>
                                 <Link href="/solutions" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
-                                    Technology
+                                    Solutions
                                 </Link>
                             </li>
                             <li>
@@ -61,9 +61,14 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/pricing" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
-                                    Pricing
-                                </Link>
+                                <a 
+                                    href="https://blog.acumen-strategy.com" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-white/70 hover:text-white transition-colors duration-300"
+                                >
+                                    Blog
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -88,14 +93,14 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/solutions/aci" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
-                                    Compliance Institute
+                                <Link href="/solutions/wmci" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
+                                    WMCI
                                 </Link>
                             </li>
                         </ul>
                     </div>
 
-                    {/* Contact */}
+                    {/* Contact - ADDRESS PENDING CONFIRMATION WITH FRIENDY */}
                     <div className="space-y-4">
                         <h4 className="text-sm font-semibold tracking-wide text-accent">Contact</h4>
                         <ul className="space-y-3">
@@ -108,17 +113,16 @@ export default function Footer() {
                                     info@acumen-strategy.com
                                 </a>
                             </li>
-                            {/*
-                            <li className="flex items-start gap-3">
+                            {/* CONFIRM PHONE NUMBER WITH FRIENDY BEFORE UNCOMMENTING */}
+                            {/* <li className="flex items-start gap-3">
                                 <Phone className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
-                                <span className="text-sm text-white/70">+1 (555) 123-4567</span>
-                            </li>
-                            */}
+                                <span className="text-sm text-white/70">[PHONE TO BE CONFIRMED]</span>
+                            </li> */}
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <span className="text-sm text-white/70">
-                                    272 Market Sq , Lake Forest<br />
-                                    Chicago, IL 60045
+                                    272 Market Sq<br />
+                                    Lake Forest, IL 60045
                                 </span>
                             </li>
                         </ul>

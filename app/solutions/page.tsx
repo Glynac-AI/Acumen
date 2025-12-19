@@ -13,33 +13,39 @@ import { ArrowRight } from 'lucide-react';
 import { fadeInUp } from '@/lib/animations';
 
 export default function Solutions() {
-    const solutions = [
+    const software = [
         {
             name: 'Glynac',
             tagline: 'Compliance-First AI Workspace',
             description: 'Unified CRM, communications, and portfolio data with supervised AI agents that automate workflows and surface regulatory risk.',
             href: '/solutions/glynac',
             accent: 'primary'
-        },
+        }
+    ];
+
+    const education = [
+        {
+            name: 'WMCI',
+            tagline: 'Education & Certification',
+            description: 'Professional development, compliance training, and certification programs designed for wealth management professionals.',
+            href: '/solutions/wmci',
+            accent: 'accent'
+        }
+    ];
+
+    const investmentProducts = [
         {
             name: 'Tollbooth',
             tagline: 'Automated Options Execution',
             description: 'Rules-based covered call and options automation that generates systematic income while preserving individual equity positions.',
             href: '/solutions/tollbooth',
-            accent: 'accent'
+            accent: 'primary'
         },
         {
             name: 'Prairie Hill Holdings',
             tagline: 'Institutional NNN Real Estate',
             description: 'Institutional-quality triple-net lease (NNN) real estate solutions for advisors and high-net-worth clients with tax-efficient structures.',
             href: '/solutions/phh',
-            accent: 'primary'
-        },
-        {
-            name: 'Acumen Compliance Institute',
-            tagline: 'Education & Certification',
-            description: 'Professional development, compliance training, and certification programs designed for wealth management professionals.',
-            href: '/solutions/aci',
             accent: 'accent'
         }
     ];
@@ -93,26 +99,24 @@ export default function Solutions() {
                 </Container>
             </Section>
 
-            {/* Solutions Grid - NO ICONS */}
+            {/* Education Section */}
             <Section background="muted" padding="lg">
                 <Container>
-                    <AnimatedSection animation="fadeInUp" className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Our Solutions</h2>
-                        <p className="text-xl text-primary/70 max-w-3xl mx-auto">
-                            Four specialized solutions that address different aspects of wealth management operations—from compliance automation to institutional products.
+                    <AnimatedSection animation="fadeInUp" className="mb-12">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Education</h2>
+                        <p className="text-xl text-primary/70 max-w-3xl">
+                            Professional development and certification
                         </p>
                     </AnimatedSection>
 
-                    <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                        {solutions.map((solution, index) => (
+                    <StaggerContainer className="max-w-2xl mx-auto">
+                        {education.map((solution, index) => (
                             <motion.div key={solution.name} variants={fadeInUp}>
                                 <Link href={solution.href} className="group block">
                                     <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
                                         <div className="p-8 space-y-6">
-                                            {/* Accent Bar */}
                                             <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
 
-                                            {/* Content */}
                                             <div>
                                                 <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
                                                     {solution.name}
@@ -130,7 +134,6 @@ export default function Solutions() {
                                             </div>
                                         </div>
 
-                                        {/* Hover Gradient */}
                                         <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
                                     </Card>
                                 </Link>
@@ -140,7 +143,95 @@ export default function Solutions() {
                 </Container>
             </Section>
 
-            {/* Key Benefits - NO ICONS */}
+            {/* Software Section */}
+            <Section background="white" padding="lg">
+                <Container>
+                    <AnimatedSection animation="fadeInUp" className="mb-12">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Software</h2>
+                        <p className="text-xl text-primary/70 max-w-3xl">
+                            Compliance and operational technology
+                        </p>
+                    </AnimatedSection>
+
+                    <StaggerContainer className="max-w-2xl mx-auto">
+                        {software.map((solution, index) => (
+                            <motion.div key={solution.name} variants={fadeInUp}>
+                                <Link href={solution.href} className="group block">
+                                    <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
+                                        <div className="p-8 space-y-6">
+                                            <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
+
+                                            <div>
+                                                <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
+                                                    {solution.name}
+                                                </h3>
+                                                <p className={`text-${solution.accent} font-semibold mb-3 text-sm uppercase tracking-wide`}>
+                                                    {solution.tagline}
+                                                </p>
+                                                <p className="text-primary/70 leading-relaxed mb-6 group-hover:text-primary/80 transition-colors duration-300">
+                                                    {solution.description}
+                                                </p>
+                                                <div className={`inline-flex items-center text-sm font-medium text-${solution.accent} group-hover:gap-2 transition-all duration-300`}>
+                                                    Learn more
+                                                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                    </Card>
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+                </Container>
+            </Section>
+
+            {/* Investment Products Section */}
+            <Section background="muted" padding="lg">
+                <Container>
+                    <AnimatedSection animation="fadeInUp" className="mb-12">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Investment Products</h2>
+                        <p className="text-xl text-primary/70 max-w-3xl">
+                            Institutional-grade investment solutions
+                        </p>
+                    </AnimatedSection>
+
+                    <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                        {investmentProducts.map((solution, index) => (
+                            <motion.div key={solution.name} variants={fadeInUp}>
+                                <Link href={solution.href} className="group block">
+                                    <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
+                                        <div className="p-8 space-y-6">
+                                            <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
+
+                                            <div>
+                                                <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
+                                                    {solution.name}
+                                                </h3>
+                                                <p className={`text-${solution.accent} font-semibold mb-3 text-sm uppercase tracking-wide`}>
+                                                    {solution.tagline}
+                                                </p>
+                                                <p className="text-primary/70 leading-relaxed mb-6 group-hover:text-primary/80 transition-colors duration-300">
+                                                    {solution.description}
+                                                </p>
+                                                <div className={`inline-flex items-center text-sm font-medium text-${solution.accent} group-hover:gap-2 transition-all duration-300`}>
+                                                    Learn more
+                                                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                    </Card>
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+                </Container>
+            </Section>
+
+            {/* Key Benefits */}
             <Section background="white" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="text-center mb-16">
@@ -188,31 +279,28 @@ export default function Solutions() {
                 </Container>
             </Section>
 
-            {/* Implementation Approach */}
+            {/* How We Work */}
             <Section background="muted" padding="lg">
                 <Container maxWidth="lg">
                     <AnimatedSection animation="fadeInUp">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Implementation Approach</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">How We Work</h2>
                         <div className="space-y-8">
                             <div className="grid md:grid-cols-3 gap-8">
                                 {[
                                     {
                                         number: "01",
                                         title: "Discovery",
-                                        description: "We start by understanding your current compliance workflows, technology stack, and operational constraints. This helps us identify where our solutions provide the most value.",
-                                        accent: "accent"
+                                        description: "We start by understanding your current compliance workflows, technology stack, and operational constraints. This helps us identify where our solutions provide the most value."
                                     },
                                     {
                                         number: "02",
                                         title: "Pilot",
-                                        description: "Deploy with a small group—typically your compliance team or a subset of advisors. This validates the approach and builds internal champions before broader rollout.",
-                                        accent: "primary"
+                                        description: "Deploy with a small group—typically your compliance team or a subset of advisors. This validates the approach and builds internal champions before broader rollout."
                                     },
                                     {
                                         number: "03",
                                         title: "Scale",
-                                        description: "Expand to additional users and integrate with existing systems. We provide ongoing training, support, and updates as your needs evolve.",
-                                        accent: "accent"
+                                        description: "Expand to additional users and integrate with existing systems. We provide ongoing training, support, and updates as your needs evolve."
                                     }
                                 ].map((step) => (
                                     <div key={step.number} className="group">
@@ -250,12 +338,11 @@ export default function Solutions() {
                                 </p>
 
                                 <Button href="/contact" variant="accent" size="lg" className="group-hover:scale-105 transition-transform duration-300">
-                                    Get in Touch
+                                    Connect with Relationship Manager
                                     <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </div>
 
-                            {/* Hover Gradient */}
                             <div className="absolute inset-0 bg-linear-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                         </Card>
                     </AnimatedSection>

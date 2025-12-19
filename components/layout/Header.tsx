@@ -11,7 +11,7 @@ const solutions = [
     { name: 'Glynac', href: '/solutions/glynac', description: 'Compliance-first AI workspace' },
     { name: 'Tollbooth', href: '/solutions/tollbooth', description: 'Automated options execution' },
     { name: 'Prairie Hill Holdings', href: '/solutions/phh', description: 'Institutional NNN real estate' },
-    { name: 'Acumen Compliance Institute', href: '/solutions/aci', description: 'Education & certification' },
+    { name: 'WMCI', href: '/solutions/wmci', description: 'Wealth management education' },
 ];
 
 export default function Header() {
@@ -81,7 +81,7 @@ export default function Header() {
                                 : 'text-white/80 hover:text-white'
                                 }`}
                         >
-                            Technology
+                            Solutions
                             <ChevronDown
                                 className={`w-4 h-4 transition-transform duration-200 ${solutionsOpen ? 'rotate-180' : ''
                                     }`}
@@ -108,7 +108,7 @@ export default function Header() {
                                                 View All Solutions
                                             </div>
                                             <div className="text-xs text-primary/50 mt-1">
-                                                Complete technology platform
+                                                Complete platform overview
                                             </div>
                                         </Link>
 
@@ -151,15 +151,18 @@ export default function Header() {
                     >
                         Resources
                     </Link>
-                    <Link
-                        href="/pricing"
+                    {/* Blog Link - External */}
+                    <a
+                        href="https:/acumen-blogs.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className={`text-sm font-medium transition-colors duration-300 ${scrolled
                             ? 'text-primary/70 hover:text-primary'
                             : 'text-white/80 hover:text-white'
                             }`}
                     >
-                        Pricing
-                    </Link>
+                        Blog
+                    </a>
                 </div>
 
                 {/* Desktop CTA */}
@@ -171,7 +174,7 @@ export default function Header() {
                             : 'bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm'
                             }`}
                     >
-                        Request Platform Access
+                        Connect with Relationship Manager
                     </Link>
                 </div>
 
@@ -219,7 +222,7 @@ export default function Header() {
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="text-sm font-medium text-primary hover:text-accent transition-colors mb-2 block"
                                 >
-                                    Technology
+                                    Solutions
                                 </Link>
                                 <div className="pl-4 space-y-2">
                                     {solutions.map((solution) => (
@@ -249,13 +252,14 @@ export default function Header() {
                             >
                                 Resources
                             </Link>
-                            <Link
-                                href="/pricing"
-                                onClick={() => setMobileMenuOpen(false)}
+                            <a
+                                href="https://blog.acumen-strategy.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="block py-3 text-sm font-medium text-primary hover:text-accent transition-colors"
                             >
-                                Pricing
-                            </Link>
+                                Blog
+                            </a>
 
                             {/* Mobile CTA */}
                             <div className="pt-4">
@@ -264,7 +268,7 @@ export default function Header() {
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="block text-center py-3 text-sm font-medium text-white bg-accent rounded-lg hover:bg-accent/90 transition-colors"
                                 >
-                                    Request Platform Access
+                                    Connect with Relationship Manager
                                 </Link>
                             </div>
                         </div>

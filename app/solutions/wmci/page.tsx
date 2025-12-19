@@ -1,4 +1,4 @@
-// app/solutions/aci/page.tsx
+// app/solutions/wmci/page.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -11,7 +11,7 @@ import StaggerContainer from '@/components/ui/StaggerContainer';
 import { CheckCircle2, Award, Users, BookOpen } from 'lucide-react';
 import { fadeInUp } from '@/lib/animations';
 
-export default function ACI() {
+export default function WMCI() {
     return (
         <div className="min-h-screen">
             {/* Hero - Full Screen Height */}
@@ -28,7 +28,7 @@ export default function ACI() {
                             className="space-y-8"
                         >
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
-                                Acumen Compliance Institute
+                                WMCI
                             </h1>
 
                             <motion.p
@@ -62,10 +62,10 @@ export default function ACI() {
             <Section background="white" padding="lg">
                 <Container maxWidth="lg">
                     <AnimatedSection animation="fadeInUp">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">About ACI</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">About WMCI</h2>
                         <div className="space-y-6 text-lg text-primary/70 leading-relaxed">
                             <p>
-                                The Acumen Compliance Institute (ACI) provides industry-leading education and certification programs for wealth management professionals seeking to master modern compliance practices and technology solutions.
+                                WMCI provides industry-leading education and certification programs for wealth management professionals seeking to master modern compliance practices and technology solutions.
                             </p>
                             <p>
                                 Our curriculum combines regulatory expertise, practical application, and hands-on technology training to prepare compliance officers, operations leaders, and advisors for the evolving regulatory landscape.
@@ -87,45 +87,35 @@ export default function ACI() {
                             {
                                 title: "Compliance Fundamentals",
                                 description: "Core regulatory requirements, supervision frameworks, and audit preparation for wealth management firms",
-                                icon: BookOpen,
                                 accent: "accent"
                             },
                             {
                                 title: "Technology Integration",
                                 description: "Hands-on training with AI-powered compliance tools, CRM systems, and data management platforms",
-                                icon: Users,
                                 accent: "primary"
                             },
                             {
                                 title: "Advanced Certification",
                                 description: "Professional certification programs for compliance officers and operations leaders seeking specialized credentials",
-                                icon: Award,
                                 accent: "accent"
                             }
-                        ].map((program, index) => {
-                            const Icon = program.icon;
-                            return (
-                                <motion.div key={program.title} variants={fadeInUp}>
-                                    <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 space-y-6 h-full overflow-hidden relative">
-                                        <div className={`w-12 h-12 rounded-xl bg-${program.accent}/10 flex items-center justify-center mb-4 group-hover:bg-${program.accent}/20 transition-all duration-300`}>
-                                            <Icon className={`h-6 w-6 text-${program.accent} group-hover:scale-110 transition-transform duration-300`} />
-                                        </div>
+                        ].map((program, index) => (
+                            <motion.div key={program.title} variants={fadeInUp}>
+                                <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 space-y-6 h-full overflow-hidden relative">
+                                    <div className={`w-12 h-1 bg-${program.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
 
-                                        <div className={`w-12 h-1 bg-${program.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
+                                    <h3 className={`text-lg font-bold text-primary group-hover:text-${program.accent} transition-colors duration-300`}>
+                                        {program.title}
+                                    </h3>
 
-                                        <h3 className={`text-lg font-bold text-primary group-hover:text-${program.accent} transition-colors duration-300`}>
-                                            {program.title}
-                                        </h3>
+                                    <p className="text-sm text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
+                                        {program.description}
+                                    </p>
 
-                                        <p className="text-sm text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
-                                            {program.description}
-                                        </p>
-
-                                        <div className={`absolute inset-0 bg-linear-to-r from-${program.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
-                                    </Card>
-                                </motion.div>
-                            );
-                        })}
+                                    <div className={`absolute inset-0 bg-linear-to-r from-${program.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                </Card>
+                            </motion.div>
+                        ))}
                     </StaggerContainer>
                 </Container>
             </Section>
