@@ -208,18 +208,7 @@ export default function About() {
                                 expertise: "Strategic leader specializing in operational excellence and business development. Drives growth initiatives and partnership development across the organization.",
                                 accent: "accent"
                             },
-                            {
-                                name: "Lubna",
-                                role: "Managing Director",
-                                expertise: "Operations leader managing day-to-day execution, client success, and team coordination. Ensures seamless delivery and implementation of solutions across client engagements.",
-                                accent: "accent"
-                            },
-                            {
-                                name: "Gurinder Khera",
-                                role: "Chief Marketing Officer",
-                                expertise: "Marketing strategist with deep expertise in fintech and financial services. Leads brand positioning, market strategy, and client engagement initiatives.",
-                                accent: "primary"
-                            },
+                            
                             
                         ].map((leader, index) => (
                             <motion.div key={leader.name} variants={fadeInUp}>
