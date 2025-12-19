@@ -8,7 +8,7 @@ import Section from '@/components/ui/Section';
 import Card from '@/components/ui/Card';
 import AnimatedSection from '@/components/ui/AnimatedSection';
 import StaggerContainer from '@/components/ui/StaggerContainer';
-import { Mail, Phone, MapPin, Linkedin, CheckCircle2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, CheckCircle2, ArrowUpRight } from 'lucide-react';
 import { fadeInUp } from '@/lib/animations';
 
 export default function Contact() {
@@ -134,6 +134,30 @@ export default function Contact() {
                                         </div>
                                     </Card>
                                 </motion.div>
+
+                                {/* LinkedIn */}
+                                <motion.div variants={fadeInUp}>
+                                    <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                                        <div className="flex items-start gap-4 p-6">
+                                            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
+                                                <Linkedin className="h-6 w-6 text-primary group-hover:scale-110 transition-transform duration-300" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-semibold text-primary mb-1">LinkedIn</h3>
+                                                <a
+                                                    href="https://www.linkedin.com/company/acumen-strategy"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-primary/70 hover:text-accent transition-colors duration-300 flex items-center gap-1 group"
+                                                >
+                                                    Follow us on LinkedIn
+                                                    
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </motion.div>
+                   
                             </StaggerContainer>
                         </div>
 

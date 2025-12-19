@@ -30,7 +30,7 @@ export default function Footer() {
                         </p>
                         <div className="flex gap-4 pt-2">
                             <a
-                                href="https://linkedin.com"
+                                href="https://www.linkedin.com/company/acumen-strategy/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-white/60 hover:text-accent transition-colors duration-300 p-2 rounded-lg hover:bg-white/5"
@@ -113,7 +113,7 @@ export default function Footer() {
                                     info@acumen-strategy.com
                                 </a>
                             </li>
-                            {/* CONFIRM PHONE NUMBER WITH FRIENDY BEFORE UNCOMMENTING */}
+                            
                             {/* <li className="flex items-start gap-3">
                                 <Phone className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <span className="text-sm text-white/70">[PHONE TO BE CONFIRMED]</span>
