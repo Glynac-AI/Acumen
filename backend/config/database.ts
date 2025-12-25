@@ -2,18 +2,14 @@ import path from 'path';
 
 export default ({ env }) => {
   const databaseUrl = env('DATABASE_URL', '');
+  const client = env('DATABASE_CLIENT', 'sqlite');
 
-  // If DATABASE_URL is present (Render), use PostgreSQL
+  // If DATABASE_URL is present (Render linked database), use PostgreSQL with connection string
   if (databaseUrl) {
     return {
       connection: {
         client: 'postgres',
-        connection: {
-          connectionString: databaseUrl,
-          ssl: {
-            rejectUnauthorized: false, // Required for Render
-          },
-        },
+        connection: databaseUrl,
         pool: {
           min: 2,
           max: 10,
@@ -23,9 +19,7 @@ export default ({ env }) => {
     };
   }
 
-  // Otherwise, check DATABASE_CLIENT or default to sqlite
-  const client = env('DATABASE_CLIENT', 'sqlite');
-
+  // PostgreSQL with individual connection parameters
   if (client === 'postgres') {
     return {
       connection: {
@@ -35,10 +29,8 @@ export default ({ env }) => {
           port: env.int('DATABASE_PORT', 5432),
           database: env('DATABASE_NAME', 'strapi'),
           user: env('DATABASE_USERNAME', 'strapi'),
-          password: env('DATABASE_PASSWORD', 'strapi'),
-          ssl: env.bool('DATABASE_SSL', false) && {
-            rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', true),
-          },
+          password: env('DATABASE_PASSWORD', ''),
+          ssl: env.bool('DATABASE_SSL', false) ? { rejectUnauthorized: false } : false,
           schema: env('DATABASE_SCHEMA', 'public'),
         },
         pool: {
@@ -50,6 +42,7 @@ export default ({ env }) => {
     };
   }
 
+  // MySQL
   if (client === 'mysql') {
     return {
       connection: {
@@ -59,10 +52,8 @@ export default ({ env }) => {
           port: env.int('DATABASE_PORT', 3306),
           database: env('DATABASE_NAME', 'strapi'),
           user: env('DATABASE_USERNAME', 'strapi'),
-          password: env('DATABASE_PASSWORD', 'strapi'),
-          ssl: env.bool('DATABASE_SSL', false) && {
-            rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', true),
-          },
+          password: env('DATABASE_PASSWORD', ''),
+          ssl: env.bool('DATABASE_SSL', false) ? { rejectUnauthorized: false } : false,
         },
         pool: {
           min: env.int('DATABASE_POOL_MIN', 2),
