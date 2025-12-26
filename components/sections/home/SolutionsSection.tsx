@@ -14,6 +14,13 @@ export default function SolutionsSection() {
             description: 'Unified CRM, communications, and portfolio data with supervised AI agents that automate workflows and surface regulatory risk.',
             href: '/solutions/glynac',
             accent: 'primary'
+        },
+        {
+            name: 'Tollbooth',
+            tagline: 'Automated Options Execution',
+            description: 'Rules-based covered call and options automation that generates systematic income while preserving individual equity positions.',
+            href: '/solutions/tollbooth',
+            accent: 'accent'
         }
     ];
 
@@ -23,18 +30,11 @@ export default function SolutionsSection() {
             tagline: 'Education & Certification',
             description: 'Professional development, compliance training, and certification programs designed for wealth management professionals.',
             href: '/solutions/wmci',
-            accent: 'accent'
+            accent: 'primary'
         }
     ];
 
-    const investmentProducts = [
-        {
-            name: 'Tollbooth',
-            tagline: 'Automated Options Execution',
-            description: 'Rules-based covered call and options automation that generates systematic income while preserving individual equity positions.',
-            href: '/solutions/tollbooth',
-            accent: 'primary'
-        },
+    const investments = [
         {
             name: 'Prairie Hill Holdings',
             tagline: 'Institutional NNN Real Estate',
@@ -98,7 +98,7 @@ export default function SolutionsSection() {
                     <h3 className="text-2xl font-bold text-primary mb-2">Software</h3>
                     <p className="text-primary/60 mb-8">Compliance and operational technology</p>
 
-                    <div className="max-w-2xl">
+                    <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
                         {software.map((solution) => (
                             <Link
                                 key={solution.name}
@@ -128,15 +128,15 @@ export default function SolutionsSection() {
                             </Link>
                         ))}
                     </div>
-                </div>              
+                </div>
 
                 {/* Investment Products */}
                 <div>
-                    <h3 className="text-2xl font-bold text-primary mb-2">Investment Products</h3>
+                    <h3 className="text-2xl font-bold text-primary mb-2">Investments</h3>
                     <p className="text-primary/60 mb-8">Institutional-grade investment solutions</p>
 
-                    <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
-                        {investmentProducts.map((solution) => (
+                    <div className="max-w-2xl">
+                        {investments.map((solution) => (
                             <Link
                                 key={solution.name}
                                 href={solution.href}

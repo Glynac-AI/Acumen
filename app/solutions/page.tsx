@@ -20,6 +20,13 @@ export default function Solutions() {
             description: 'Unified CRM, communications, and portfolio data with supervised AI agents that automate workflows and surface regulatory risk.',
             href: '/solutions/glynac',
             accent: 'primary'
+        },
+        {
+            name: 'Tollbooth',
+            tagline: 'Automated Options Execution',
+            description: 'Rules-based covered call and options automation that generates systematic income while preserving individual equity positions.',
+            href: '/solutions/tollbooth',
+            accent: 'accent'
         }
     ];
 
@@ -29,18 +36,11 @@ export default function Solutions() {
             tagline: 'Education & Certification',
             description: 'Professional development, compliance training, and certification programs designed for wealth management professionals.',
             href: '/solutions/wmci',
-            accent: 'accent'
+            accent: 'primary'
         }
     ];
 
-    const investmentProducts = [
-        {
-            name: 'Tollbooth',
-            tagline: 'Automated Options Execution',
-            description: 'Rules-based covered call and options automation that generates systematic income while preserving individual equity positions.',
-            href: '/solutions/tollbooth',
-            accent: 'primary'
-        },
+    const investments = [
         {
             name: 'Prairie Hill Holdings',
             tagline: 'Institutional NNN Real Estate',
@@ -153,7 +153,7 @@ export default function Solutions() {
                         </p>
                     </AnimatedSection>
 
-                    <StaggerContainer className="max-w-2xl mx-auto">
+                    <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         {software.map((solution, index) => (
                             <motion.div key={solution.name} variants={fadeInUp}>
                                 <Link href={solution.href} className="group block">
@@ -191,14 +191,14 @@ export default function Solutions() {
             <Section background="muted" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="mb-12">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Investment Products</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Investments</h2>
                         <p className="text-xl text-primary/70 max-w-3xl">
                             Institutional-grade investment solutions
                         </p>
                     </AnimatedSection>
 
-                    <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                        {investmentProducts.map((solution, index) => (
+                    <StaggerContainer className="max-w-2xl mx-auto">
+                        {investments.map((solution, index) => (
                             <motion.div key={solution.name} variants={fadeInUp}>
                                 <Link href={solution.href} className="group block">
                                     <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">

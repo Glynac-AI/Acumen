@@ -1,3 +1,4 @@
+// components/sections/home/HeroSection.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -22,7 +23,7 @@ export default function HeroSection() {
                         className="space-y-8"
                     >
                         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
-                            Modern Compliance Solutions for Wealth Management
+                            Modern solutions for wealth management and wealth management compliance
                         </h1>
 
                         <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-3xl">
@@ -31,7 +32,7 @@ export default function HeroSection() {
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">
                             <Button href="/contact" variant="secondary" size="lg">
-                                Get Started
+                                Connect with Relationship Manager
                             </Button>
                             <Button href="/solutions" variant="accent" size="lg">
                                 Explore Solutions
