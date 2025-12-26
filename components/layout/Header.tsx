@@ -11,7 +11,7 @@ const solutions = [
     { name: 'Glynac', href: '/solutions/glynac', description: 'Compliance-first AI workspace' },
     { name: 'Tollbooth', href: '/solutions/tollbooth', description: 'Automated options execution' },
     { name: 'Prairie Hill Holdings', href: '/solutions/phh', description: 'Institutional NNN real estate' },
-    { name: 'WMCI', href: '/solutions/wmci', description: 'Wealth management education' },
+    { name: 'CWMU', href: '/solutions/cwmu', description: 'Wealth management education' },
 ];
 
 export default function Header() {

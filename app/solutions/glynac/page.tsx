@@ -48,12 +48,10 @@ export default function Glynac() {
                                 transition={{ duration: 0.8, delay: 0.6 }}
                                 className="flex flex-col sm:flex-row gap-4 pt-4"
                             >
-                                <Button href="/contact" variant="secondary" size="lg">
-                                    Request a Demo
+                                <Button href="https://glynac.ai" variant="secondary" size="lg">
+                                    Learn More
                                 </Button>
-                                <Button href="/resources" variant="accent" size="lg">
-                                    Download Product Brief
-                                </Button>
+                                
                             </motion.div>
                         </motion.div>
                     </div>

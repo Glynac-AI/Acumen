@@ -48,11 +48,9 @@ export default function PHH() {
                                 className="flex flex-col sm:flex-row gap-4 pt-4"
                             >
                                 <Button href="/contact" variant="secondary" size="lg">
-                                    Learn About the Fund
+                                    Learn More
                                 </Button>
-                                <Button href="/resources" variant="accent" size="lg">
-                                    Download Overview
-                                </Button>
+                                
                             </motion.div>
                         </motion.div>
                     </div>

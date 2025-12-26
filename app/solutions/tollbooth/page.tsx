@@ -48,10 +48,7 @@ export default function Tollbooth() {
                                 className="flex flex-col sm:flex-row gap-4 pt-4"
                             >
                                 <Button href="/contact" variant="secondary" size="lg">
-                                    Request a Demo
-                                </Button>
-                                <Button href="/resources" variant="accent" size="lg">
-                                    Download Overview
+                                    Learn More
                                 </Button>
                             </motion.div>
                         </motion.div>

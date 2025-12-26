@@ -30,16 +30,6 @@ export default function Solutions() {
         }
     ];
 
-    const education = [
-        {
-            name: 'WMCI',
-            tagline: 'Education & Certification',
-            description: 'Professional development, compliance training, and certification programs designed for wealth management professionals.',
-            href: '/solutions/wmci',
-            accent: 'primary'
-        }
-    ];
-
     const investments = [
         {
             name: 'Prairie Hill Holdings',
@@ -47,6 +37,16 @@ export default function Solutions() {
             description: 'Institutional-quality triple-net lease (NNN) real estate solutions for advisors and high-net-worth clients with tax-efficient structures.',
             href: '/solutions/phh',
             accent: 'accent'
+        }
+    ];
+
+    const education = [
+        {
+            name: 'CWMU',
+            tagline: 'Compliance Wealth Management University',
+            description: 'Professional education covering compliance, operations, technology, advisory practice, and business development for wealth management firms.',
+            href: '/solutions/cwmu',
+            accent: 'primary'
         }
     ];
 
@@ -99,52 +99,8 @@ export default function Solutions() {
                 </Container>
             </Section>
 
-            {/* Education Section */}
-            <Section background="muted" padding="lg">
-                <Container>
-                    <AnimatedSection animation="fadeInUp" className="mb-12">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Education</h2>
-                        <p className="text-xl text-primary/70 max-w-3xl">
-                            Professional development and certification
-                        </p>
-                    </AnimatedSection>
-
-                    <StaggerContainer className="max-w-2xl mx-auto">
-                        {education.map((solution, index) => (
-                            <motion.div key={solution.name} variants={fadeInUp}>
-                                <Link href={solution.href} className="group block">
-                                    <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
-                                        <div className="p-8 space-y-6">
-                                            <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
-
-                                            <div>
-                                                <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
-                                                    {solution.name}
-                                                </h3>
-                                                <p className={`text-${solution.accent} font-semibold mb-3 text-sm uppercase tracking-wide`}>
-                                                    {solution.tagline}
-                                                </p>
-                                                <p className="text-primary/70 leading-relaxed mb-6 group-hover:text-primary/80 transition-colors duration-300">
-                                                    {solution.description}
-                                                </p>
-                                                <div className={`inline-flex items-center text-sm font-medium text-${solution.accent} group-hover:gap-2 transition-all duration-300`}>
-                                                    Learn more
-                                                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
-                                    </Card>
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </StaggerContainer>
-                </Container>
-            </Section>
-
             {/* Software Section */}
-            <Section background="white" padding="lg">
+            <Section background="muted" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="mb-12">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Software</h2>
@@ -188,7 +144,7 @@ export default function Solutions() {
             </Section>
 
             {/* Investment Products Section */}
-            <Section background="muted" padding="lg">
+            <Section background="white" padding="lg">
                 <Container>
                     <AnimatedSection animation="fadeInUp" className="mb-12">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Investments</h2>
@@ -199,6 +155,50 @@ export default function Solutions() {
 
                     <StaggerContainer className="max-w-2xl mx-auto">
                         {investments.map((solution, index) => (
+                            <motion.div key={solution.name} variants={fadeInUp}>
+                                <Link href={solution.href} className="group block">
+                                    <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
+                                        <div className="p-8 space-y-6">
+                                            <div className={`w-12 h-1 bg-${solution.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
+
+                                            <div>
+                                                <h3 className={`text-2xl font-bold text-primary mb-2 group-hover:text-${solution.accent} transition-colors duration-300`}>
+                                                    {solution.name}
+                                                </h3>
+                                                <p className={`text-${solution.accent} font-semibold mb-3 text-sm uppercase tracking-wide`}>
+                                                    {solution.tagline}
+                                                </p>
+                                                <p className="text-primary/70 leading-relaxed mb-6 group-hover:text-primary/80 transition-colors duration-300">
+                                                    {solution.description}
+                                                </p>
+                                                <div className={`inline-flex items-center text-sm font-medium text-${solution.accent} group-hover:gap-2 transition-all duration-300`}>
+                                                    Learn more
+                                                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={`absolute inset-0 bg-linear-to-r from-${solution.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+                                    </Card>
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </StaggerContainer>
+                </Container>
+            </Section>
+
+            {/* Education Section */}
+            <Section background="muted" padding="lg">
+                <Container>
+                    <AnimatedSection animation="fadeInUp" className="mb-12">
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Education</h2>
+                        <p className="text-xl text-primary/70 max-w-3xl">
+                            Professional development and training
+                        </p>
+                    </AnimatedSection>
+
+                    <StaggerContainer className="max-w-2xl mx-auto">
+                        {education.map((solution, index) => (
                             <motion.div key={solution.name} variants={fadeInUp}>
                                 <Link href={solution.href} className="group block">
                                     <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden relative h-full">
