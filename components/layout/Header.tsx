@@ -133,7 +133,7 @@ export default function Header() {
                         </AnimatePresence>
                     </div>
 
-                    <Link
+                   {/* <Link
                         href="/use-cases"
                         className={`text-sm font-medium transition-colors duration-300 ${scrolled
                             ? 'text-primary/70 hover:text-primary'
@@ -141,7 +141,7 @@ export default function Header() {
                             }`}
                     >
                         Use Cases
-                    </Link>
+                    </Link> */}
                     <Link
                         href="/resources"
                         className={`text-sm font-medium transition-colors duration-300 ${scrolled
