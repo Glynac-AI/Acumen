@@ -18,10 +18,11 @@ COPY . .
 # Create data directory
 RUN mkdir -p .tmp
 
-# Set development environment
+# Set development environment with increased memory
 ENV NODE_ENV=development
 ENV HOST=0.0.0.0
 ENV PORT=5603
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 
 # Expose port
 EXPOSE 5603
