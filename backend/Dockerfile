@@ -1,4 +1,4 @@
-# Strapi Production Dockerfile for DigitalOcean
+# Strapi Production Dockerfile for Render
 FROM node:20-alpine AS builder
 
 # Install build dependencies
@@ -34,6 +34,8 @@ RUN npm ci --only=production
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/config ./config
+COPY --from=builder /app/src ./src
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/favicon.png ./favicon.png
 
