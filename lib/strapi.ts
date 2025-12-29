@@ -143,6 +143,8 @@ async function fetchStrapi<T>(
     const response = await fetch(`${config.strapiUrl}/api${endpoint}`, {
         ...options,
         headers,
+        // Disable caching to always get fresh data from Strapi
+        cache: 'no-store',
     });
 
     if (!response.ok) {
