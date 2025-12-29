@@ -12,13 +12,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build arguments for Strapi connection (passed at build time)
-ARG NEXT_PUBLIC_STRAPI_URL
-ARG NEXT_PUBLIC_STRAPI_API_TOKEN
-ENV NEXT_PUBLIC_STRAPI_URL=$NEXT_PUBLIC_STRAPI_URL
-ENV NEXT_PUBLIC_STRAPI_API_TOKEN=$NEXT_PUBLIC_STRAPI_API_TOKEN
-
-# Build the application
+# Build the application (will use placeholders for env vars)
+# The actual values come from runtime environment variables
 RUN npm run build
 
 # Production stage
@@ -30,12 +25,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Re-set the Strapi variables for runtime (needed for client-side fetching)
-ARG NEXT_PUBLIC_STRAPI_URL
-ARG NEXT_PUBLIC_STRAPI_API_TOKEN
-ENV NEXT_PUBLIC_STRAPI_URL=$NEXT_PUBLIC_STRAPI_URL
-ENV NEXT_PUBLIC_STRAPI_API_TOKEN=$NEXT_PUBLIC_STRAPI_API_TOKEN
-
 # Copy standalone build
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
@@ -45,4 +34,6 @@ COPY --from=builder /app/public ./public
 EXPOSE 3000
 
 # Start Next.js standalone server
+# Environment variables NEXT_PUBLIC_STRAPI_URL and NEXT_PUBLIC_STRAPI_API_TOKEN
+# will be picked up from Render's environment variables at runtime
 CMD ["node", "server.js"]

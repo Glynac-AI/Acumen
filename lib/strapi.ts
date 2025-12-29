@@ -3,9 +3,43 @@
  * Handles all communication with the Strapi CMS backend
  */
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603';
-// Use NEXT_PUBLIC_ prefix so the token is available for client-side API calls
-const STRAPI_API_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
+// Runtime config cache
+let runtimeConfig: { strapiUrl: string; strapiToken: string } | null = null;
+
+// Get runtime config from API (works both client and server side)
+async function getRuntimeConfig(): Promise<{ strapiUrl: string; strapiToken: string }> {
+    // Return cached config if available
+    if (runtimeConfig) {
+        return runtimeConfig;
+    }
+
+    // Check if we're on the server side - use env vars directly
+    if (typeof window === 'undefined') {
+        runtimeConfig = {
+            strapiUrl: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603',
+            strapiToken: process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || '',
+        };
+        return runtimeConfig;
+    }
+
+    // Client-side: try to fetch from API endpoint
+    try {
+        const response = await fetch('/api/config');
+        if (response.ok) {
+            runtimeConfig = await response.json();
+            return runtimeConfig!;
+        }
+    } catch (error) {
+        console.error('Failed to fetch runtime config:', error);
+    }
+
+    // Fallback to build-time values (may be empty if not set during build)
+    runtimeConfig = {
+        strapiUrl: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603',
+        strapiToken: process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || '',
+    };
+    return runtimeConfig;
+}
 
 // Types for Strapi responses
 export interface StrapiMeta {
@@ -95,16 +129,18 @@ async function fetchStrapi<T>(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<T> {
+    const config = await getRuntimeConfig();
+
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
         ...options.headers,
     };
 
-    if (STRAPI_API_TOKEN) {
-        (headers as Record<string, string>)['Authorization'] = `Bearer ${STRAPI_API_TOKEN}`;
+    if (config.strapiToken) {
+        (headers as Record<string, string>)['Authorization'] = `Bearer ${config.strapiToken}`;
     }
 
-    const response = await fetch(`${STRAPI_URL}/api${endpoint}`, {
+    const response = await fetch(`${config.strapiUrl}/api${endpoint}`, {
         ...options,
         headers,
     });
@@ -116,11 +152,14 @@ async function fetchStrapi<T>(
     return response.json();
 }
 
-// Helper to get full image URL
+// Helper to get full image URL (uses cached config URL)
+// The runtimeConfig is populated by the first fetchStrapi call
 export function getStrapiMediaUrl(url: string | undefined): string {
     if (!url) return '';
     if (url.startsWith('http')) return url;
-    return `${STRAPI_URL}${url}`;
+    // Use cached config if available, otherwise fall back to env var
+    const baseUrl = runtimeConfig?.strapiUrl || process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603';
+    return `${baseUrl}${url}`;
 }
 
 // API Functions
