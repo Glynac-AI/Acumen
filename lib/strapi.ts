@@ -4,7 +4,8 @@
  */
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603';
-const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
+// Use NEXT_PUBLIC_ prefix so the token is available for client-side API calls
+const STRAPI_API_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 
 // Types for Strapi responses
 export interface StrapiMeta {

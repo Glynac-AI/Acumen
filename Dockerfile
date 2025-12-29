@@ -12,9 +12,11 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build argument for Strapi URL (passed at build time)
+# Build arguments for Strapi connection (passed at build time)
 ARG NEXT_PUBLIC_STRAPI_URL
+ARG NEXT_PUBLIC_STRAPI_API_TOKEN
 ENV NEXT_PUBLIC_STRAPI_URL=$NEXT_PUBLIC_STRAPI_URL
+ENV NEXT_PUBLIC_STRAPI_API_TOKEN=$NEXT_PUBLIC_STRAPI_API_TOKEN
 
 # Build the application
 RUN npm run build
@@ -27,6 +29,12 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV=production
 ENV PORT=3000
+
+# Re-set the Strapi variables for runtime (needed for client-side fetching)
+ARG NEXT_PUBLIC_STRAPI_URL
+ARG NEXT_PUBLIC_STRAPI_API_TOKEN
+ENV NEXT_PUBLIC_STRAPI_URL=$NEXT_PUBLIC_STRAPI_URL
+ENV NEXT_PUBLIC_STRAPI_API_TOKEN=$NEXT_PUBLIC_STRAPI_API_TOKEN
 
 # Copy standalone build
 COPY --from=builder /app/.next/standalone ./
