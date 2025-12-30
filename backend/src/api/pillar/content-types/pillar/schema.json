@@ -43,8 +43,7 @@
             "type": "component",
             "repeatable": true,
             "component": "shared.pillar-details",
-            "min": 3,
-            "max": 5
+            "max": 10
         },
         "articles": {
             "type": "relation",
