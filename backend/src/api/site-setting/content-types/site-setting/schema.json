@@ -22,7 +22,7 @@
         },
         "gtmId": {
             "type": "string",
-            "regex": "^GTM-[A-Z0-9]+$"
+            "maxLength": 50
         },
         "gtmEnabled": {
             "type": "boolean",
@@ -30,14 +30,15 @@
         },
         "googleAnalyticsId": {
             "type": "string",
-            "regex": "^(G|UA)-[A-Z0-9-]+$"
+            "maxLength": 50
         },
         "gaEnabled": {
             "type": "boolean",
             "default": false
         },
         "metaPixelId": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 50
         },
         "metaPixelEnabled": {
             "type": "boolean",
