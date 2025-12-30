@@ -14,6 +14,12 @@
     "attributes": {
         "name": {
             "type": "string",
+            "required": true,
+            "maxLength": 100
+        },
+        "slug": {
+            "type": "uid",
+            "targetField": "name",
             "required": true
         },
         "title": {
@@ -22,12 +28,16 @@
         },
         "bio": {
             "type": "text",
-            "required": true
+            "required": true,
+            "maxLength": 1000
+        },
+        "email": {
+            "type": "email"
         },
         "photo": {
             "type": "media",
             "multiple": false,
-            "required": false,
+            "required": true,
             "allowedTypes": [
                 "images"
             ]
@@ -38,8 +48,16 @@
         "twitter": {
             "type": "string"
         },
-        "email": {
-            "type": "email"
+        "articles": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::article.article",
+            "mappedBy": "author"
+        },
+        "isActive": {
+            "type": "boolean",
+            "default": true,
+            "required": true
         }
     }
 }

@@ -14,59 +14,84 @@
     "attributes": {
         "title": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 200
         },
         "subtitle": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 250
         },
         "slug": {
             "type": "uid",
             "targetField": "title",
             "required": true
         },
-        "content": {
-            "type": "blocks"
-        },
         "excerpt": {
             "type": "text",
+            "required": true,
+            "maxLength": 500
+        },
+        "content": {
+            "type": "richtext",
             "required": true
         },
-        "pillar": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::pillar.pillar"
-        },
-        "tags": {
-            "type": "relation",
-            "relation": "manyToMany",
-            "target": "api::tag.tag"
-        },
-        "author": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::author.author"
-        },
-        "featuredImage": {
-            "type": "media",
-            "multiple": false,
-            "required": false,
-            "allowedTypes": [
-                "images"
-            ]
-        },
         "publishDate": {
-            "type": "date",
+            "type": "datetime",
             "required": true
         },
         "readTime": {
             "type": "integer",
             "required": true,
             "default": 5,
-            "min": 1
+            "min": 1,
+            "max": 60
         },
         "isFeatured": {
             "type": "boolean",
-            "default": false
+            "default": false,
+            "required": true
+        },
+        "status": {
+            "type": "enumeration",
+            "enum": [
+                "Draft",
+                "Published",
+                "Scheduled",
+                "Archived"
+            ],
+            "default": "Draft",
+            "required": true
+        },
+        "featuredImage": {
+            "type": "media",
+            "multiple": false,
+            "required": true,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "author": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::author.author",
+            "inversedBy": "articles"
+        },
+        "pillar": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::pillar.pillar",
+            "inversedBy": "articles"
+        },
+        "tags": {
+            "type": "relation",
+            "relation": "manyToMany",
+            "target": "api::tag.tag",
+            "inversedBy": "articles"
+        },
+        "seo": {
+            "type": "component",
+            "repeatable": false,
+            "component": "shared.seo"
         }
     }
 }

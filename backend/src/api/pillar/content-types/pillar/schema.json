@@ -22,8 +22,35 @@
             "targetField": "name",
             "required": true
         },
+        "subtitle": {
+            "type": "string",
+            "required": true,
+            "maxLength": 100
+        },
         "description": {
-            "type": "text"
+            "type": "text",
+            "required": true
+        },
+        "color": {
+            "type": "string",
+            "required": true
+        },
+        "order": {
+            "type": "integer",
+            "required": true
+        },
+        "details": {
+            "type": "component",
+            "repeatable": true,
+            "component": "shared.pillar-details",
+            "min": 3,
+            "max": 5
+        },
+        "articles": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::article.article",
+            "mappedBy": "pillar"
         }
     }
 }

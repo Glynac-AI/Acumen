@@ -14,12 +14,23 @@
     "attributes": {
         "name": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 50
         },
         "slug": {
             "type": "uid",
             "targetField": "name",
             "required": true
+        },
+        "description": {
+            "type": "text",
+            "maxLength": 250
+        },
+        "articles": {
+            "type": "relation",
+            "relation": "manyToMany",
+            "target": "api::article.article",
+            "mappedBy": "tags"
         }
     }
 }

@@ -1,61 +1,119 @@
-# 🚀 Getting started with Strapi
+# 🚀 Strapi Blog CMS Backend
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
+A pre-configured Strapi CMS template for blog platforms with content types for Articles, Authors, Tags, and Pillars.
 
-### `develop`
+## 📋 Content Types
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
+| Content Type | Description |
+|--------------|-------------|
+| **Articles** | Blog posts with title, content, SEO, featured images, and relationships |
+| **Authors** | Content creators with bio, photo, social links |
+| **Tags** | Article categorization |
+| **Pillars** | Main content categories/themes |
 
+## 🛠 Customization Guide
+
+### Modifying Seed Data
+
+Edit `src/index.ts` to customize the pre-populated data:
+
+```typescript
+// Pillars - Edit this array to change your main categories
+const pillarsData = [
+  {
+    name: 'Your Pillar Name',
+    slug: 'your-pillar-slug',
+    subtitle: 'Your Tagline',
+    description: 'Description of this pillar...',
+    color: '#YOUR_HEX_COLOR',
+    order: 1,
+    details: [
+      { detail: 'First detail point' },
+      { detail: 'Second detail point' },
+      { detail: 'Third detail point' },
+    ],
+  },
+  // Add more pillars...
+];
+
+// Tags - Edit this array to customize your tags
+const tagsData = [
+  'Your Tag 1',
+  'Your Tag 2',
+  // Add more tags...
+];
 ```
+
+### Modifying Content Types
+
+Content type schemas are located in `src/api/[content-type]/content-types/[content-type]/schema.json`:
+
+- **Articles**: `src/api/article/content-types/article/schema.json`
+- **Authors**: `src/api/author/content-types/author/schema.json`
+- **Tags**: `src/api/tag/content-types/tag/schema.json`
+- **Pillars**: `src/api/pillar/content-types/pillar/schema.json`
+
+### Modifying Components
+
+Reusable components are in `src/components/shared/`:
+
+- **SEO**: `src/components/shared/seo.json` - Meta title, description, keywords, OG image
+- **Pillar Details**: `src/components/shared/pillar-details.json` - Repeatable detail points
+
+### CORS Configuration
+
+Edit `config/middlewares.ts` to add your domains:
+
+```typescript
+{
+  name: 'strapi::cors',
+  config: {
+    origin: [
+      'http://localhost:3000',
+      'https://your-domain.com',
+    ],
+  },
+},
+```
+
+## 🚀 Quick Start
+
+### Development
+
+```bash
+npm install
 npm run develop
-# or
-yarn develop
 ```
 
-### `start`
+### Production Build
 
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
-
-```
-npm run start
-# or
-yarn start
-```
-
-### `build`
-
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
-
-```
+```bash
 npm run build
-# or
-yarn build
+npm run start
 ```
 
-## ⚙️ Deployment
+## ⚙️ First Run Setup
 
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
+1. **Start Strapi**: `npm run develop`
+2. **Create Admin User**: Follow the setup wizard at `http://localhost:1337/admin`
+3. **Auto-Seed**: Pillars and Tags are automatically created on first startup
+4. **Set Permissions**: 
+   - Go to Settings → Roles → Public
+   - Enable `find` and `findOne` for Articles, Authors, Tags, Pillars
+5. **Create API Token**: Settings → API Tokens → Create read-only token
+
+## 📡 API Endpoints
 
 ```
-yarn strapi deploy
+GET /api/articles?populate=*
+GET /api/articles?filters[slug][$eq]=your-slug
+GET /api/authors?populate=articles
+GET /api/tags
+GET /api/pillars?populate=details,articles
 ```
 
 ## 📚 Learn more
 
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
-
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
-
----
-
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+- [Strapi documentation](https://docs.strapi.io)
+- [Strapi tutorials](https://strapi.io/tutorials)
+- [Strapi blog](https://strapi.io/blog)
