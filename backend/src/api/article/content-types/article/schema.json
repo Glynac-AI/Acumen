@@ -28,7 +28,6 @@
         },
         "excerpt": {
             "type": "text",
-            "required": true,
             "maxLength": 500
         },
         "content": {
@@ -36,20 +35,17 @@
             "required": true
         },
         "publishDate": {
-            "type": "datetime",
-            "required": true
+            "type": "datetime"
         },
         "readTime": {
             "type": "integer",
-            "required": true,
             "default": 5,
             "min": 1,
             "max": 60
         },
         "isFeatured": {
             "type": "boolean",
-            "default": false,
-            "required": true
+            "default": false
         },
         "articleStatus": {
             "type": "enumeration",
@@ -59,13 +55,11 @@
                 "Scheduled",
                 "Archived"
             ],
-            "default": "Draft",
-            "required": true
+            "default": "Draft"
         },
         "featuredImage": {
             "type": "media",
             "multiple": false,
-            "required": true,
             "allowedTypes": [
                 "images"
             ]

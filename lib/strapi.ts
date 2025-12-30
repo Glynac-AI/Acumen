@@ -263,6 +263,36 @@ export async function getPillars(): Promise<StrapiResponse<StrapiData<StrapiPill
     return fetchStrapi('/pillars');
 }
 
+// Site Settings type for GTM and analytics
+export interface SiteSettingsAttributes {
+    siteName: string;
+    siteDescription?: string;
+    gtmId?: string;
+    gtmEnabled: boolean;
+    googleAnalyticsId?: string;
+    gaEnabled: boolean;
+    metaPixelId?: string;
+    metaPixelEnabled: boolean;
+    customHeadScripts?: string;
+    customBodyScripts?: string;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt?: string;
+}
+
+export async function getSiteSettings(): Promise<SiteSettingsAttributes | null> {
+    try {
+        const response = await fetchStrapi<StrapiResponse<StrapiData<SiteSettingsAttributes>>>('/site-setting');
+        if (response.data) {
+            return response.data.attributes;
+        }
+        return null;
+    } catch (error) {
+        console.error('Failed to fetch site settings:', error);
+        return null;
+    }
+}
+
 // Transform Strapi data to match existing frontend types
 import type { Author, Article, Tag, Pillar } from '@/types';
 

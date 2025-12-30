@@ -1,0 +1,53 @@
+{
+    "kind": "singleType",
+    "collectionName": "site_settings",
+    "info": {
+        "singularName": "site-setting",
+        "pluralName": "site-settings",
+        "displayName": "Site Settings",
+        "description": "Global site settings including analytics and tracking"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "siteName": {
+            "type": "string",
+            "required": true,
+            "default": "RegulateThis"
+        },
+        "siteDescription": {
+            "type": "text"
+        },
+        "gtmId": {
+            "type": "string",
+            "regex": "^GTM-[A-Z0-9]+$"
+        },
+        "gtmEnabled": {
+            "type": "boolean",
+            "default": false
+        },
+        "googleAnalyticsId": {
+            "type": "string",
+            "regex": "^(G|UA)-[A-Z0-9-]+$"
+        },
+        "gaEnabled": {
+            "type": "boolean",
+            "default": false
+        },
+        "metaPixelId": {
+            "type": "string"
+        },
+        "metaPixelEnabled": {
+            "type": "boolean",
+            "default": false
+        },
+        "customHeadScripts": {
+            "type": "text"
+        },
+        "customBodyScripts": {
+            "type": "text"
+        }
+    }
+}
