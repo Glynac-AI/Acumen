@@ -1,4 +1,4 @@
-# Strapi Development Dockerfile for Render
+# Strapi Production Dockerfile for Render
 FROM node:20-alpine
 
 # Install build dependencies
@@ -9,17 +9,20 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install ALL dependencies (including dev dependencies)
+# Install ALL dependencies (including dev for build)
 RUN npm ci
 
-# Copy ALL source code (needed for development mode)
+# Copy ALL source code
 COPY . .
 
 # Create data directory
 RUN mkdir -p .tmp
 
-# Set development environment with increased memory
-ENV NODE_ENV=development
+# Build Strapi admin panel
+RUN npm run build
+
+# Set production environment
+ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=5603
 ENV NODE_OPTIONS="--max-old-space-size=1024"
@@ -27,5 +30,5 @@ ENV NODE_OPTIONS="--max-old-space-size=1024"
 # Expose port
 EXPOSE 5603
 
-# Start Strapi in development mode
-CMD ["npm", "run", "develop"]
+# Start Strapi in production mode
+CMD ["npm", "run", "start"]
