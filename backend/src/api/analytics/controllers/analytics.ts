@@ -66,11 +66,13 @@ export default {
      * Switches between mock and real data based on MOCK_ANALYTICS env variable.
      */
     async getDashboardData(ctx) {
-        const isMockMode = process.env.MOCK_ANALYTICS === 'true';
+        // Default to mock mode unless explicitly set to 'false'
+        const mockEnv = process.env.MOCK_ANALYTICS;
+        const isMockMode = mockEnv !== 'false';
 
         try {
             if (isMockMode) {
-                strapi.log.info('Analytics: Returning mock data (MOCK_ANALYTICS=true)');
+                strapi.log.info('Analytics: Returning mock data (MOCK_ANALYTICS != false)');
                 ctx.body = getMockData();
                 return;
             }
