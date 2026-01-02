@@ -197,7 +197,7 @@ export default function About() {
                     <StaggerContainer className="space-y-6">
                         {[
                             {
-                                name: "Andrew Chen",
+                                name: "Andrew Rosenthal",
                                 role: "Co-Founder",
                                 expertise: "Investment professional with extensive experience launching institutional-grade products for wealth advisors and family offices. Leads investment product strategy and client relationships.",
                                 accent: "primary"
