@@ -2,6 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Container from '@/components/ui/Container';
 import Section from '@/components/ui/Section';
 import Card from '@/components/ui/Card';
@@ -198,27 +199,35 @@ export default function About() {
                         {[
                             {
                                 name: "Andrew Rosenthal",
-                                role: "Co-Founder",
-                                expertise: "Investment professional with extensive experience launching institutional-grade products for wealth advisors and family offices. Leads investment product strategy and client relationships.",
-                                accent: "primary"
+                                role: "CEO at Acumen, President at Glynac",
+                                expertise: `Ex founder of Link People, which he built into a 1,500-unit turnkey subleasing platform in Shanghai before achieving a successful exit through its sale to Dothink, a publicly listed Hong Kong developer. Brings private equity experience in both the US and China, with a proven track record in operational scaling and strategy`,
+                                accent: "primary",
+                                image: "/andrew.png"
                             },
                             {
-                                name: "Alisa",
-                                role: "Co-Founder",
-                                expertise: "Strategic leader specializing in operational excellence and business development. Drives growth initiatives and partnership development across the organization.",
-                                accent: "accent"
+                                name: "Alisa Kolodizner",
+                                role: "Managing Partner at Acumen, Advisor at Glynac",
+                                expertise: "Co-Founder of Prairie Hill Holdings, former VP of Institutional Sales at TD Ameritrade. 15+ years of experience helping RIAs, family offices, and HNWIs with financial services, private equity, and real estate investments. CFP®, entrepreneur, and investor. Over $53M in PE investments and over $200B in RIA relationships as the #1 VP in Institutional and Financial sales",
+                                accent: "accent",
+                                image: "/alisa.png"
                             },
-                            
-                            
+
+
                         ].map((leader, index) => (
                             <motion.div key={leader.name} variants={fadeInUp}>
                                 <Card className="group hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 overflow-hidden relative">
                                     <div className="p-8">
                                         <div className="flex flex-col md:flex-row gap-8">
-                                            {/* Visual Element */}
-                                            <div className="shrink-0">
-                                                <div className={`w-20 h-20 rounded-2xl bg-linear-to-br from-${leader.accent}/10 to-${leader.accent}/20 group-hover:from-${leader.accent}/20 group-hover:to-${leader.accent}/30 transition-all duration-300 flex items-center justify-center`}>
-                                                    <div className={`w-8 h-8 rounded-lg bg-${leader.accent} group-hover:scale-110 transition-transform duration-300`}></div>
+                                            {/* Profile Photo */}
+                                            <div className="shrink-0 flex justify-center">
+                                                <div className="w-32 h-32 md:w-36 md:h-36 rounded-full overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300">
+                                                    <Image
+                                                        src={leader.image}
+                                                        alt={leader.name}
+                                                        width={400}
+                                                        height={400}
+                                                        className="w-full h-full object-cover object-center scale-155"
+                                                    />
                                                 </div>
                                             </div>
 
