@@ -1,4 +1,3 @@
-// components/layout/Header.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -153,7 +152,7 @@ export default function Header() {
                     </Link> */}
                     {/* Blog Link - External */}
                     <a
-                        href="https:/acumen-blogs.com"
+                        href="https://www.regulatethis.com/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`text-sm font-medium transition-colors duration-300 ${scrolled
