@@ -26,10 +26,10 @@ export default function SolutionsSection() {
 
     const investments = [
         {
-            name: 'Prairie Hill Holdings',
-            tagline: 'Institutional NNN Real Estate',
-            description: 'Institutional-quality triple-net lease (NNN) real estate solutions for advisors and high-net-worth clients with tax-efficient structures.',
-            href: '/solutions/phh',
+            name: 'Sylvan',
+            tagline: 'Structured Real Estate Income Platform',
+            description: 'Access institutional-grade private real estate income through a standardized, governance-ready investment framework designed for consistency, repeatability, and scale.',
+            href: '/solutions/sylvan',
             accent: 'accent'
         }
     ];

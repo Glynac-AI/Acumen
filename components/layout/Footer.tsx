@@ -88,8 +88,8 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/solutions/phh" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
-                                    Prairie Hill Holdings
+                                <Link href="/solutions/sylvan" className="text-sm text-white/70 hover:text-white transition-colors duration-300">
+                                    Sylvan
                                 </Link>
                             </li>
                             <li>

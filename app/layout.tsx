@@ -8,6 +8,9 @@ import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 export const metadata: Metadata = {
   title: "Acumen Strategy - Modern Compliance Solutions for Wealth Management",
   description: "Software, products, and services designed to help wealth management firms navigate compliance requirements and scale their operations.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

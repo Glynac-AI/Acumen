@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const solutions = [
     { name: 'Glynac', href: '/solutions/glynac', description: 'Compliance-first AI workspace' },
     { name: 'Tollbooth', href: '/solutions/tollbooth', description: 'Automated options execution' },
-    { name: 'Prairie Hill Holdings', href: '/solutions/phh', description: 'Institutional NNN real estate' },
+    { name: 'Sylvan', href: '/solutions/sylvan', description: 'Structured real estate income' },
     { name: 'CWMU', href: '/solutions/cwmu', description: 'Wealth management education' },
 ];
 
@@ -47,7 +47,7 @@ export default function Header() {
                         className="object-contain" priority />
                 </Link>
 
-                {/* Desktop Navigation */}
+                {/* Desktop Navigation + CTA - All on the right */}
                 <div className="hidden lg:flex items-center gap-8">
                     <Link
                         href="/"
@@ -95,7 +95,7 @@ export default function Header() {
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
-                                    className="absolute top-full left-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-primary/10 overflow-hidden"
+                                    className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-80 bg-white rounded-xl shadow-xl border border-primary/10 overflow-hidden"
                                 >
                                     <div className="p-2">
                                         {/* View All Solutions Link */}
@@ -133,27 +133,9 @@ export default function Header() {
                         </AnimatePresence>
                     </div>
 
-                   {/* <Link
-                        href="/use-cases"
-                        className={`text-sm font-medium transition-colors duration-300 ${scrolled
-                            ? 'text-primary/70 hover:text-primary'
-                            : 'text-white/80 hover:text-white'
-                            }`}
-                    >
-                        Use Cases
-                    </Link> */}
-                    {/*<Link
-                        href="/resources"
-                        className={`text-sm font-medium transition-colors duration-300 ${scrolled
-                            ? 'text-primary/70 hover:text-primary'
-                            : 'text-white/80 hover:text-white'
-                            }`}
-                    >
-                        Resources
-                    </Link> */}
                     {/* Blog Link - External */}
                     <a
-                        href="https:/acumen-blogs.com"
+                        href="https://acumen-blogs.com"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`text-sm font-medium transition-colors duration-300 ${scrolled
@@ -163,10 +145,8 @@ export default function Header() {
                     >
                         Blog
                     </a>
-                </div>
 
-                {/* Desktop CTA */}
-                <div className="hidden lg:block">
+                    {/* CTA Button */}
                     <Link
                         href="/contact"
                         className={`px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${scrolled

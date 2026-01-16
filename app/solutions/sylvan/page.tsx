@@ -1,4 +1,4 @@
-// app/solutions/phh/page.tsx
+// app/solutions/sylvan/page.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -11,7 +11,7 @@ import StaggerContainer from '@/components/ui/StaggerContainer';
 import { CheckCircle2 } from 'lucide-react';
 import { fadeInUp } from '@/lib/animations';
 
-export default function PHH() {
+export default function Sylvan() {
     return (
         <div className="min-h-screen">
             {/* Hero - Full Screen Height */}
@@ -29,7 +29,7 @@ export default function PHH() {
                         >
 
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
-                                Prairie Hill Holdings — Institutional Triple-Net Lease (NNN) Real Estate Solutions
+                                Sylvan — Structured Real Estate Income Platform
                             </h1>
 
                             <motion.p
@@ -38,7 +38,7 @@ export default function PHH() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                Access diversified, triple-net lease (NNN) real estate investments designed for yield and low volatility. Institutional-quality properties for wealth management clients.
+                                Access institutional-grade private real estate income through a standardized, governance-ready investment framework designed for consistency, repeatability, and scale.
                             </motion.p>
 
                             <motion.div
@@ -47,10 +47,10 @@ export default function PHH() {
                                 transition={{ duration: 0.8, delay: 0.6 }}
                                 className="flex flex-col sm:flex-row gap-4 pt-4"
                             >
-                                <Button href="/contact" variant="secondary" size="lg">
+                                <Button href="https://sylvan.com" variant="secondary" size="lg">
                                     Learn More
                                 </Button>
-                                
+
                             </motion.div>
                         </motion.div>
                     </div>
@@ -61,13 +61,13 @@ export default function PHH() {
             <Section background="white" padding="lg">
                 <Container maxWidth="lg">
                     <AnimatedSection animation="fadeInUp">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">About Prairie Hill Holdings</h2>
+                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">About Sylvan</h2>
                         <div className="space-y-6 text-lg text-primary/70 leading-relaxed">
                             <p>
-                                Prairie Hill Holdings (PHH) provides advisors and their high-net-worth clients access to institutional-quality commercial real estate through a diversified portfolio of triple-net lease (NNN) properties.
+                                Sylvan provides advisors and their wealth management clients access to institutional-quality private real estate income through a standardized structured investment platform.
                             </p>
                             <p>
-                                Each investment is structured for tax efficiency, predictable income, and capital preservation—offering an alternative to traditional fixed income with tangible asset backing.
+                                Each offering is governed by fixed structural rules and documentation, enabling predictable income behavior, repeatable approvals, and disciplined portfolio integration — offering an alternative to traditional fixed income with real-asset backing and improved operational efficiency.
                             </p>
                         </div>
                     </AnimatedSection>
@@ -84,33 +84,33 @@ export default function PHH() {
                     <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         {[
                             {
-                                title: "Triple-Net Lease (NNN) Properties",
-                                description: "Tenant-responsible for taxes, insurance, and maintenance—reducing owner operational burden",
+                                title: "Standardized Structure",
+                                description: "Fixed governance framework with consistent rules, documentation, and controls across all offerings — reducing complexity and approval burden.",
                                 accent: "accent"
                             },
                             {
-                                title: "Target Returns",
-                                description: "Competitive yields with focus on cash flow stability and capital appreciation potential",
+                                title: "Target Income Profile",
+                                description: "Income-focused real estate strategies designed for durable cash flow and long-term capital discipline.",
                                 accent: "primary"
                             },
                             {
-                                title: "Diversified Property Types",
-                                description: "Exposure across logistics and distribution facilities, warehouse/industrial, grocery-anchored retail, medical/healthcare retail, education retail, and quick-service restaurants",
+                                title: "Asset-Level Flexibility",
+                                description: "Individual offerings may vary by property type and geography while operating within the same approved structural framework.",
                                 accent: "accent"
                             },
                             {
-                                title: "Tax-Efficient Structure",
-                                description: "Designed to optimize tax treatment with 1031 exchange compatibility for qualified investors",
+                                title: "Governance-First Design",
+                                description: "Built for CIO and CCO oversight with audit-ready documentation, version control, and defined risk parameters.",
                                 accent: "primary"
                             },
                             {
                                 title: "Institutional Quality",
-                                description: "Grade-A properties in prime locations with credit-rated tenants and long-term leases",
+                                description: "Institutional underwriting standards, disciplined leverage, and transparent reporting.",
                                 accent: "accent"
                             },
                             {
                                 title: "Regular Distributions",
-                                description: "Quarterly income distributions with transparent reporting and performance tracking",
+                                description: "Quarterly income distributions with consistent reporting and performance visibility.",
                                 accent: "primary"
                             }
                         ].map((feature, index) => (
@@ -141,7 +141,7 @@ export default function PHH() {
                     <AnimatedSection animation="fadeInUp" className="mb-16">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Asset Classes</h2>
                         <p className="text-xl text-primary/70 mb-8">
-                            PHH focuses exclusively on institutional-grade NNN properties across six core asset classes:
+                            Sylvan supports structured real estate income across multiple property categories, including:
                         </p>
                     </AnimatedSection>
 
@@ -149,32 +149,32 @@ export default function PHH() {
                         {[
                             {
                                 title: "Logistics & Distribution Facilities",
-                                description: "Modern distribution centers and fulfillment facilities with long-term credit tenants in strategic locations",
+                                description: "Stabilized distribution and fulfillment properties with long-term operating history.",
                                 accent: "accent"
                             },
                             {
-                                title: "Warehouse/Industrial",
-                                description: "Class-A industrial properties in strategic locations with stable cash flows and institutional-grade tenants",
+                                title: "Warehouse / Industrial",
+                                description: "Institutional-grade industrial assets in strategic markets with stable cash flows.",
                                 accent: "primary"
                             },
                             {
                                 title: "Grocery-Anchored Retail",
-                                description: "Essential retail centers anchored by major grocery chains in high-traffic, resilient markets",
+                                description: "Essential retail centers in high-traffic, resilient trade areas.",
                                 accent: "accent"
                             },
                             {
-                                title: "Medical/Healthcare Retail",
-                                description: "Medical office buildings and healthcare facilities with long-term healthcare provider tenants",
+                                title: "Medical / Healthcare Retail",
+                                description: "Medical office buildings and healthcare facilities with long-term operating tenants.",
                                 accent: "primary"
                             },
                             {
                                 title: "Education Retail",
-                                description: "Facilities leased to educational institutions, training centers, and childcare providers",
+                                description: "Facilities supporting education, training, and childcare services.",
                                 accent: "accent"
                             },
                             {
                                 title: "Quick-Service Restaurants",
-                                description: "National QSR brands with corporate guarantees in high-visibility, high-traffic locations",
+                                description: "High-visibility locations operated by national QSR brands.",
                                 accent: "primary"
                             }
                         ].map((asset, index) => (
@@ -206,11 +206,11 @@ export default function PHH() {
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Ideal For</h2>
                         <div className="space-y-4">
                             {[
-                                'High-net-worth individuals seeking income and diversification beyond equities and bonds',
-                                'Advisors looking to add alternative investments with tangible asset backing',
-                                'Clients interested in 1031 exchange opportunities for tax deferral',
-                                'Portfolios requiring low-volatility income with capital preservation focus',
-                                'Investors seeking institutional-grade NNN real estate without direct property management',
+                                'High-net-worth individuals seeking consistent private income beyond traditional stocks and bonds',
+                                'Advisors seeking scalable alternative investment solutions',
+                                'Clients prioritizing income stability and capital preservation',
+                                'Portfolios requiring low-volatility real asset exposure',
+                                'Firms seeking institutional-grade real estate income without operational complexity',
                             ].map((item, index) => (
                                 <div key={index} className="flex items-start gap-3">
                                     <CheckCircle2 className="h-6 w-6 text-accent shrink-0 mt-0.5" />
@@ -227,17 +227,14 @@ export default function PHH() {
                 <Container maxWidth="lg">
                     <AnimatedSection animation="fadeInUp" className="text-center">
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-                            Interested in Adding PHH to Your Practice?
+                            Interested in Adding Sylvan to Your Practice?
                         </h2>
                         <p className="text-xl text-primary/70 mb-8 max-w-3xl mx-auto">
-                            Contact us for detailed investor materials, performance data, and advisor partnership opportunities.
+                            Contact us for detailed investor materials, platform overview, and advisor partnership opportunities.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Button href="/contact" variant="accent" size="lg" className="hover:scale-105 transition-transform duration-300">
-                                Learn About the Fund
-                            </Button>
-                            <Button href="/resources" variant="secondary" size="lg">
-                                Download Overview
+                            <Button href="https://sylvan.com" variant="accent" size="lg" className="hover:scale-105 transition-transform duration-300">
+                                Learn About the Platform
                             </Button>
                         </div>
                     </AnimatedSection>
