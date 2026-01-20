@@ -151,13 +151,13 @@ export default function Contact() {
                                                     className="text-primary/70 hover:text-accent transition-colors duration-300 flex items-center gap-1 group"
                                                 >
                                                     Follow us on LinkedIn
-                                                    
+
                                                 </a>
                                             </div>
                                         </div>
                                     </Card>
                                 </motion.div>
-                   
+
                             </StaggerContainer>
                         </div>
 
@@ -282,27 +282,27 @@ export default function Contact() {
                                                     </div>
                                                 </div>
 
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-primary mb-2">
-                                                            Area of Interest *
-                                                        </label>
-                                                        <select
-                                                            name="interest"
-                                                            value={formData.interest}
-                                                            onChange={handleChange}
-                                                            required
-                                                            className="w-full px-4 py-3 border border-primary/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent hover:border-accent/30 transition-colors"
-                                                        >
-                                                            <option value="">Select area</option>
-                                                            <option value="glynac">Glynac (AI Workspace)</option>
-                                                            <option value="tollbooth">Tollbooth (Options Automation)</option>
-                                                            <option value="sylvan">Sylvan (Structured Real Estate Income)</option>
-                                                            <option value="aci">Acumen Compliance Institute (Education)</option>
-                                                            <option value="platform">Platform Access</option>
-                                                            <option value="multiple">Multiple Solutions</option>
-                                                            <option value="enterprise">Enterprise Implementation</option>
-                                                        </select>
-                                                    </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-primary mb-2">
+                                                        Area of Interest *
+                                                    </label>
+                                                    <select
+                                                        name="interest"
+                                                        value={formData.interest}
+                                                        onChange={handleChange}
+                                                        required
+                                                        className="w-full px-4 py-3 border border-primary/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent hover:border-accent/30 transition-colors"
+                                                    >
+                                                        <option value="">Select area</option>
+                                                        <option value="glynac">Glynac (AI Workspace)</option>
+                                                        <option value="tollbooth">Tollbooth (Options Automation)</option>
+                                                        <option value="phh">Prairie Hill Holdings (Real Estate)</option>
+                                                        <option value="aci">Acumen Compliance Institute (Education)</option>
+                                                        <option value="platform">Platform Access</option>
+                                                        <option value="multiple">Multiple Solutions</option>
+                                                        <option value="enterprise">Enterprise Implementation</option>
+                                                    </select>
+                                                </div>
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-primary mb-2">
@@ -343,7 +343,7 @@ export default function Contact() {
                                                         className="mt-1 w-4 h-4 text-accent border-primary/20 rounded focus:ring-2 focus:ring-accent"
                                                     />
                                                     <label className="text-sm text-primary/70">
-                                                        I agree to the privacy policy and consent to being contacted by Acumen Strategy *
+                                                        I consent to Acumen Strategy collecting and processing my personal information as described in the <a href="/legal/privacy" target="_blank" className="text-accent hover:underline">Privacy Policy</a>. I agree to the <a href="/legal/terms" target="_blank" className="text-accent hover:underline">Terms of Service</a> and understand that I may receive email communications regarding my inquiry and related services. I can unsubscribe at any time. *
                                                     </label>
                                                 </div>
 

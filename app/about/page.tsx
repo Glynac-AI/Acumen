@@ -1,4 +1,3 @@
-// app/about/page.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -36,7 +35,7 @@ export default function About() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                We help wealth management firms navigate the intersection of regulatory compliance, operational efficiency, and growth.
+                                We build software and products that help wealth management firms navigate the intersection of regulatory compliance, operational efficiency, and growth.
                             </motion.p>
                         </motion.div>
                     </div>
@@ -199,15 +198,15 @@ export default function About() {
                         {[
                             {
                                 name: "Andrew Rosenthal",
-                                role: "Co-Founder",
-                                expertise: "Investment professional with extensive experience launching institutional-grade products for wealth advisors and family offices. Leads investment product strategy and client relationships.",
+                                role: "CEO at Acumen, President at Glynac",
+                                expertise: `Ex founder of Link People, which he built into a 1,500-unit turnkey subleasing platform in Shanghai before achieving a successful exit through its sale to Dothink, a publicly listed Hong Kong developer. Brings private equity experience in both the US and China, with a proven track record in operational scaling and strategy`,
                                 accent: "primary",
                                 image: "/andrew.png"
                             },
                             {
-                                name: "Alisa",
-                                role: "Co-Founder",
-                                expertise: "Strategic leader specializing in operational excellence and business development. Drives growth initiatives and partnership development across the organization.",
+                                name: "Alisa Kolodizner",
+                                role: "Managing Partner at Acumen, Advisor at Glynac",
+                                expertise: "Co-Founder of Prairie Hill Holdings, former VP of Institutional Sales at TD Ameritrade. 15+ years of experience helping RIAs, family offices, and HNWIs with financial services, private equity, and real estate investments. CFP®, entrepreneur, and investor. Over $53M in PE investments and over $200B in RIA relationships as the #1 VP in Institutional and Financial sales",
                                 accent: "accent",
                                 image: "/alisa.png"
                             },

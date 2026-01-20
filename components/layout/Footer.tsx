@@ -61,9 +61,9 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <a 
-                                    href="https://blog.acumen-strategy.com" 
-                                    target="_blank" 
+                                <a
+                                    href="https://regulateThis.com"
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-sm text-white/70 hover:text-white transition-colors duration-300"
                                 >
@@ -113,11 +113,15 @@ export default function Footer() {
                                     info@acumen-strategy.com
                                 </a>
                             </li>
-                            
-                            {/* <li className="flex items-start gap-3">
+                            <li className="flex items-start gap-3">
                                 <Phone className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
-                                <span className="text-sm text-white/70">[PHONE TO BE CONFIRMED]</span>
-                            </li> */}
+                                <a
+                                    href="tel:+18472300014"
+                                    className="text-sm text-white/70 hover:text-accent transition-colors duration-300"
+                                >
+                                    +1 847 230 0014
+                                </a>
+                            </li>
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
                                 <span className="text-sm text-white/70">
@@ -141,6 +145,9 @@ export default function Footer() {
                             </Link>
                             <Link href="/legal/terms" className="text-sm text-white/50 hover:text-accent transition-colors duration-300">
                                 Terms of Service
+                            </Link>
+                            <Link href="/legal/unsubscribe" className="text-sm text-white/50 hover:text-accent transition-colors duration-300">
+                                Email Preferences
                             </Link>
                         </div>
                     </div>

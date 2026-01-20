@@ -135,7 +135,7 @@ export default function Header() {
 
                     {/* Blog Link - External */}
                     <a
-                        href="https://acumen-blogs.com"
+                        href="https://www.regulatethis.com/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`text-sm font-medium transition-colors duration-300 ${scrolled
@@ -233,7 +233,7 @@ export default function Header() {
                                 Resources
                             </Link>
                             <a
-                                href="https://blog.acumen-strategy.com"
+                                href="https://www.regulatethis.com/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="block py-3 text-sm font-medium text-primary hover:text-accent transition-colors"
