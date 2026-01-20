@@ -14,7 +14,7 @@
 import type { Core } from '@strapi/strapi';
 
 interface TenantContext {
-    id: string;
+    id: number;
     documentId: string;
     name: string;
     slug: string;
