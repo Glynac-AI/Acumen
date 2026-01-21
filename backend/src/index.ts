@@ -102,19 +102,38 @@ export default {
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     // Seed Default Tenant first
     let defaultTenant: any = null;
-    const existingTenants = await strapi.documents('api::tenant.tenant').findMany({
-      filters: { slug: 'regulatethis' }
-    });
 
-    if (existingTenants.length === 0) {
-      console.log('🏢 Seeding default tenant...');
-      defaultTenant = await strapi.documents('api::tenant.tenant').create({
-        data: defaultTenantData,
+    try {
+      const existingTenants = await strapi.documents('api::tenant.tenant').findMany({
+        filters: { slug: 'regulatethis' }
       });
-      console.log('✅ Default tenant created!');
-    } else {
-      defaultTenant = existingTenants[0];
-      console.log('📋 Default tenant already exists, skipping seed.');
+
+      if (existingTenants.length === 0) {
+        console.log('🏢 Seeding default tenant...');
+        try {
+          defaultTenant = await strapi.documents('api::tenant.tenant').create({
+            data: defaultTenantData,
+          });
+          console.log('✅ Default tenant created!');
+        } catch (createError: any) {
+          // Handle race condition - another instance may have created it
+          if (createError.message?.includes('unique') || createError.name === 'ValidationError') {
+            console.log('⚠️ Tenant was created by another process, fetching...');
+            const refetchedTenants = await strapi.documents('api::tenant.tenant').findMany({
+              filters: { slug: 'regulatethis' }
+            });
+            defaultTenant = refetchedTenants[0];
+          } else {
+            throw createError;
+          }
+        }
+      } else {
+        defaultTenant = existingTenants[0];
+        console.log('📋 Default tenant already exists, skipping seed.');
+      }
+    } catch (error) {
+      console.error('❌ Error seeding tenant:', error);
+      // Continue without tenant - allows app to start
     }
 
     // Seed Pillars (with tenant association)
