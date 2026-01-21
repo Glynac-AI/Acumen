@@ -11,7 +11,10 @@ export const metadata: Metadata = {
   title: "Acumen Strategy - Modern Compliance Solutions for Wealth Management",
   description: "Software, products, and services designed to help wealth management firms navigate compliance requirements and scale their operations.",
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.png" },
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+    ],
   },
 };
 
