@@ -2,9 +2,9 @@
  * Tenant-Scoped Policy
  * 
  * This policy ensures that:
- * 1. Requests have a valid tenant context
- * 2. Queries are automatically filtered by tenant
- * 3. Create/Update operations include the tenant relation
+ * 1. GET requests work publicly (with optional tenant filtering)
+ * 2. Write operations require valid tenant context
+ * 3. When tenant context exists, queries are filtered by tenant
  * 
  * Apply this policy to routes that require tenant isolation.
  */
@@ -21,32 +21,46 @@ export default (policyContext: any, config: Record<string, unknown>, { strapi }:
         return false;
     }
 
-    // Check if tenant context exists
-    if (!ctx.state.tenant) {
-        strapi.log.debug('is-tenant-scoped: No tenant context found, denying access');
-        return false; // Deny access if no tenant context
+    const isReadOperation = ctx.request?.method === 'GET';
+    const isWriteOperation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(ctx.request?.method);
+    const hasTenantContext = !!ctx.state.tenant;
+
+    // For write operations, tenant context is REQUIRED
+    if (isWriteOperation && !hasTenantContext) {
+        strapi.log.debug('is-tenant-scoped: Write operation without tenant context, denying access');
+        return false;
     }
 
-    // Inject tenant filter into query params for find operations
-    if (ctx.request?.method === 'GET') {
-        if (!ctx.query) {
-            ctx.query = {};
-        }
-        if (!ctx.query.filters) {
-            ctx.query.filters = {};
-        }
-        // Add tenant filter to existing filters
-        ctx.query.filters.tenant = {
-            documentId: ctx.state.tenant.documentId
-        };
+    // For read operations without tenant context, allow access (public API)
+    if (isReadOperation && !hasTenantContext) {
+        strapi.log.debug('is-tenant-scoped: Public read access allowed without tenant context');
+        return true;
     }
 
-    // For create/update operations, ensure tenant is set in request body
-    if (['POST', 'PUT', 'PATCH'].includes(ctx.request?.method)) {
-        if (ctx.request.body && ctx.request.body.data) {
-            ctx.request.body.data.tenant = ctx.state.tenant.documentId;
+    // If we have tenant context, apply tenant filtering
+    if (hasTenantContext) {
+        // Inject tenant filter into query params for find operations
+        if (isReadOperation) {
+            if (!ctx.query) {
+                ctx.query = {};
+            }
+            if (!ctx.query.filters) {
+                ctx.query.filters = {};
+            }
+            // Add tenant filter to existing filters
+            ctx.query.filters.tenant = {
+                documentId: ctx.state.tenant.documentId
+            };
+        }
+
+        // For create/update operations, ensure tenant is set in request body
+        if (['POST', 'PUT', 'PATCH'].includes(ctx.request?.method)) {
+            if (ctx.request.body && ctx.request.body.data) {
+                ctx.request.body.data.tenant = ctx.state.tenant.documentId;
+            }
         }
     }
 
     return true;
 };
+
