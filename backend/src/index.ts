@@ -200,52 +200,5 @@ export default {
     } else {
       console.log('📋 Site settings already exist, skipping seed.');
     }
-
-    // Migration: Fix newsletter subscriber status values (capitalize -> lowercase)
-    // This is a ONE-TIME migration with a flag check
-    try {
-      const knex = strapi.db.connection;
-
-      // Check if migration has already run using a simple flag table
-      const migrationKey = 'newsletter_status_lowercase_v1';
-
-      // Create migrations tracking table if it doesn't exist
-      const hasTable = await knex.schema.hasTable('_strapi_migrations_custom');
-      if (!hasTable) {
-        await knex.schema.createTable('_strapi_migrations_custom', (table) => {
-          table.string('key').primary();
-          table.timestamp('executed_at').defaultTo(knex.fn.now());
-        });
-      }
-
-      // Check if this migration already ran
-      const existingMigration = await knex('_strapi_migrations_custom')
-        .where('key', migrationKey)
-        .first();
-
-      if (!existingMigration) {
-        console.log('🔄 Running one-time newsletter status migration...');
-
-        // Update 'Active' -> 'active'
-        const updatedActive = await knex('newsletter_subscribers')
-          .where('status', 'Active')
-          .update({ status: 'active' });
-
-        // Update 'Unsubscribed' -> 'unsubscribed'
-        const updatedUnsubscribed = await knex('newsletter_subscribers')
-          .where('status', 'Unsubscribed')
-          .update({ status: 'unsubscribed' });
-
-        // Mark migration as complete
-        await knex('_strapi_migrations_custom').insert({ key: migrationKey });
-
-        console.log(`✅ Migration complete: ${updatedActive} Active -> active, ${updatedUnsubscribed} Unsubscribed -> unsubscribed`);
-      } else {
-        console.log('📋 Newsletter status migration already executed, skipping.');
-      }
-    } catch (migrationError) {
-      console.error('⚠️ Newsletter status migration error (non-fatal):', migrationError);
-      // Non-fatal - app can continue
-    }
   },
 };
