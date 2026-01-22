@@ -1,18 +1,6 @@
-/**
- * Tenant-Scoped Policy
- * 
- * This policy ensures that:
- * 1. GET requests work publicly (with optional tenant filtering)
- * 2. Write operations require valid tenant context
- * 3. When tenant context exists, queries are filtered by tenant
- * 
- * Apply this policy to routes that require tenant isolation.
- */
-
 import type { Core } from '@strapi/strapi';
 
 export default (policyContext: any, config: Record<string, unknown>, { strapi }: { strapi: Core.Strapi }) => {
-    // In Strapi 5, policyContext IS the Koa context directly
     const ctx = policyContext;
 
     // Safety check - ensure ctx and ctx.state exist

@@ -24,10 +24,10 @@
         "status": {
             "type": "enumeration",
             "enum": [
-                "Active",
-                "Unsubscribed"
+                "active",
+                "unsubscribed"
             ],
-            "default": "Active",
+            "default": "active",
             "required": true
         },
         "source": {
