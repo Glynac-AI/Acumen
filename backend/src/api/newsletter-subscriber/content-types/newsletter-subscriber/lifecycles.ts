@@ -5,12 +5,18 @@ export default {
         // Debug logging to help diagnose validation issues
         console.log('📧 Newsletter Subscriber beforeCreate hook triggered');
         console.log('📧 Incoming data:', JSON.stringify(data, null, 2));
-        console.log('📧 Event state tenant:', event.state?.tenant);
+        
+        // Safely check for tenant in event state (only available for API requests, not admin panel)
+        const eventState = event?.state;
+        const tenantContext = eventState?.tenant;
+        console.log('📧 Event has state:', !!eventState);
+        console.log('📧 Tenant context available:', !!tenantContext);
 
         // Auto-assign tenant from context if available and not already set
-        if (!data.tenant && event.state?.tenant) {
+        // Note: Admin panel requests may not have tenant context - this is OK
+        if (!data.tenant && tenantContext) {
             // Use documentId for Strapi 5.x (not id)
-            data.tenant = event.state.tenant.documentId || event.state.tenant.id;
+            data.tenant = tenantContext.documentId || tenantContext.id;
             console.log('📧 Auto-assigned tenant:', data.tenant);
         }
 
@@ -25,7 +31,7 @@ export default {
         if (!data.status) {
             data.status = 'active';
             console.log('📧 Set default status:', data.status);
-        } else {
+        } else if (typeof data.status === 'string') {
             // Normalize status to lowercase to prevent validation errors
             const normalizedStatus = data.status.toLowerCase();
             if (normalizedStatus !== data.status) {
@@ -44,7 +50,7 @@ export default {
         console.log('📧 Update data:', JSON.stringify(data, null, 2));
 
         // Normalize status if being updated
-        if (data.status) {
+        if (data.status && typeof data.status === 'string') {
             const normalizedStatus = data.status.toLowerCase();
             if (normalizedStatus !== data.status) {
                 console.log(`📧 Normalizing status from "${data.status}" to "${normalizedStatus}"`);
