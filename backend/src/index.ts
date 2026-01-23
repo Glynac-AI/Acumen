@@ -200,5 +200,89 @@ export default {
     } else {
       console.log('📋 Site settings already exist, skipping seed.');
     }
+
+    // Seed Newsletter Subscribers (with tenant association)
+    const existingSubscribers = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({});
+
+    if (existingSubscribers.length === 0 && defaultTenant) {
+      console.log('📧 Seeding newsletter subscribers...');
+
+      const newsletterSubscribers = [
+        {
+          email: "tech.enthusiast@example.com",
+          status: "active",
+          source: "Homepage",
+          subscribedAt: "2026-01-15T09:00:00.000Z"
+        },
+        {
+          email: "news.reader@example.com",
+          status: "active",
+          source: "Article_CTA",
+          subscribedAt: "2026-01-16T14:30:00.000Z"
+        },
+        {
+          email: "blog.follower@example.com",
+          status: "active",
+          source: "Author_CTA",
+          subscribedAt: "2026-01-17T11:15:00.000Z"
+        },
+        {
+          email: "weekly.digest@example.com",
+          status: "active",
+          source: "global_footer",
+          subscribedAt: "2026-01-18T16:45:00.000Z"
+        },
+        {
+          email: "industry.news@example.com",
+          status: "active",
+          source: "Website",
+          subscribedAt: "2026-01-19T10:00:00.000Z"
+        },
+        {
+          email: "content.lover@example.com",
+          status: "active",
+          source: "Homepage",
+          subscribedAt: "2026-01-20T13:20:00.000Z"
+        },
+        {
+          email: "insights.subscriber@example.com",
+          status: "active",
+          source: "Article_CTA",
+          subscribedAt: "2026-01-21T08:30:00.000Z"
+        },
+        {
+          email: "former.subscriber@example.com",
+          status: "unsubscribed",
+          source: "Homepage",
+          subscribedAt: "2026-01-10T12:00:00.000Z",
+          unsubscribeAt: "2026-01-22T15:00:00.000Z",
+          unsubscribeReason: "Too many emails"
+        },
+        {
+          email: "market.updates@example.com",
+          status: "active",
+          source: "Website",
+          subscribedAt: "2026-01-22T09:00:00.000Z"
+        },
+        {
+          email: "research.reader@example.com",
+          status: "active",
+          source: "Author_CTA",
+          subscribedAt: "2026-01-23T11:30:00.000Z"
+        }
+      ];
+
+      for (const subscriber of newsletterSubscribers) {
+        await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').create({
+          data: {
+            ...subscriber,
+            tenant: defaultTenant.documentId,
+          },
+        });
+      }
+      console.log('✅ Newsletter subscribers seeded successfully!');
+    } else {
+      console.log('📋 Newsletter subscribers already exist, skipping seed.');
+    }
   },
 };
