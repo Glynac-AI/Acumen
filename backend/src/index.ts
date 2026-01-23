@@ -90,7 +90,55 @@ export default {
    *
    * This gives you an opportunity to extend code.
    */
-  register(/* { strapi }: { strapi: Core.Strapi } */) { },
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // Register Document Service Middleware to normalize newsletter-subscriber data
+    // This runs BEFORE Strapi's content validation, allowing us to fix the status field
+    strapi.documents.use(async (context, next) => {
+      // Only apply to newsletter-subscriber content type
+      if (context.uid !== 'api::newsletter-subscriber.newsletter-subscriber') {
+        return next();
+      }
+
+      // Only apply to create and update actions
+      if (['create', 'update'].includes(context.action)) {
+        const data = context.params?.data;
+
+        if (data) {
+          strapi.log.debug(`📧 Document Middleware: Processing ${context.action} for newsletter-subscriber`);
+          strapi.log.debug(`📧 Document Middleware: Input data: ${JSON.stringify(data)}`);
+
+          // Normalize status to lowercase if present
+          if (data.status && typeof data.status === 'string') {
+            const originalStatus = data.status;
+            const normalizedStatus = originalStatus.toLowerCase();
+
+            if (originalStatus !== normalizedStatus) {
+              context.params.data.status = normalizedStatus;
+              strapi.log.info(`📧 Document Middleware: Normalized status from "${originalStatus}" to "${normalizedStatus}"`);
+            }
+          }
+
+          // Set default status if not provided
+          if (!data.status) {
+            context.params.data.status = 'active';
+            strapi.log.debug('📧 Document Middleware: Set default status to "active"');
+          }
+
+          // Set default subscribedAt if not provided (for create action)
+          if (context.action === 'create' && !data.subscribedAt) {
+            context.params.data.subscribedAt = new Date().toISOString();
+            strapi.log.debug(`📧 Document Middleware: Set subscribedAt to ${context.params.data.subscribedAt}`);
+          }
+
+          strapi.log.debug(`📧 Document Middleware: Final data: ${JSON.stringify(context.params.data)}`);
+        }
+      }
+
+      return next();
+    });
+
+    strapi.log.info('📧 Newsletter subscriber document middleware registered');
+  },
 
   /**
    * An asynchronous bootstrap function that runs before
