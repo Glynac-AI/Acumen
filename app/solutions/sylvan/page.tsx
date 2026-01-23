@@ -38,7 +38,7 @@ export default function Sylvan() {
                                 transition={{ duration: 0.8, delay: 0.4 }}
                                 className="text-xl md:text-2xl text-white/90 leading-relaxed"
                             >
-                                Access institutional-grade private real estate income through a standardized, governance-ready investment framework designed for consistency, repeatability, and scale.
+                                Sylvan delivers structured real estate exposure through pre-approved, ring fenced SPVs with lockbox governed rental cash distributions.
                             </motion.p>
 
                             <motion.div
@@ -64,10 +64,10 @@ export default function Sylvan() {
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">About Sylvan</h2>
                         <div className="space-y-6 text-lg text-primary/70 leading-relaxed">
                             <p>
-                                Sylvan provides advisors and their wealth management clients access to institutional-quality private real estate income through a standardized structured investment platform.
+                                Sylvan standardizes how real estate debt is issued and paid. Advisors invest in second-lien notes backed by specific properties held in ring-fenced SPVs, where rental income is lockboxed and distributed through fixed cash-flow waterfalls.
                             </p>
                             <p>
-                                Each offering is governed by fixed structural rules and documentation, enabling predictable income behavior, repeatable approvals, and disciplined portfolio integration — offering an alternative to traditional fixed income with real-asset backing and improved operational efficiency.
+                                With structure and governance held constant across issuances, advisors can focus on asset quality and issuer performance, allocating client capital into multiple portfolios without repeating the full due diligence process each time.
                             </p>
                         </div>
                     </AnimatedSection>
@@ -81,39 +81,34 @@ export default function Sylvan() {
                         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">Key Features</h2>
                     </AnimatedSection>
 
-                    <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <StaggerContainer className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                         {[
                             {
-                                title: "Standardized Structure",
-                                description: "Fixed governance framework with consistent rules, documentation, and controls across all offerings — reducing complexity and approval burden.",
+                                title: "Repeatable Capital Allocation",
+                                description: "Use a single approved framework to deploy capital across multiple issuers and income-producing real estate portfolios.",
                                 accent: "accent"
                             },
                             {
-                                title: "Target Income Profile",
-                                description: "Income-focused real estate strategies designed for durable cash flow and long-term capital discipline.",
+                                title: "Lockbox-Protected Cash Flow",
+                                description: "Rental income is lockboxed and distributed through a fixed waterfall, ensuring banks and Sylvan investors are paid before any capital reaches the developer.",
                                 accent: "primary"
                             },
                             {
-                                title: "Asset-Level Flexibility",
-                                description: "Individual offerings may vary by property type and geography while operating within the same approved structural framework.",
+                                title: "Ring-Fenced Investment Structure",
+                                description: "Each investment is issued through a standalone SPV that isolates assets and cash flows, preventing cross-contamination of risk across portfolios or issuers.",
                                 accent: "accent"
                             },
                             {
-                                title: "Governance-First Design",
-                                description: "Built for CIO and CCO oversight with audit-ready documentation, version control, and defined risk parameters.",
+                                title: "Rental Income Without Ownership Risk",
+                                description: "Debt positions on stabilized, income-producing portfolio of properties provide exposure to rental performance without developer equity risk.",
                                 accent: "primary"
                             },
                             {
-                                title: "Institutional Quality",
-                                description: "Institutional underwriting standards, disciplined leverage, and transparent reporting.",
+                                title: "Custodian-Native Execution",
+                                description: "Sylvan offerings are executed directly through your existing custodian using a unique offering code, eliminating the need for new accounts or bespoke processes.",
                                 accent: "accent"
-                            },
-                            {
-                                title: "Regular Distributions",
-                                description: "Quarterly income distributions with consistent reporting and performance visibility.",
-                                accent: "primary"
                             }
-                        ].map((feature, index) => (
+                        ].map((feature) => (
                             <motion.div key={feature.title} variants={fadeInUp}>
                                 <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 space-y-6 h-full overflow-hidden relative">
                                     <div className={`w-12 h-1 bg-${feature.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
@@ -128,70 +123,6 @@ export default function Sylvan() {
 
                                     {/* Hover Gradient */}
                                     <div className={`absolute inset-0 bg-linear-to-r from-${feature.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
-                                </Card>
-                            </motion.div>
-                        ))}
-                    </StaggerContainer>
-                </Container>
-            </Section>
-
-            {/* Asset Classes */}
-            <Section background="white" padding="lg">
-                <Container maxWidth="lg">
-                    <AnimatedSection animation="fadeInUp" className="mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-primary mb-8">Asset Classes</h2>
-                        <p className="text-xl text-primary/70 mb-8">
-                            Sylvan supports structured real estate income across multiple property categories, including:
-                        </p>
-                    </AnimatedSection>
-
-                    <StaggerContainer className="grid md:grid-cols-2 gap-6">
-                        {[
-                            {
-                                title: "Logistics & Distribution Facilities",
-                                description: "Stabilized distribution and fulfillment properties with long-term operating history.",
-                                accent: "accent"
-                            },
-                            {
-                                title: "Warehouse / Industrial",
-                                description: "Institutional-grade industrial assets in strategic markets with stable cash flows.",
-                                accent: "primary"
-                            },
-                            {
-                                title: "Grocery-Anchored Retail",
-                                description: "Essential retail centers in high-traffic, resilient trade areas.",
-                                accent: "accent"
-                            },
-                            {
-                                title: "Medical / Healthcare Retail",
-                                description: "Medical office buildings and healthcare facilities with long-term operating tenants.",
-                                accent: "primary"
-                            },
-                            {
-                                title: "Education Retail",
-                                description: "Facilities supporting education, training, and childcare services.",
-                                accent: "accent"
-                            },
-                            {
-                                title: "Quick-Service Restaurants",
-                                description: "High-visibility locations operated by national QSR brands.",
-                                accent: "primary"
-                            }
-                        ].map((asset, index) => (
-                            <motion.div key={asset.title} variants={fadeInUp}>
-                                <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 space-y-4 h-full overflow-hidden relative">
-                                    <div className={`w-12 h-1 bg-${asset.accent} rounded-full group-hover:w-16 transition-all duration-300`}></div>
-
-                                    <h3 className={`text-xl font-bold text-primary group-hover:text-${asset.accent} transition-colors duration-300`}>
-                                        {asset.title}
-                                    </h3>
-
-                                    <p className="text-primary/70 leading-relaxed group-hover:text-primary/80 transition-colors duration-300">
-                                        {asset.description}
-                                    </p>
-
-                                    {/* Hover Gradient */}
-                                    <div className={`absolute inset-0 bg-linear-to-r from-${asset.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
                                 </Card>
                             </motion.div>
                         ))}
