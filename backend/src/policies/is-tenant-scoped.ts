@@ -9,11 +9,23 @@ export default (policyContext: any, config: Record<string, unknown>, { strapi }:
         return false;
     }
 
+    // Check if this is a Strapi admin panel request
+    // Admin panel requests go through content-manager routes and have admin user in state
+    const isAdminRequest = ctx.state.user?.roles?.some((role: any) =>
+        role.code === 'strapi-super-admin' || role.code === 'strapi-editor' || role.code === 'strapi-author'
+    ) || ctx.request?.url?.includes('/content-manager/');
+
+    // Allow admin panel requests to bypass tenant restrictions
+    if (isAdminRequest) {
+        strapi.log.debug('is-tenant-scoped: Admin request detected, bypassing tenant check');
+        return true;
+    }
+
     const isReadOperation = ctx.request?.method === 'GET';
     const isWriteOperation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(ctx.request?.method);
     const hasTenantContext = !!ctx.state.tenant;
 
-    // For write operations, tenant context is REQUIRED
+    // For write operations from public API, tenant context is REQUIRED
     if (isWriteOperation && !hasTenantContext) {
         strapi.log.debug('is-tenant-scoped: Write operation without tenant context, denying access');
         return false;
