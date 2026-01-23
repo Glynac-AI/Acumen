@@ -24,21 +24,27 @@
         "status": {
             "type": "enumeration",
             "enum": [
-                "Active",
-                "Unsubscribed"
+                "active",
+                "unsubscribed"
             ],
-            "default": "Active",
+            "default": "active",
             "required": true
         },
         "source": {
             "type": "enumeration",
             "enum": [
                 "Homepage",
-                "Article_Footer",
-                "Sidebar",
-                "Popup",
-                "Other"
+                "global_footer",
+                "Article_CTA",
+                "Author_CTA",
+                "Website"
             ]
+        },
+        "unsubscribeAt": {
+            "type": "datetime"
+        },
+        "unsubscribeReason": {
+            "type": "text"
         },
         "tenant": {
             "type": "relation",
