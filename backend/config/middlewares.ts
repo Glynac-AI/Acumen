@@ -47,6 +47,9 @@ export default [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
+  // Newsletter status normalization - must be after body parsing
+  'global::normalize-newsletter-status',
   // Tenant context middleware - must be after body parsing
   'global::tenant-context',
 ];
+
