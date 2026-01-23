@@ -101,7 +101,9 @@ export default {
 
       // Only apply to create and update actions
       if (['create', 'update'].includes(context.action)) {
-        const data = context.params?.data;
+        // Cast params to any to access data property (varies by action type)
+        const params = context.params as any;
+        const data = params?.data;
 
         if (data) {
           strapi.log.debug(`📧 Document Middleware: Processing ${context.action} for newsletter-subscriber`);
@@ -113,24 +115,24 @@ export default {
             const normalizedStatus = originalStatus.toLowerCase();
 
             if (originalStatus !== normalizedStatus) {
-              context.params.data.status = normalizedStatus;
+              params.data.status = normalizedStatus;
               strapi.log.info(`📧 Document Middleware: Normalized status from "${originalStatus}" to "${normalizedStatus}"`);
             }
           }
 
           // Set default status if not provided
           if (!data.status) {
-            context.params.data.status = 'active';
+            params.data.status = 'active';
             strapi.log.debug('📧 Document Middleware: Set default status to "active"');
           }
 
           // Set default subscribedAt if not provided (for create action)
           if (context.action === 'create' && !data.subscribedAt) {
-            context.params.data.subscribedAt = new Date().toISOString();
-            strapi.log.debug(`📧 Document Middleware: Set subscribedAt to ${context.params.data.subscribedAt}`);
+            params.data.subscribedAt = new Date().toISOString();
+            strapi.log.debug(`📧 Document Middleware: Set subscribedAt to ${params.data.subscribedAt}`);
           }
 
-          strapi.log.debug(`📧 Document Middleware: Final data: ${JSON.stringify(context.params.data)}`);
+          strapi.log.debug(`📧 Document Middleware: Final data: ${JSON.stringify(params.data)}`);
         }
       }
 
