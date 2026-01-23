@@ -252,12 +252,24 @@ export default {
     }
 
     // Seed Newsletter Subscribers (with tenant association)
+    // Force re-seed with unique emails to test the fix
     const existingSubscribers = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({});
 
-    if (existingSubscribers.length === 0 && defaultTenant) {
-      console.log('📧 Seeding newsletter subscribers...');
+    // Always try to add at least one test subscriber to confirm the fix works
+    if (defaultTenant) {
+      console.log('📧 Attempting to seed newsletter subscribers...');
+      console.log(`📧 Existing subscribers count: ${existingSubscribers.length}`);
+
+      // Generate unique timestamp for test emails
+      const timestamp = Date.now();
 
       const newsletterSubscribers = [
+        {
+          email: `test.active.${timestamp}@example.com`,
+          status: "active",
+          source: "Homepage",
+          subscribedAt: new Date().toISOString()
+        },
         {
           email: "tech.enthusiast@example.com",
           status: "active",
@@ -322,17 +334,44 @@ export default {
         }
       ];
 
+      let successCount = 0;
+      let skipCount = 0;
+      let errorCount = 0;
+
       for (const subscriber of newsletterSubscribers) {
-        await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').create({
-          data: {
-            ...subscriber,
-            tenant: defaultTenant.documentId,
-          },
-        });
+        try {
+          // Check if this email already exists
+          const existing = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({
+            filters: { email: subscriber.email }
+          });
+
+          if (existing.length > 0) {
+            console.log(`📧 Subscriber ${subscriber.email} already exists, skipping.`);
+            skipCount++;
+            continue;
+          }
+
+          console.log(`📧 Creating subscriber: ${subscriber.email} with status: ${subscriber.status}`);
+
+          const created = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').create({
+            data: {
+              ...subscriber,
+              tenant: defaultTenant.documentId,
+            },
+          });
+
+          console.log(`✅ Successfully created subscriber: ${subscriber.email}, ID: ${created.documentId}`);
+          successCount++;
+        } catch (error: any) {
+          console.error(`❌ Failed to create subscriber ${subscriber.email}:`, error.message);
+          console.error(`❌ Full error:`, JSON.stringify(error, null, 2));
+          errorCount++;
+        }
       }
-      console.log('✅ Newsletter subscribers seeded successfully!');
+
+      console.log(`📧 Newsletter seed complete: ${successCount} created, ${skipCount} skipped, ${errorCount} failed`);
     } else {
-      console.log('📋 Newsletter subscribers already exist, skipping seed.');
+      console.log('⚠️ No default tenant available, skipping newsletter subscriber seed.');
     }
   },
 };
