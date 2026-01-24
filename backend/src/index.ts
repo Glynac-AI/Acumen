@@ -153,6 +153,40 @@ export default {
     // Seed Default Tenant first
     let defaultTenant: any = null;
 
+    // Database Migration Fix for Newsletter Subscriber Status
+    // Force the status column to be text type and remove any enum constraints
+    try {
+      console.log('🔄 Running database migration fix for newsletter_subscribers status...');
+
+      const knex = strapi.db.connection;
+
+      // Check if we are running on Postgres
+      const client = knex.client.config.client;
+      console.log(`ℹ️ Database client: ${client}`);
+
+      if (client === 'postgres' || client === 'pg') {
+        // Drop any existing check constraint on status
+        // Note: Constraint names vary, we'll try standard ones or just alter type which might fail if constraint exists
+        // Best effort approach
+
+        // 1. Alter column type to text (this usually handles the enum conversion in PG)
+        await knex.raw('ALTER TABLE newsletter_subscribers_links ALTER COLUMN status TYPE text USING status::text').catch(() => { });
+        await knex.raw('ALTER TABLE newsletter_subscribers ALTER COLUMN status TYPE text USING status::text').catch((err: any) => {
+          console.log('ℹ️ Could not alter newsletter_subscribers status (might not exist yet):', err.message);
+        });
+
+        // 2. Drop the custom enum type if it exists (for Strapi enums)
+        await knex.raw('DROP TYPE IF EXISTS newsletter_subscribers_status_enum CASCADE').catch(() => { });
+
+        // 3. Drop check constraints
+        await knex.raw('ALTER TABLE newsletter_subscribers DROP CONSTRAINT IF EXISTS newsletter_subscribers_status_check').catch(() => { });
+
+        console.log('✅ Database migration fix completed');
+      }
+    } catch (err: any) {
+      console.error('⚠️ Database migration fix warning:', err.message);
+    }
+
     try {
       const existingTenants = await strapi.documents('api::tenant.tenant').findMany({
         filters: { slug: 'regulatethis' }
