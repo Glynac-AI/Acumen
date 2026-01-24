@@ -5,7 +5,7 @@ export default {
         // Debug logging to help diagnose validation issues
         console.log('📧 Newsletter Subscriber beforeCreate hook triggered');
         console.log('📧 Incoming data:', JSON.stringify(data, null, 2));
-        
+
         // Safely check for tenant in event state (only available for API requests, not admin panel)
         const eventState = event?.state;
         const tenantContext = eventState?.tenant;
@@ -26,18 +26,27 @@ export default {
             console.log('📧 Set subscribedAt:', data.subscribedAt);
         }
 
-        // Ensure status is set to default if not provided
-        // IMPORTANT: status must be lowercase to match schema enum values
-        if (!data.status) {
-            data.status = 'active';
-            console.log('📧 Set default status:', data.status);
-        } else if (typeof data.status === 'string') {
-            // Normalize status to lowercase to prevent validation errors
-            const normalizedStatus = data.status.toLowerCase();
+        // Normalize status
+        if (data.status && typeof data.status === 'string') {
+            const originalStatus = data.status;
+            let normalizedStatus = originalStatus.toLowerCase().trim();
+
+            if (['unactive', 'inactive', 'unsubcribe', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
+                normalizedStatus = 'unsubscribed';
+            } else if (normalizedStatus === 'active') {
+                normalizedStatus = 'active';
+            }
+
             if (normalizedStatus !== data.status) {
                 console.log(`📧 Normalizing status from "${data.status}" to "${normalizedStatus}"`);
                 data.status = normalizedStatus;
             }
+        }
+
+        // Default status
+        if (!data.status) {
+            data.status = 'active';
+            console.log('📧 Set default status:', data.status);
         }
 
         console.log('📧 Final data before validation:', JSON.stringify(data, null, 2));
@@ -51,7 +60,15 @@ export default {
 
         // Normalize status if being updated
         if (data.status && typeof data.status === 'string') {
-            const normalizedStatus = data.status.toLowerCase();
+            const originalStatus = data.status;
+            let normalizedStatus = originalStatus.toLowerCase().trim();
+
+            if (['unactive', 'inactive', 'unsubcribe', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
+                normalizedStatus = 'unsubscribed';
+            } else if (normalizedStatus === 'active') {
+                normalizedStatus = 'active';
+            }
+
             if (normalizedStatus !== data.status) {
                 console.log(`📧 Normalizing status from "${data.status}" to "${normalizedStatus}"`);
                 data.status = normalizedStatus;

@@ -109,19 +109,32 @@ export default {
           strapi.log.debug(`📧 Document Middleware: Processing ${context.action} for newsletter-subscriber`);
           strapi.log.debug(`📧 Document Middleware: Input data: ${JSON.stringify(data)}`);
 
-          // Normalize status to lowercase if present
+          // Normalize status if present
           if (data.status && typeof data.status === 'string') {
             const originalStatus = data.status;
-            const normalizedStatus = originalStatus.toLowerCase();
+            let normalizedStatus = originalStatus.toLowerCase().trim();
+
+            // Map non-standard values to standard enum values
+            if (['unactive', 'inactive', 'unsubcribe', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
+              normalizedStatus = 'unsubscribed';
+            } else if (normalizedStatus === 'active') {
+              normalizedStatus = 'active';
+            }
 
             if (originalStatus !== normalizedStatus) {
               params.data.status = normalizedStatus;
               strapi.log.info(`📧 Document Middleware: Normalized status from "${originalStatus}" to "${normalizedStatus}"`);
             }
+
+            // If status became unsubscribed, ensure unsubscribeAt is set
+            if (normalizedStatus === 'unsubscribed' && !data.unsubscribeAt) {
+              params.data.unsubscribeAt = new Date().toISOString();
+              strapi.log.info(`📧 Document Middleware: Auto-set unsubscribeAt for unsubscribed user`);
+            }
           }
 
-          // Set default status if not provided
-          if (!data.status) {
+          // Set default status if not provided (only for create)
+          if (!data.status && context.action === 'create') {
             params.data.status = 'active';
             strapi.log.debug('📧 Document Middleware: Set default status to "active"');
           }
