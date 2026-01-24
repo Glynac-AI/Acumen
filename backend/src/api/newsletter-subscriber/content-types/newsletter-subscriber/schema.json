@@ -25,7 +25,9 @@
             "type": "enumeration",
             "enum": [
                 "active",
-                "unsubscribed"
+                "unsubscribed",
+                "Active",
+                "Unsubscribed"
             ],
             "default": "active",
             "required": true
