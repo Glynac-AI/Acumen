@@ -300,125 +300,130 @@ export default {
 
     // Seed Newsletter Subscribers (with tenant association)
     // Force re-seed with unique emails to test the fix
-    const existingSubscribers = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({});
+    try {
+      const existingSubscribers = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({});
 
-    // Always try to add at least one test subscriber to confirm the fix works
-    if (defaultTenant) {
-      console.log('📧 Attempting to seed newsletter subscribers...');
-      console.log(`📧 Existing subscribers count: ${existingSubscribers.length}`);
+      // Always try to add at least one test subscriber to confirm the fix works
+      if (defaultTenant) {
+        console.log('📧 Attempting to seed newsletter subscribers...');
+        console.log(`📧 Existing subscribers count: ${existingSubscribers.length}`);
 
-      // Generate unique timestamp for test emails
-      const timestamp = Date.now();
+        // Generate unique timestamp for test emails
+        const timestamp = Date.now();
 
-      const newsletterSubscribers = [
-        {
-          email: `test.active.${timestamp}@example.com`,
-          status: "active",
-          source: "Homepage",
-          subscribedAt: new Date().toISOString()
-        },
-        {
-          email: "tech.enthusiast@example.com",
-          status: "active",
-          source: "Homepage",
-          subscribedAt: "2026-01-15T09:00:00.000Z"
-        },
-        {
-          email: "news.reader@example.com",
-          status: "active",
-          source: "Article_CTA",
-          subscribedAt: "2026-01-16T14:30:00.000Z"
-        },
-        {
-          email: "blog.follower@example.com",
-          status: "active",
-          source: "Author_CTA",
-          subscribedAt: "2026-01-17T11:15:00.000Z"
-        },
-        {
-          email: "weekly.digest@example.com",
-          status: "active",
-          source: "global_footer",
-          subscribedAt: "2026-01-18T16:45:00.000Z"
-        },
-        {
-          email: "industry.news@example.com",
-          status: "active",
-          source: "Website",
-          subscribedAt: "2026-01-19T10:00:00.000Z"
-        },
-        {
-          email: "content.lover@example.com",
-          status: "active",
-          source: "Homepage",
-          subscribedAt: "2026-01-20T13:20:00.000Z"
-        },
-        {
-          email: "insights.subscriber@example.com",
-          status: "active",
-          source: "Article_CTA",
-          subscribedAt: "2026-01-21T08:30:00.000Z"
-        },
-        {
-          email: "former.subscriber@example.com",
-          status: "unsubscribed",
-          source: "Homepage",
-          subscribedAt: "2026-01-10T12:00:00.000Z",
-          unsubscribeAt: "2026-01-22T15:00:00.000Z",
-          unsubscribeReason: "Too many emails"
-        },
-        {
-          email: "market.updates@example.com",
-          status: "active",
-          source: "Website",
-          subscribedAt: "2026-01-22T09:00:00.000Z"
-        },
-        {
-          email: "research.reader@example.com",
-          status: "active",
-          source: "Author_CTA",
-          subscribedAt: "2026-01-23T11:30:00.000Z"
-        }
-      ];
-
-      let successCount = 0;
-      let skipCount = 0;
-      let errorCount = 0;
-
-      for (const subscriber of newsletterSubscribers) {
-        try {
-          // Check if this email already exists
-          const existing = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({
-            filters: { email: subscriber.email }
-          });
-
-          if (existing.length > 0) {
-            console.log(`📧 Subscriber ${subscriber.email} already exists, skipping.`);
-            skipCount++;
-            continue;
+        const newsletterSubscribers = [
+          {
+            email: `test.active.${timestamp}@example.com`,
+            status: "active",
+            source: "Homepage",
+            subscribedAt: new Date().toISOString()
+          },
+          {
+            email: "tech.enthusiast@example.com",
+            status: "active",
+            source: "Homepage",
+            subscribedAt: "2026-01-15T09:00:00.000Z"
+          },
+          {
+            email: "news.reader@example.com",
+            status: "active",
+            source: "Article_CTA",
+            subscribedAt: "2026-01-16T14:30:00.000Z"
+          },
+          {
+            email: "blog.follower@example.com",
+            status: "active",
+            source: "Author_CTA",
+            subscribedAt: "2026-01-17T11:15:00.000Z"
+          },
+          {
+            email: "weekly.digest@example.com",
+            status: "active",
+            source: "global_footer",
+            subscribedAt: "2026-01-18T16:45:00.000Z"
+          },
+          {
+            email: "industry.news@example.com",
+            status: "active",
+            source: "Website",
+            subscribedAt: "2026-01-19T10:00:00.000Z"
+          },
+          {
+            email: "content.lover@example.com",
+            status: "active",
+            source: "Homepage",
+            subscribedAt: "2026-01-20T13:20:00.000Z"
+          },
+          {
+            email: "insights.subscriber@example.com",
+            status: "active",
+            source: "Article_CTA",
+            subscribedAt: "2026-01-21T08:30:00.000Z"
+          },
+          {
+            email: "former.subscriber@example.com",
+            status: "unsubscribed",
+            source: "Homepage",
+            subscribedAt: "2026-01-10T12:00:00.000Z",
+            unsubscribeAt: "2026-01-22T15:00:00.000Z",
+            unsubscribeReason: "Too many emails"
+          },
+          {
+            email: "market.updates@example.com",
+            status: "active",
+            source: "Website",
+            subscribedAt: "2026-01-22T09:00:00.000Z"
+          },
+          {
+            email: "research.reader@example.com",
+            status: "active",
+            source: "Author_CTA",
+            subscribedAt: "2026-01-23T11:30:00.000Z"
           }
+        ];
 
-          console.log(`📧 Creating subscriber: ${subscriber.email} with status: ${subscriber.status}`);
+        let successCount = 0;
+        let skipCount = 0;
+        let errorCount = 0;
 
-          const created = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').create({
-            data: {
-              ...subscriber,
-              tenant: defaultTenant.documentId,
-            },
-          });
+        for (const subscriber of newsletterSubscribers) {
+          try {
+            // Check if this email already exists
+            const existing = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({
+              filters: { email: subscriber.email }
+            });
 
-          console.log(`✅ Successfully created subscriber: ${subscriber.email}, ID: ${created.documentId}`);
-          successCount++;
-        } catch (error: any) {
-          console.error(`❌ Failed to create subscriber ${subscriber.email}:`, error.message);
-          console.error(`❌ Full error:`, JSON.stringify(error, null, 2));
-          errorCount++;
+            if (existing.length > 0) {
+              console.log(`📧 Subscriber ${subscriber.email} already exists, skipping.`);
+              skipCount++;
+              continue;
+            }
+
+            console.log(`📧 Creating subscriber: ${subscriber.email} with status: ${subscriber.status}`);
+
+            const created = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').create({
+              data: {
+                ...subscriber,
+                tenant: defaultTenant.documentId,
+              },
+            });
+
+            console.log(`✅ Successfully created subscriber: ${subscriber.email}, ID: ${created.documentId}`);
+            successCount++;
+          } catch (error: any) {
+            console.error(`❌ Failed to create subscriber ${subscriber.email}:`, error.message);
+            console.error(`❌ Full error:`, JSON.stringify(error, null, 2));
+            errorCount++;
+          }
         }
-      }
 
-      console.log(`📧 Newsletter seed complete: ${successCount} created, ${skipCount} skipped, ${errorCount} failed`);
-    } else {
-      console.log('⚠️ No default tenant available, skipping newsletter subscriber seed.');
+        console.log(`📧 Newsletter seed complete: ${successCount} created, ${skipCount} skipped, ${errorCount} failed`);
+      } else {
+        console.log('⚠️ No default tenant available, skipping newsletter subscriber seed.');
+      }
+    } catch (error: any) {
+      console.error('❌ Failed to seed newsletter subscribers (Table might be missing):', error.message);
+      // Do not re-throw, allow server to start
     }
   },
 };
