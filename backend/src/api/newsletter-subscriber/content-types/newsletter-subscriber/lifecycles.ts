@@ -31,7 +31,7 @@ export default {
             const originalStatus = data.status;
             let normalizedStatus = originalStatus.toLowerCase().trim();
 
-            if (['unactive', 'inactive', 'unsubcribe', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
+            if (['unactive', 'inactive', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
                 normalizedStatus = 'unsubscribed';
             } else if (normalizedStatus === 'active') {
                 normalizedStatus = 'active';

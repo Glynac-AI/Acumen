@@ -28,7 +28,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             // Normalize status field if present
             if (ctx.request.body?.status && typeof ctx.request.body.status === 'string') {
                 const originalStatus = ctx.request.body.status;
-                const normalizedStatus = originalStatus.toLowerCase();
+                const normalizedStatus = originalStatus.toLowerCase().trim();
 
                 if (originalStatus !== normalizedStatus) {
                     ctx.request.body.status = normalizedStatus;
@@ -39,7 +39,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             // Also check for nested data structure (Content Manager may use different formats)
             if (ctx.request.body?.data?.status && typeof ctx.request.body.data.status === 'string') {
                 const originalStatus = ctx.request.body.data.status;
-                const normalizedStatus = originalStatus.toLowerCase();
+                const normalizedStatus = originalStatus.toLowerCase().trim();
 
                 if (originalStatus !== normalizedStatus) {
                     ctx.request.body.data.status = normalizedStatus;
