@@ -56,6 +56,72 @@ const pillarsData = [
   },
 ];
 
+// Seed data for Newsletter Subscribers
+const newsletterSubscribersData = [
+  {
+    email: 'tech.enthusiast@example.com',
+    status: 'active',
+    source: 'Homepage',
+    subscribedAt: '2026-01-15T09:00:00.000Z'
+  },
+  {
+    email: 'news.reader@example.com',
+    status: 'active',
+    source: 'Article_CTA',
+    subscribedAt: '2026-01-16T14:30:00.000Z'
+  },
+  {
+    email: 'blog.follower@example.com',
+    status: 'active',
+    source: 'Author_CTA',
+    subscribedAt: '2026-01-17T11:15:00.000Z'
+  },
+  {
+    email: 'weekly.digest@example.com',
+    status: 'active',
+    source: 'global_footer',
+    subscribedAt: '2026-01-18T16:45:00.000Z'
+  },
+  {
+    email: 'industry.news@example.com',
+    status: 'active',
+    source: 'Website',
+    subscribedAt: '2026-01-19T10:00:00.000Z'
+  },
+  {
+    email: 'content.lover@example.com',
+    status: 'active',
+    source: 'Homepage',
+    subscribedAt: '2026-01-20T13:20:00.000Z'
+  },
+  {
+    email: 'insights.subscriber@example.com',
+    status: 'active',
+    source: 'Article_CTA',
+    subscribedAt: '2026-01-21T08:30:00.000Z'
+  },
+  {
+    email: 'former.subscriber@example.com',
+    status: 'unsubscribed',
+    source: 'Homepage',
+    subscribedAt: '2026-01-10T12:00:00.000Z',
+    unsubscribeAt: '2026-01-22T15:00:00.000Z',
+    unsubscribeReason: 'Too many emails'
+  },
+  {
+    email: 'market.updates@example.com',
+    status: 'active',
+    source: 'Website',
+    subscribedAt: '2026-01-22T09:00:00.000Z'
+  },
+  {
+    email: 'research.reader@example.com',
+    status: 'active',
+    source: 'Author_CTA',
+    subscribedAt: '2026-01-23T11:30:00.000Z'
+  }
+];
+
 // Seed data for Tags
 const tagsData = [
   'Portfolio Management',
@@ -176,6 +242,35 @@ export default {
       console.log('✅ Tags seeded successfully!');
     } else {
       console.log('📋 Tags already exist, skipping seed.');
+    }
+    // Seed Newsletter Subscribers (with tenant association)
+    try {
+      const existingSubscribers = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({});
+
+      if (existingSubscribers.length === 0 && defaultTenant) {
+        console.log('📧 Seeding newsletter subscribers...');
+        for (const subscriber of newsletterSubscribersData) {
+          try {
+            await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').create({
+              data: {
+                ...subscriber,
+                tenant: defaultTenant.documentId,
+              },
+            });
+          } catch (subError: any) {
+            // Skip duplicate email errors
+            if (!subError.message?.includes('unique')) {
+              console.error(`⚠️ Failed to create subscriber ${subscriber.email}:`, subError.message);
+            }
+          }
+        }
+        console.log('✅ Newsletter subscribers seeded successfully!');
+      } else {
+        console.log('📋 Newsletter subscribers already exist, skipping seed.');
+      }
+    } catch (error) {
+      console.error('❌ Error seeding newsletter subscribers:', error);
+      // Continue - don't block app startup
     }
 
     // Seed default Site Settings for the tenant
