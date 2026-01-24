@@ -22,11 +22,15 @@
             "required": true
         },
         "status": {
+<<<<<<< HEAD
             "type": "enumeration",
             "enum": [
                 "active",
                 "unsubscribed"
             ],
+=======
+            "type": "string",
+>>>>>>> 64aef64276b0aea99c3c1e0b98bf791f0a784b09
             "default": "active",
             "required": true
         },
