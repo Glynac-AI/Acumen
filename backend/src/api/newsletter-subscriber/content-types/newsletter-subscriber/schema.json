@@ -22,13 +22,7 @@
             "required": true
         },
         "status": {
-            "type": "enumeration",
-            "enum": [
-                "active",
-                "unsubscribed",
-                "Active",
-                "Unsubscribed"
-            ],
+            "type": "string",
             "default": "active",
             "required": true
         },
