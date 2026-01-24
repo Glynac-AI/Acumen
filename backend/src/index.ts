@@ -299,7 +299,7 @@ export default {
     }
 
     // Seed Newsletter Subscribers (with tenant association)
-    // Force re-seed with unique emails to test the fix
+    // Re-seeding after database cleanup - 2026-01-24T13:46:00Z
     try {
       const existingSubscribers = await strapi.documents('api::newsletter-subscriber.newsletter-subscriber').findMany({});
 
