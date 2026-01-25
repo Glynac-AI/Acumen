@@ -1,76 +1,86 @@
 /**
- * Migration: Fix newsletter_subscribers table schema
+ * Migration: Create newsletter_subscribers_tenant_lnk table
  * 
- * This migration ensures the newsletter_subscribers table has:
- * 1. The correct columns (created_by_id, updated_by_id)
- * 2. The status column is a VARCHAR, not an enum
+ * This migration creates the missing link table for the manyToOne/oneToMany
+ * bidirectional relationship between newsletter_subscribers and tenants.
+ * 
+ * Error fixed: "relation newsletter_subscribers_tenant_lnk does not exist"
  */
 
 export async function up(knex: any) {
-    console.log('🔧 Running newsletter_subscribers migration...');
+    console.log('🔧 Running newsletter_subscribers_tenant_lnk migration...');
 
-    // Check if the table exists
-    const tableExists = await knex.schema.hasTable('newsletter_subscribers');
+    const tableName = 'newsletter_subscribers_tenant_lnk';
 
-    if (!tableExists) {
-        console.log('📋 Table newsletter_subscribers does not exist, skipping migration.');
+    // Check if the link table already exists
+    const tableExists = await knex.schema.hasTable(tableName);
+
+    if (tableExists) {
+        console.log(`✅ Table ${tableName} already exists, skipping creation.`);
         return;
     }
 
-    // Check if created_by_id column exists
-    const hasCreatedBy = await knex.schema.hasColumn('newsletter_subscribers', 'created_by_id');
-    if (!hasCreatedBy) {
-        console.log('➕ Adding created_by_id column...');
-        await knex.schema.alterTable('newsletter_subscribers', (table: any) => {
-            table.integer('created_by_id').unsigned().nullable();
-        });
-    }
+    console.log(`📋 Creating table ${tableName}...`);
 
-    // Check if updated_by_id column exists
-    const hasUpdatedBy = await knex.schema.hasColumn('newsletter_subscribers', 'updated_by_id');
-    if (!hasUpdatedBy) {
-        console.log('➕ Adding updated_by_id column...');
-        await knex.schema.alterTable('newsletter_subscribers', (table: any) => {
-            table.integer('updated_by_id').unsigned().nullable();
-        });
-    }
+    await knex.schema.createTable(tableName, (table: any) => {
+        // Primary key
+        table.increments('id').primary();
 
-    // Fix the status column - convert from enum to varchar if needed
-    // This handles PostgreSQL enum constraints
-    try {
-        console.log('🔄 Ensuring status column is VARCHAR...');
+        // Foreign key to newsletter_subscribers
+        table.integer('newsletter_subscriber_id').unsigned().notNullable();
 
-        // For PostgreSQL - alter the column type to varchar
-        await knex.raw(`
-      DO $$ 
-      BEGIN
-        -- Check if status column exists and alter it
-        IF EXISTS (
-          SELECT 1 FROM information_schema.columns 
-          WHERE table_name = 'newsletter_subscribers' 
-          AND column_name = 'status'
-        ) THEN
-          -- Try to alter to varchar, this handles enum conversion
-          ALTER TABLE newsletter_subscribers 
-          ALTER COLUMN status TYPE VARCHAR(255) USING status::VARCHAR;
-          
-          -- Set default value
-          ALTER TABLE newsletter_subscribers 
-          ALTER COLUMN status SET DEFAULT 'active';
-        END IF;
-      END $$;
+        // Foreign key to tenants
+        table.integer('tenant_id').unsigned().notNullable();
+
+        // Strapi's internal ordering column for relations
+        table.double('newsletter_subscriber_ord').nullable();
+
+        // Add foreign key constraints
+        table
+            .foreign('newsletter_subscriber_id')
+            .references('id')
+            .inTable('newsletter_subscribers')
+            .onDelete('CASCADE')
+            .onUpdate('CASCADE');
+
+        table
+            .foreign('tenant_id')
+            .references('id')
+            .inTable('tenants')
+            .onDelete('CASCADE')
+            .onUpdate('CASCADE');
+
+        // Unique constraint to prevent duplicate links
+        table.unique(['newsletter_subscriber_id', 'tenant_id']);
+    });
+
+    // Create indexes for better query performance
+    console.log('📋 Creating indexes...');
+
+    await knex.raw(`
+        CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_tenant_lnk_subscriber 
+        ON ${tableName} (newsletter_subscriber_id);
     `);
 
-        console.log('✅ Status column updated to VARCHAR.');
-    } catch (error: any) {
-        // If the column is already varchar, this might fail - that's OK
-        console.log('⚠️ Status column modification skipped (may already be VARCHAR):', error.message);
-    }
+    await knex.raw(`
+        CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_tenant_lnk_tenant 
+        ON ${tableName} (tenant_id);
+    `);
 
-    console.log('✅ Newsletter subscribers migration completed!');
+    console.log(`✅ Table ${tableName} created successfully!`);
 }
 
 export async function down(knex: any) {
-    // We don't want to revert these changes
-    console.log('⚠️ Down migration not implemented for newsletter_subscribers fix.');
+    console.log('🔧 Rolling back newsletter_subscribers_tenant_lnk migration...');
+
+    const tableName = 'newsletter_subscribers_tenant_lnk';
+    const tableExists = await knex.schema.hasTable(tableName);
+
+    if (tableExists) {
+        console.log(`📋 Dropping table ${tableName}...`);
+        await knex.schema.dropTable(tableName);
+        console.log(`✅ Table ${tableName} dropped.`);
+    } else {
+        console.log(`⚠️ Table ${tableName} does not exist, nothing to drop.`);
+    }
 }
