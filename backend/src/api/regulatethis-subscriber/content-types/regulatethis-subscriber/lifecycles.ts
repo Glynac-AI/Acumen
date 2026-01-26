@@ -26,6 +26,15 @@ export default {
             console.log('📧 Set subscribedAt:', data.subscribedAt);
         }
 
+        // Normalize subscriptionMethod (Map legacy values to "Email")
+        if (data.subscriptionMethod && typeof data.subscriptionMethod === 'string') {
+            const invalidMethods = ['Free', 'CreditCard', 'PayPal', 'BankTransfer', 'Manual', 'Cryptocurrency'];
+            if (invalidMethods.includes(data.subscriptionMethod)) {
+                console.log(`📧 Normalizing legacy subscriptionMethod from "${data.subscriptionMethod}" to "Email"`);
+                data.subscriptionMethod = 'Email';
+            }
+        }
+
         // Normalize status
         if (data.status && typeof data.status === 'string') {
             const originalStatus = data.status;
