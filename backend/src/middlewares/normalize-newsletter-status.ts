@@ -14,13 +14,17 @@ import type { Core } from '@strapi/strapi';
 
 export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Strapi }) => {
     return async (ctx: any, next: () => Promise<void>) => {
-        // Intercept both Content Manager AND API requests for newsletter-subscriber
+        // Intercept both Content Manager AND API requests for subscriber collections
         const isContentManagerRequest = ctx.url.includes('/content-manager/');
         const isApiRequest = ctx.url.includes('/api/');
-        const isNewsletterRequest = ctx.url.includes('newsletter-subscriber');
+
+        // Check for either collection name
+        const isNewsletterRequest = ctx.url.includes('newsletter-subscriber') ||
+            ctx.url.includes('regulatethis-subscriber');
+
         const isWriteRequest = ['POST', 'PUT', 'PATCH'].includes(ctx.request.method);
 
-        // Allow if it's a newsletter request, is a write op, AND is either content manager OR api
+        // Allow if it's a subscriber request, is a write op, AND is either content manager OR api
         if ((isContentManagerRequest || isApiRequest) && isNewsletterRequest && isWriteRequest) {
             strapi.log.debug('📧 Newsletter middleware: Intercepting Content Manager request');
             strapi.log.debug(`📧 Request URL: ${ctx.url}`);
