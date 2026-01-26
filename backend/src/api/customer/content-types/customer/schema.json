@@ -1,0 +1,53 @@
+{
+    "kind": "collectionType",
+    "collectionName": "customers",
+    "info": {
+        "singularName": "customer",
+        "pluralName": "customers",
+        "displayName": "Customer",
+        "description": "Store customers with their subscription methods"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "fullName": {
+            "type": "string",
+            "required": true
+        },
+        "email": {
+            "type": "email",
+            "required": true,
+            "unique": true
+        },
+        "subscriptionMethod": {
+            "type": "enumeration",
+            "enum": [
+                "CreditCard",
+                "PayPal",
+                "BankTransfer",
+                "Manual",
+                "Cryptocurrency",
+                "Free"
+            ],
+            "default": "Free"
+        },
+        "subscriptionStatus": {
+            "type": "enumeration",
+            "enum": [
+                "Active",
+                "Pending",
+                "Canceled",
+                "PastDue"
+            ],
+            "default": "Pending"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "customers"
+        }
+    }
+}
