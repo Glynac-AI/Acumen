@@ -96,6 +96,12 @@
             "target": "api::newsletter-subscriber.newsletter-subscriber",
             "mappedBy": "tenant"
         },
+        "regulatethisSubscribers": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::regulatethis-subscriber.regulatethis-subscriber",
+            "mappedBy": "tenant"
+        },
         "siteSettings": {
             "type": "relation",
             "relation": "oneToMany",

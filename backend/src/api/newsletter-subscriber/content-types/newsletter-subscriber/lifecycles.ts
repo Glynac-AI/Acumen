@@ -33,8 +33,8 @@ export default {
 
             if (['unactive', 'inactive', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
                 normalizedStatus = 'unsubscribed';
-            } else if (normalizedStatus === 'active') {
-                normalizedStatus = 'active';
+            } else if (['active', 'subscribed'].includes(normalizedStatus)) {
+                normalizedStatus = 'subscribed';
             }
 
             if (normalizedStatus !== data.status) {
@@ -45,7 +45,7 @@ export default {
 
         // Default status
         if (!data.status) {
-            data.status = 'active';
+            data.status = 'subscribed';
             console.log('📧 Set default status:', data.status);
         }
 
@@ -65,8 +65,8 @@ export default {
 
             if (['unactive', 'inactive', 'unsubcribe', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
                 normalizedStatus = 'unsubscribed';
-            } else if (normalizedStatus === 'active') {
-                normalizedStatus = 'active';
+            } else if (['active', 'subscribed'].includes(normalizedStatus)) {
+                normalizedStatus = 'subscribed';
             }
 
             if (normalizedStatus !== data.status) {

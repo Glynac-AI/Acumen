@@ -14,12 +14,14 @@ import type { Core } from '@strapi/strapi';
 
 export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Strapi }) => {
     return async (ctx: any, next: () => Promise<void>) => {
-        // Only intercept Content Manager requests for newsletter-subscriber
+        // Intercept both Content Manager AND API requests for newsletter-subscriber
         const isContentManagerRequest = ctx.url.includes('/content-manager/');
+        const isApiRequest = ctx.url.includes('/api/');
         const isNewsletterRequest = ctx.url.includes('newsletter-subscriber');
         const isWriteRequest = ['POST', 'PUT', 'PATCH'].includes(ctx.request.method);
 
-        if (isContentManagerRequest && isNewsletterRequest && isWriteRequest) {
+        // Allow if it's a newsletter request, is a write op, AND is either content manager OR api
+        if ((isContentManagerRequest || isApiRequest) && isNewsletterRequest && isWriteRequest) {
             strapi.log.debug('📧 Newsletter middleware: Intercepting Content Manager request');
             strapi.log.debug(`📧 Request URL: ${ctx.url}`);
             strapi.log.debug(`📧 Request method: ${ctx.request.method}`);
@@ -28,7 +30,12 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             // Normalize status field if present
             if (ctx.request.body?.status && typeof ctx.request.body.status === 'string') {
                 const originalStatus = ctx.request.body.status;
-                const normalizedStatus = originalStatus.toLowerCase().trim();
+                let normalizedStatus = originalStatus.toLowerCase().trim();
+
+                // Map synonyms to "subscribed"
+                if (['active', 'true', '1', 'subscribed'].includes(normalizedStatus)) {
+                    normalizedStatus = 'subscribed';
+                }
 
                 if (originalStatus !== normalizedStatus) {
                     ctx.request.body.status = normalizedStatus;
@@ -39,7 +46,12 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             // Also check for nested data structure (Content Manager may use different formats)
             if (ctx.request.body?.data?.status && typeof ctx.request.body.data.status === 'string') {
                 const originalStatus = ctx.request.body.data.status;
-                const normalizedStatus = originalStatus.toLowerCase().trim();
+                let normalizedStatus = originalStatus.toLowerCase().trim();
+
+                // Map synonyms to "subscribed"
+                if (['active', 'true', '1', 'subscribed'].includes(normalizedStatus)) {
+                    normalizedStatus = 'subscribed';
+                }
 
                 if (originalStatus !== normalizedStatus) {
                     ctx.request.body.data.status = normalizedStatus;
