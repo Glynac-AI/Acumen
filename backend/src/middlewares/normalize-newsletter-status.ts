@@ -32,36 +32,36 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             strapi.log.debug(`📧 Request method: ${ctx.request.method}`);
             strapi.log.debug(`📧 Request body: ${JSON.stringify(ctx.request.body, null, 2)}`);
 
-            // Normalize status field if present
-            if (ctx.request.body?.status && typeof ctx.request.body.status === 'string') {
-                const originalStatus = ctx.request.body.status;
-                let normalizedStatus = originalStatus.toLowerCase().trim();
+            // Helper to normalize a specific field
+            const normalizeField = (body: any, fieldName: string, targetValue: string, validSynonyms: string[]) => {
+                if (body && body[fieldName] !== undefined) {
+                    const originalValue = String(body[fieldName]); // Convert/Cast to string (handles boolean/number)
+                    const normalizedInput = originalValue.toLowerCase().trim();
 
-                // Map synonyms to "subscribed"
-                if (['active', 'true', '1', 'subscribed'].includes(normalizedStatus)) {
-                    normalizedStatus = 'subscribed';
+                    if (validSynonyms.includes(normalizedInput)) {
+                        body[fieldName] = targetValue;
+                        strapi.log.info(`📧 Middleware: Normalized ${fieldName} from "${originalValue}" to "${targetValue}"`);
+                    }
                 }
+            };
 
-                if (originalStatus !== normalizedStatus) {
-                    ctx.request.body.status = normalizedStatus;
-                    strapi.log.info(`📧 Newsletter middleware: Normalized status from "${originalStatus}" to "${normalizedStatus}"`);
-                }
+            // 1. Handle Newsletter & Regulatethis Subscriber (status -> subscribed)
+            // Synonyms: active, true, 1, subscribed
+            const subscriberSynonyms = ['active', 'true', '1', 'subscribed'];
+
+            normalizeField(ctx.request.body, 'status', 'subscribed', subscriberSynonyms);
+            if (ctx.request.body?.data) {
+                normalizeField(ctx.request.body.data, 'status', 'subscribed', subscriberSynonyms);
             }
 
-            // Also check for nested data structure (Content Manager may use different formats)
-            if (ctx.request.body?.data?.status && typeof ctx.request.body.data.status === 'string') {
-                const originalStatus = ctx.request.body.data.status;
-                let normalizedStatus = originalStatus.toLowerCase().trim();
+            // 2. Handle Customer (subscriptionStatus -> Active)
+            // Synonyms: active, true, 1, pending
+            // Note: Customer requires Capitalized "Active" or "Pending"
+            const customerActiveSynonyms = ['active', 'true', '1'];
 
-                // Map synonyms to "subscribed"
-                if (['active', 'true', '1', 'subscribed'].includes(normalizedStatus)) {
-                    normalizedStatus = 'subscribed';
-                }
-
-                if (originalStatus !== normalizedStatus) {
-                    ctx.request.body.data.status = normalizedStatus;
-                    strapi.log.info(`📧 Newsletter middleware: Normalized data.status from "${originalStatus}" to "${normalizedStatus}"`);
-                }
+            normalizeField(ctx.request.body, 'subscriptionStatus', 'Active', customerActiveSynonyms);
+            if (ctx.request.body?.data) {
+                normalizeField(ctx.request.body.data, 'subscriptionStatus', 'Active', customerActiveSynonyms);
             }
 
             strapi.log.debug(`📧 Request body after normalization: ${JSON.stringify(ctx.request.body, null, 2)}`);
