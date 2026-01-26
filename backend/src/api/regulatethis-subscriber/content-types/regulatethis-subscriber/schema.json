@@ -47,6 +47,18 @@
         "unsubscribeReason": {
             "type": "text"
         },
+        "subscriptionMethod": {
+            "type": "enumeration",
+            "enum": [
+                "CreditCard",
+                "PayPal",
+                "BankTransfer",
+                "Manual",
+                "Cryptocurrency",
+                "Free"
+            ],
+            "default": "Free"
+        },
         "tenant": {
             "type": "relation",
             "relation": "manyToOne",

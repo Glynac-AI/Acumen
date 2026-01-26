@@ -45,23 +45,13 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 }
             };
 
-            // 1. Handle Newsletter & Regulatethis Subscriber (status -> subscribed)
-            // Synonyms: active, true, 1, subscribed
+            // Unified Status Handling for ALL collections (Newsletter, Regulatethis, Customer)
+            // They all use 'status' now, and map 'active' -> 'subscribed'
             const subscriberSynonyms = ['active', 'true', '1', 'subscribed'];
 
             normalizeField(ctx.request.body, 'status', 'subscribed', subscriberSynonyms);
             if (ctx.request.body?.data) {
                 normalizeField(ctx.request.body.data, 'status', 'subscribed', subscriberSynonyms);
-            }
-
-            // 2. Handle Customer (subscriptionStatus -> Active)
-            // Synonyms: active, true, 1, pending
-            // Note: Customer requires Capitalized "Active" or "Pending"
-            const customerActiveSynonyms = ['active', 'true', '1'];
-
-            normalizeField(ctx.request.body, 'subscriptionStatus', 'Active', customerActiveSynonyms);
-            if (ctx.request.body?.data) {
-                normalizeField(ctx.request.body.data, 'subscriptionStatus', 'Active', customerActiveSynonyms);
             }
 
             strapi.log.debug(`📧 Request body after normalization: ${JSON.stringify(ctx.request.body, null, 2)}`);

@@ -10,9 +10,26 @@ export default {
             data.tenant = tenantContext.documentId || tenantContext.id;
         }
 
+        // Normalize status
+        if (data.status && typeof data.status === 'string') {
+            const originalStatus = data.status;
+            let normalizedStatus = originalStatus.toLowerCase().trim();
+
+            if (['unactive', 'inactive', 'unsubscribe', 'unsubscribed', 'canceled', 'cancelled'].includes(normalizedStatus)) {
+                normalizedStatus = 'unsubscribed';
+            } else if (['active', 'subscribed', 'true', '1'].includes(normalizedStatus)) {
+                normalizedStatus = 'subscribed';
+            }
+
+            if (normalizedStatus !== data.status) {
+                console.log(`📧 Customer: Normalizing status from "${data.status}" to "${normalizedStatus}"`);
+                data.status = normalizedStatus;
+            }
+        }
+
         // Default status
-        if (!data.subscriptionStatus) {
-            data.subscriptionStatus = 'Active';
+        if (!data.status) {
+            data.status = 'subscribed'; // Default for customers (or pending, but aligns with others now)
         }
 
         // Default method
@@ -22,6 +39,23 @@ export default {
     },
 
     async beforeUpdate(event) {
-        // Add specific update logic here if needed
+        const { data } = event.params;
+
+        // Normalize status if being updated
+        if (data.status && typeof data.status === 'string') {
+            const originalStatus = data.status;
+            let normalizedStatus = originalStatus.toLowerCase().trim();
+
+            if (['unactive', 'inactive', 'unsubscribe', 'unsubscribed', 'canceled', 'cancelled'].includes(normalizedStatus)) {
+                normalizedStatus = 'unsubscribed';
+            } else if (['active', 'subscribed', 'true', '1'].includes(normalizedStatus)) {
+                normalizedStatus = 'subscribed';
+            }
+
+            if (normalizedStatus !== data.status) {
+                console.log(`📧 Customer: Normalizing status from "${data.status}" to "${normalizedStatus}"`);
+                data.status = normalizedStatus;
+            }
+        }
     },
 };

@@ -33,15 +33,15 @@
             ],
             "default": "Free"
         },
-        "subscriptionStatus": {
+        "status": {
             "type": "enumeration",
             "enum": [
-                "Active",
-                "Pending",
-                "Canceled",
-                "PastDue"
+                "subscribed",
+                "pending",
+                "unsubscribed"
             ],
-            "default": "Pending"
+            "default": "subscribed",
+            "required": true
         },
         "tenant": {
             "type": "relation",
