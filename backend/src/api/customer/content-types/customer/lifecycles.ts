@@ -34,7 +34,7 @@ export default {
 
         // Default method
         if (!data.subscriptionMethod) {
-            data.subscriptionMethod = 'Free';
+            data.subscriptionMethod = 'Email';
         }
     },
 

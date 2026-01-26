@@ -50,14 +50,12 @@
         "subscriptionMethod": {
             "type": "enumeration",
             "enum": [
-                "CreditCard",
-                "PayPal",
-                "BankTransfer",
-                "Manual",
-                "Cryptocurrency",
-                "Free"
+                "Email",
+                "SMS",
+                "WhatsApp",
+                "PushNotification"
             ],
-            "default": "Free"
+            "default": "Email"
         },
         "tenant": {
             "type": "relation",
