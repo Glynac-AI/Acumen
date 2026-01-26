@@ -23,8 +23,7 @@
         },
         "status": {
             "type": "string",
-            "default": "active",
-            "required": true
+            "default": "active"
         },
         "source": {
             "type": "enumeration",
