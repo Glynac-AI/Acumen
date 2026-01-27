@@ -96,29 +96,31 @@ export default {
     // Seed Pillars
     if (defaultTenant) {
       for (const pillar of pillarsData) {
+        // Check if pillar exists by slug (assuming slug is unique globally or sufficient to identify)
+        // We removed the tenant filter to catch existing pillars that might have been created without a tenant relation
+        // or to prevent unique constraint violations if the pillar exists globally.
         const existingPillar = await strapi.documents('api::pillar.pillar').findFirst({
           filters: {
             slug: pillar.slug,
-            tenant: {
-              documentId: defaultTenant.documentId,
-            },
           },
         });
 
         if (!existingPillar) {
           console.log(`⚙️ Seeding pillar: ${pillar.name}...`);
-          // Extract details to separate them from the pillar data if needed, 
-          // but assuming the pillar content type handles them as a component or json.
-          // However, looking at the data, 'details' is an array of objects. 
-          // If 'details' is a component, it should be fine.
+
+          // Remove color from data as it's not in the schema
+          const { color, ...pillarData } = pillar as any;
+
           await strapi.documents('api::pillar.pillar').create({
             data: {
-              ...pillar,
+              ...pillarData,
               tenant: defaultTenant.documentId,
             },
             status: 'published',
           });
           console.log(`✅ Pillar ${pillar.name} created!`);
+        } else {
+          console.log(`📋 Pillar ${pillar.name} already exists, skipping seed.`);
         }
       }
     }
