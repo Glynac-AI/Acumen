@@ -76,7 +76,12 @@ export default {
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     // Seed Default Tenant
     let defaultTenant = await strapi.documents('api::tenant.tenant').findFirst({
-      filters: { slug: defaultTenantData.slug },
+      filters: {
+        $or: [
+          { slug: defaultTenantData.slug },
+          { domain: defaultTenantData.domain },
+        ],
+      },
     });
 
     if (!defaultTenant) {
