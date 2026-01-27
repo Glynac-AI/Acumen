@@ -19,8 +19,8 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
         const isApiRequest = ctx.url.includes('/api/');
 
         // Check for either collection name
-        const isNewsletterRequest = ctx.url.includes('newsletter-subscriber') ||
-            ctx.url.includes('regulatethis-subscriber') ||
+        // Check for either collection name
+        const isNewsletterRequest = ctx.url.includes('regulatethis-subscriber') ||
             ctx.url.includes('customer');
 
         const isWriteRequest = ['POST', 'PUT', 'PATCH'].includes(ctx.request.method);

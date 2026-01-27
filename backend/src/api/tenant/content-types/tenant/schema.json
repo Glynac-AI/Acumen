@@ -90,12 +90,6 @@
             "target": "api::pillar.pillar",
             "mappedBy": "tenant"
         },
-        "newsletterSubscribers": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::newsletter-subscriber.newsletter-subscriber",
-            "mappedBy": "tenant"
-        },
         "regulatethisSubscribers": {
             "type": "relation",
             "relation": "oneToMany",

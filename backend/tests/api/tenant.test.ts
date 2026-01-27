@@ -11,7 +11,7 @@ const categorySchema = require('../../src/api/category/content-types/category/sc
 const tagSchema = require('../../src/api/tag/content-types/tag/schema.json');
 const pillarSchema = require('../../src/api/pillar/content-types/pillar/schema.json');
 const subcategorySchema = require('../../src/api/subcategory/content-types/subcategory/schema.json');
-const newsletterSubscriberSchema = require('../../src/api/newsletter-subscriber/content-types/newsletter-subscriber/schema.json');
+
 const siteSettingSchema = require('../../src/api/site-setting/content-types/site-setting/schema.json');
 
 describe('Tenant Schema', () => {
@@ -93,7 +93,6 @@ describe('Multitenancy - All Content Types Have Tenant Relation', () => {
         { name: 'Tag', schema: tagSchema },
         { name: 'Pillar', schema: pillarSchema },
         { name: 'Subcategory', schema: subcategorySchema },
-        { name: 'Newsletter Subscriber', schema: newsletterSubscriberSchema },
         { name: 'Site Setting', schema: siteSettingSchema },
     ];
 
