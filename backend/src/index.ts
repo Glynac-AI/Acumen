@@ -57,28 +57,88 @@ const pillarsData = [
 ];
 
 
+export default {
+  /**
+   * An asynchronous register function that runs before
+   * your application is initialized.
+   *
+   * This gives you an opportunity to extend code.
+   */
+  register({ strapi }: { strapi: Core.Strapi }) { },
 
-// Seed default Site Settings for the tenant
-const existingSiteSettings = await strapi.documents('api::site-setting.site-setting').findMany({
-  filters: { tenant: { documentId: defaultTenant?.documentId } }
-});
+  /**
+   * An asynchronous bootstrap function that runs before
+   * your application gets started.
+   *
+   * This gives you an opportunity to set up your data model,
+   * run jobs, or perform some special logic.
+   */
+  async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    // Seed Default Tenant
+    let defaultTenant = await strapi.documents('api::tenant.tenant').findFirst({
+      filters: { slug: defaultTenantData.slug },
+    });
 
-if (existingSiteSettings.length === 0 && defaultTenant) {
-  console.log('⚙️ Seeding default site settings...');
-  await strapi.documents('api::site-setting.site-setting').create({
-    data: {
-      siteName: 'RegulateThis',
-      siteDescription: 'Expert insights on wealth management, compliance, and practice management for financial advisors.',
-      gtmEnabled: false,
-      gaEnabled: false,
-      metaPixelEnabled: false,
-      tenant: defaultTenant.documentId,
-    },
-    status: 'published',
-  });
-  console.log('✅ Default site settings created!');
-} else {
-  console.log('📋 Site settings already exist, skipping seed.');
-}
+    if (!defaultTenant) {
+      console.log('⚙️ Seeding default tenant...');
+      defaultTenant = await strapi.documents('api::tenant.tenant').create({
+        data: defaultTenantData,
+        status: 'published',
+      });
+      console.log('✅ Default tenant created!');
+    }
+
+    // Seed Pillars
+    if (defaultTenant) {
+      for (const pillar of pillarsData) {
+        const existingPillar = await strapi.documents('api::pillar.pillar').findFirst({
+          filters: {
+            slug: pillar.slug,
+            tenant: {
+              documentId: defaultTenant.documentId,
+            },
+          },
+        });
+
+        if (!existingPillar) {
+          console.log(`⚙️ Seeding pillar: ${pillar.name}...`);
+          // Extract details to separate them from the pillar data if needed, 
+          // but assuming the pillar content type handles them as a component or json.
+          // However, looking at the data, 'details' is an array of objects. 
+          // If 'details' is a component, it should be fine.
+          await strapi.documents('api::pillar.pillar').create({
+            data: {
+              ...pillar,
+              tenant: defaultTenant.documentId,
+            },
+            status: 'published',
+          });
+          console.log(`✅ Pillar ${pillar.name} created!`);
+        }
+      }
+    }
+
+    // Seed default Site Settings for the tenant
+    const existingSiteSettings = await strapi.documents('api::site-setting.site-setting').findMany({
+      filters: { tenant: { documentId: defaultTenant?.documentId } }
+    });
+
+    if (existingSiteSettings.length === 0 && defaultTenant) {
+      console.log('⚙️ Seeding default site settings...');
+      await strapi.documents('api::site-setting.site-setting').create({
+        data: {
+          siteName: 'RegulateThis',
+          siteDescription: 'Expert insights on wealth management, compliance, and practice management for financial advisors.',
+          gtmEnabled: false,
+          gaEnabled: false,
+          metaPixelEnabled: false,
+          tenant: defaultTenant.documentId,
+        },
+        status: 'published',
+      });
+      console.log('✅ Default site settings created!');
+    } else {
+      console.log('📋 Site settings already exist, skipping seed.');
+    }
   },
 };
