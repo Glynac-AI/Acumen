@@ -35,9 +35,9 @@ export default {
             }
         }
 
-        // Normalize status
-        if (data.status && typeof data.status === 'string') {
-            const originalStatus = data.status;
+        // Normalize subscriptionStatus
+        if (data.subscriptionStatus && typeof data.subscriptionStatus === 'string') {
+            const originalStatus = data.subscriptionStatus;
             let normalizedStatus = originalStatus.toLowerCase().trim();
 
             if (['unactive', 'inactive', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
@@ -46,16 +46,16 @@ export default {
                 normalizedStatus = 'subscribed';
             }
 
-            if (normalizedStatus !== data.status) {
-                console.log(`📧 Normalizing status from "${data.status}" to "${normalizedStatus}"`);
-                data.status = normalizedStatus;
+            if (normalizedStatus !== data.subscriptionStatus) {
+                console.log(`📧 Normalizing subscriptionStatus from "${data.subscriptionStatus}" to "${normalizedStatus}"`);
+                data.subscriptionStatus = normalizedStatus;
             }
         }
 
-        // Default status
-        if (!data.status) {
-            data.status = 'subscribed';
-            console.log('📧 Set default status:', data.status);
+        // Default subscriptionStatus
+        if (!data.subscriptionStatus) {
+            data.subscriptionStatus = 'subscribed';
+            console.log('📧 Set default subscriptionStatus:', data.subscriptionStatus);
         }
 
         console.log('📧 Final data before validation:', JSON.stringify(data, null, 2));
@@ -67,9 +67,9 @@ export default {
         console.log('📧 Regulatethis Subscriber beforeUpdate hook triggered');
         console.log('📧 Update data:', JSON.stringify(data, null, 2));
 
-        // Normalize status if being updated
-        if (data.status && typeof data.status === 'string') {
-            const originalStatus = data.status;
+        // Normalize subscriptionStatus if being updated
+        if (data.subscriptionStatus && typeof data.subscriptionStatus === 'string') {
+            const originalStatus = data.subscriptionStatus;
             let normalizedStatus = originalStatus.toLowerCase().trim();
 
             if (['unactive', 'inactive', 'unsubcribe', 'unsubscribe', 'unsubscribed'].includes(normalizedStatus)) {
@@ -78,14 +78,14 @@ export default {
                 normalizedStatus = 'subscribed';
             }
 
-            if (normalizedStatus !== data.status) {
-                console.log(`📧 Normalizing status from "${data.status}" to "${normalizedStatus}"`);
-                data.status = normalizedStatus;
+            if (normalizedStatus !== data.subscriptionStatus) {
+                console.log(`📧 Normalizing subscriptionStatus from "${data.subscriptionStatus}" to "${normalizedStatus}"`);
+                data.subscriptionStatus = normalizedStatus;
             }
         }
 
-        // If status is being changed to unsubscribed, set unsubscribeAt
-        if (data.status === 'unsubscribed' && !data.unsubscribeAt) {
+        // If subscriptionStatus is being changed to unsubscribed, set unsubscribeAt
+        if (data.subscriptionStatus === 'unsubscribed' && !data.unsubscribeAt) {
             data.unsubscribeAt = new Date().toISOString();
             console.log('📧 Set unsubscribeAt:', data.unsubscribeAt);
         }

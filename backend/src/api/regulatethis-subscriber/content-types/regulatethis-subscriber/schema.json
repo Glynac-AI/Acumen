@@ -21,7 +21,7 @@
             "type": "datetime",
             "required": true
         },
-        "status": {
+        "subscriptionStatus": {
             "type": "enumeration",
             "enum": [
                 "subscribed",
