@@ -37,7 +37,7 @@ export default [
         'https://www.regulatethis.com',
       ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-      headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+      headers: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Tenant-Domain', 'X-Tenant-Slug'],
       keepHeaderOnError: true,
     },
   },
@@ -47,4 +47,7 @@ export default [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
+
+  // Tenant context middleware - must be after body parsing
+  'global::tenant-context',
 ];

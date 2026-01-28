@@ -1,5 +1,27 @@
 import type { Core } from '@strapi/strapi';
 
+// Seed data for default tenant
+const defaultTenantData = {
+  name: 'RegulateThis',
+  slug: 'regulatethis',
+  domain: 'regulatethis.com',
+  isActive: true,
+  primaryColor: '#49648C',
+  secondaryColor: '#1a1a2e',
+  description: 'The original RegulateThis blog platform'
+};
+
+// Seed data for Sylvian tenant
+const sylvianTenantData = {
+  name: 'Sylvan',
+  slug: 'sylvian',
+  domain: 'sylvan.com',
+  isActive: true,
+  primaryColor: '#000000', // Placeholder, can be updated
+  secondaryColor: '#ffffff', // Placeholder, can be updated
+  description: 'Standardized structured real estate income platform providing repeatable structure, workflow, and audit-ready documentation for institutional-grade real estate income investing.'
+};
+
 // Seed data for Pillars
 const pillarsData = [
   {
@@ -45,32 +67,6 @@ const pillarsData = [
   },
 ];
 
-// Seed data for Tags
-const tagsData = [
-  'Portfolio Management',
-  'SEC Examinations',
-  'CRM Systems',
-  'Firm Growth',
-  'Marketing Rule',
-  'Cybersecurity',
-  'Client Segmentation',
-  'Succession Planning',
-  'Compensation Models',
-  'Integration',
-  'AI in Wealth Management',
-  'SEC Audits',
-  'RIA Growth',
-  'Options Strategies',
-  'Covered Calls',
-  'FINRA Regulation',
-  'Automation',
-  'Real Estate Investing',
-  'Tax Planning',
-  'M&A',
-  'Data Integration',
-  'Risk Management',
-  'Advisor Recruiting',
-];
 
 export default {
   /**
@@ -79,7 +75,7 @@ export default {
    *
    * This gives you an opportunity to extend code.
    */
-  register(/* { strapi }: { strapi: Core.Strapi } */) { },
+  register({ strapi }: { strapi: Core.Strapi }) { },
 
   /**
    * An asynchronous bootstrap function that runs before
@@ -89,42 +85,122 @@ export default {
    * run jobs, or perform some special logic.
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    // Seed Pillars
-    const existingPillars = await strapi.documents('api::pillar.pillar').findMany({});
+    // Seed Default Tenant
+    let defaultTenant = await strapi.documents('api::tenant.tenant').findFirst({
+      filters: {
+        $or: [
+          { slug: defaultTenantData.slug },
+          { domain: defaultTenantData.domain },
+        ],
+      },
+    });
 
-    if (existingPillars.length === 0) {
-      console.log('🌱 Seeding pillars...');
-      for (const pillar of pillarsData) {
-        await strapi.documents('api::pillar.pillar').create({
-          data: pillar,
-        });
-      }
-      console.log('✅ Pillars seeded successfully!');
-    } else {
-      console.log('📋 Pillars already exist, skipping seed.');
+    if (!defaultTenant) {
+      console.log('⚙️ Seeding default tenant...');
+      defaultTenant = await strapi.documents('api::tenant.tenant').create({
+        data: defaultTenantData,
+        status: 'published',
+      });
+      console.log('✅ Default tenant created!');
     }
 
-    // Seed Tags
-    const existingTags = await strapi.documents('api::tag.tag').findMany({});
+    // Seed Sylvian Tenant
+    let sylvianTenant = await strapi.documents('api::tenant.tenant').findFirst({
+      filters: {
+        $or: [
+          { slug: sylvianTenantData.slug },
+          { domain: sylvianTenantData.domain },
+        ],
+      },
+    });
 
-    if (existingTags.length === 0) {
-      console.log('🌱 Seeding tags...');
-      for (const tagName of tagsData) {
-        const slug = tagName
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
+    if (!sylvianTenant) {
+      console.log('⚙️ Seeding Sylvian tenant...');
+      sylvianTenant = await strapi.documents('api::tenant.tenant').create({
+        data: sylvianTenantData,
+        status: 'published',
+      });
+      console.log('✅ Sylvian tenant created!');
+    }
 
-        await strapi.documents('api::tag.tag').create({
-          data: {
-            name: tagName,
-            slug: slug,
+    // Seed Pillars
+    if (defaultTenant) {
+      for (const pillar of pillarsData) {
+        // Check if pillar exists by slug (assuming slug is unique globally or sufficient to identify)
+        // We removed the tenant filter to catch existing pillars that might have been created without a tenant relation
+        // or to prevent unique constraint violations if the pillar exists globally.
+        const existingPillar = await strapi.documents('api::pillar.pillar').findFirst({
+          filters: {
+            slug: pillar.slug,
           },
         });
+
+        if (!existingPillar) {
+          console.log(`⚙️ Seeding pillar: ${pillar.name}...`);
+
+          // Remove color from data as it's not in the schema
+          const { color, ...pillarData } = pillar as any;
+
+          await strapi.documents('api::pillar.pillar').create({
+            data: {
+              ...pillarData,
+              tenant: defaultTenant.documentId,
+            },
+            status: 'published',
+          });
+          console.log(`✅ Pillar ${pillar.name} created!`);
+        } else {
+          console.log(`📋 Pillar ${pillar.name} already exists, skipping seed.`);
+        }
       }
-      console.log('✅ Tags seeded successfully!');
+    }
+
+    // Seed default Site Settings for the tenant
+    const existingSiteSettings = await strapi.documents('api::site-setting.site-setting').findMany({
+      filters: { tenant: { documentId: defaultTenant?.documentId } }
+    });
+
+    if (existingSiteSettings.length === 0 && defaultTenant) {
+      console.log('⚙️ Seeding default site settings...');
+      await strapi.documents('api::site-setting.site-setting').create({
+        data: {
+          siteName: 'RegulateThis',
+          siteDescription: 'Expert insights on wealth management, compliance, and practice management for financial advisors.',
+          gtmEnabled: false,
+          gaEnabled: false,
+          metaPixelEnabled: false,
+          tenant: defaultTenant.documentId,
+        },
+        status: 'published',
+      });
+      console.log('✅ Default site settings created!');
     } else {
-      console.log('📋 Tags already exist, skipping seed.');
+      console.log('📋 Site settings already exist, skipping seed.');
+    }
+
+    // Seed Sylvian Site Settings
+    if (sylvianTenant) {
+      const existingSylvianSettings = await strapi.documents('api::site-setting.site-setting').findMany({
+        filters: { tenant: { documentId: sylvianTenant.documentId } }
+      });
+
+      if (existingSylvianSettings.length === 0) {
+        console.log('⚙️ Seeding Sylvian site settings...');
+        await strapi.documents('api::site-setting.site-setting').create({
+          data: {
+            siteName: 'Sylvan',
+            siteDescription: 'Structure. Yield. Growth.',
+            gtmEnabled: false,
+            gaEnabled: false,
+            metaPixelEnabled: false,
+            tenant: sylvianTenant.documentId,
+          },
+          status: 'published',
+        });
+        console.log('✅ Sylvian site settings created!');
+      } else {
+        console.log('📋 Sylvian site settings already exist, skipping seed.');
+      }
     }
   },
 };

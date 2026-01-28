@@ -1,0 +1,51 @@
+{
+    "kind": "collectionType",
+    "collectionName": "customers",
+    "info": {
+        "singularName": "customer",
+        "pluralName": "customers",
+        "displayName": "Customer",
+        "description": "Store customers with their subscription methods"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "fullName": {
+            "type": "string",
+            "required": true
+        },
+        "email": {
+            "type": "email",
+            "required": true,
+            "unique": true
+        },
+        "subscriptionMethod": {
+            "type": "enumeration",
+            "enum": [
+                "Email",
+                "SMS",
+                "WhatsApp",
+                "PushNotification"
+            ],
+            "default": "Email"
+        },
+        "subscriptionStatus": {
+            "type": "enumeration",
+            "enum": [
+                "subscribed",
+                "pending",
+                "unsubscribed"
+            ],
+            "default": "subscribed",
+            "required": true
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "customers"
+        }
+    }
+}

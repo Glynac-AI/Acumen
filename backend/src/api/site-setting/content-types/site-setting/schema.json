@@ -1,11 +1,11 @@
 {
-    "kind": "singleType",
+    "kind": "collectionType",
     "collectionName": "site_settings",
     "info": {
         "singularName": "site-setting",
         "pluralName": "site-settings",
         "displayName": "Site Settings",
-        "description": "Global site settings including analytics and tracking"
+        "description": "Per-tenant site settings including analytics and tracking"
     },
     "options": {
         "draftAndPublish": true
@@ -15,7 +15,7 @@
         "siteName": {
             "type": "string",
             "required": true,
-            "default": "RegulateThis"
+            "maxLength": 100
         },
         "siteDescription": {
             "type": "text"
@@ -49,6 +49,12 @@
         },
         "customBodyScripts": {
             "type": "text"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "siteSettings"
         }
     }
 }

@@ -31,6 +31,12 @@
             "relation": "manyToMany",
             "target": "api::article.article",
             "mappedBy": "tags"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "tags"
         }
     }
 }

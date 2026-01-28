@@ -13,6 +13,9 @@ export default ({ env }) => {
                 },
                 acquireConnectionTimeout: 60000,
             },
+            settings: {
+                forceMigration: true,
+            },
         };
     }
 

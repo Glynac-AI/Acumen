@@ -37,6 +37,12 @@
             "relation": "manyToMany",
             "target": "api::article.article",
             "mappedBy": "subcategories"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "subcategories"
         }
     }
 }

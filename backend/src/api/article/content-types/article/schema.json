@@ -98,6 +98,12 @@
             "type": "component",
             "repeatable": false,
             "component": "shared.seo"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "articles"
         }
     }
 }

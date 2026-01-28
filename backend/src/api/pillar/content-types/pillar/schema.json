@@ -46,6 +46,12 @@
             "relation": "oneToMany",
             "target": "api::article.article",
             "mappedBy": "pillar"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "pillars"
         }
     }
 }
