@@ -937,7 +937,6 @@ export interface ApiTenantTenant extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    customers: Schema.Attribute.Relation<'oneToMany', 'api::customer.customer'>;
     description: Schema.Attribute.Text;
     domain: Schema.Attribute.String &
       Schema.Attribute.Required &

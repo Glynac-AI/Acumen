@@ -96,12 +96,6 @@
             "target": "api::regulatethis-subscriber.regulatethis-subscriber",
             "mappedBy": "tenant"
         },
-        "customers": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::customer.customer",
-            "mappedBy": "tenant"
-        },
         "siteSettings": {
             "type": "relation",
             "relation": "oneToMany",
