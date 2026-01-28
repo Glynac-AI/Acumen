@@ -491,6 +491,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         maxLength: 250;
       }>;
     tags: Schema.Attribute.Relation<'manyToMany', 'api::tag.tag'>;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
@@ -542,6 +543,7 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     photo: Schema.Attribute.Media<'images'>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     twitter: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -599,6 +601,49 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 100;
       }>;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCustomerCustomer extends Struct.CollectionTypeSchema {
+  collectionName: 'customers';
+  info: {
+    description: 'Store customers with their subscription methods';
+    displayName: 'Customer';
+    pluralName: 'customers';
+    singularName: 'customer';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    fullName: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::customer.customer'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    subscriptionMethod: Schema.Attribute.Enumeration<
+      ['Email', 'SMS', 'WhatsApp', 'PushNotification']
+    > &
+      Schema.Attribute.DefaultTo<'Email'>;
+    subscriptionStatus: Schema.Attribute.Enumeration<
+      ['subscribed', 'pending', 'unsubscribed']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'subscribed'>;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -685,16 +730,65 @@ export interface ApiPillarPillar extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 100;
       }>;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
   };
 }
 
-export interface ApiSiteSettingSiteSetting extends Struct.SingleTypeSchema {
+export interface ApiRegulatethisSubscriberRegulatethisSubscriber
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'regulatethis_subscribers';
+  info: {
+    description: 'Regulatethis newsletter email subscribers';
+    displayName: 'Regulatethis Subscriber';
+    pluralName: 'regulatethis-subscribers';
+    singularName: 'regulatethis-subscriber';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::regulatethis-subscriber.regulatethis-subscriber'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    source: Schema.Attribute.Enumeration<
+      ['Homepage', 'global_footer', 'Article_CTA', 'Author_CTA', 'Website']
+    >;
+    subscribedAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    subscriptionMethod: Schema.Attribute.Enumeration<
+      ['Email', 'SMS', 'WhatsApp', 'PushNotification']
+    > &
+      Schema.Attribute.DefaultTo<'Email'>;
+    subscriptionStatus: Schema.Attribute.Enumeration<
+      ['subscribed', 'pending', 'unsubscribed']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'subscribed'>;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
+    unsubscribeAt: Schema.Attribute.DateTime;
+    unsubscribeReason: Schema.Attribute.Text;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSiteSettingSiteSetting extends Struct.CollectionTypeSchema {
   collectionName: 'site_settings';
   info: {
-    description: 'Global site settings including analytics and tracking';
+    description: 'Per-tenant site settings including analytics and tracking';
     displayName: 'Site Settings';
     pluralName: 'site-settings';
     singularName: 'site-setting';
@@ -734,7 +828,10 @@ export interface ApiSiteSettingSiteSetting extends Struct.SingleTypeSchema {
     siteDescription: Schema.Attribute.Text;
     siteName: Schema.Attribute.String &
       Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'RegulateThis'>;
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -775,6 +872,7 @@ export interface ApiSubcategorySubcategory extends Struct.CollectionTypeSchema {
       }>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -811,6 +909,83 @@ export interface ApiTagTag extends Struct.CollectionTypeSchema {
       }>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTenantTenant extends Struct.CollectionTypeSchema {
+  collectionName: 'tenants';
+  info: {
+    description: 'Multi-tenant website organizations';
+    displayName: 'Tenant';
+    pluralName: 'tenants';
+    singularName: 'tenant';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    articles: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
+    authors: Schema.Attribute.Relation<'oneToMany', 'api::author.author'>;
+    categories: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::category.category'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customers: Schema.Attribute.Relation<'oneToMany', 'api::customer.customer'>;
+    description: Schema.Attribute.Text;
+    domain: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::tenant.tenant'
+    > &
+      Schema.Attribute.Private;
+    logo: Schema.Attribute.Media<'images'>;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    pillars: Schema.Attribute.Relation<'oneToMany', 'api::pillar.pillar'>;
+    primaryColor: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 7;
+      }> &
+      Schema.Attribute.DefaultTo<'#49648C'>;
+    publishedAt: Schema.Attribute.DateTime;
+    regulatethisSubscribers: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::regulatethis-subscriber.regulatethis-subscriber'
+    >;
+    secondaryColor: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 7;
+      }> &
+      Schema.Attribute.DefaultTo<'#1a1a2e'>;
+    siteSettings: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::site-setting.site-setting'
+    >;
+    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
+    subcategories: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::subcategory.subcategory'
+    >;
+    tags: Schema.Attribute.Relation<'oneToMany', 'api::tag.tag'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1330,11 +1505,14 @@ declare module '@strapi/strapi' {
       'api::article.article': ApiArticleArticle;
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
+      'api::customer.customer': ApiCustomerCustomer;
       'api::newsletter-subscriber.newsletter-subscriber': ApiNewsletterSubscriberNewsletterSubscriber;
       'api::pillar.pillar': ApiPillarPillar;
+      'api::regulatethis-subscriber.regulatethis-subscriber': ApiRegulatethisSubscriberRegulatethisSubscriber;
       'api::site-setting.site-setting': ApiSiteSettingSiteSetting;
       'api::subcategory.subcategory': ApiSubcategorySubcategory;
       'api::tag.tag': ApiTagTag;
+      'api::tenant.tenant': ApiTenantTenant;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
