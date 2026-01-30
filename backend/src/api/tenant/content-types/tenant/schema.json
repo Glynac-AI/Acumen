@@ -101,6 +101,12 @@
             "relation": "oneToMany",
             "target": "api::site-setting.site-setting",
             "mappedBy": "tenant"
+        },
+        "sylvanRequestAccesses": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::sylvan-request-access.sylvan-request-access",
+            "mappedBy": "tenant"
         }
     }
 }
