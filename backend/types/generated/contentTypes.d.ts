@@ -608,87 +608,6 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiCustomerCustomer extends Struct.CollectionTypeSchema {
-  collectionName: 'customers';
-  info: {
-    description: 'Store customers with their subscription methods';
-    displayName: 'Customer';
-    pluralName: 'customers';
-    singularName: 'customer';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    email: Schema.Attribute.Email &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
-    fullName: Schema.Attribute.String & Schema.Attribute.Required;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::customer.customer'
-    > &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    subscriptionMethod: Schema.Attribute.Enumeration<
-      ['Email', 'SMS', 'WhatsApp', 'PushNotification']
-    > &
-      Schema.Attribute.DefaultTo<'Email'>;
-    subscriptionStatus: Schema.Attribute.Enumeration<
-      ['subscribed', 'pending', 'unsubscribed']
-    > &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'subscribed'>;
-    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiNewsletterSubscriberNewsletterSubscriber
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'newsletter_subscribers';
-  info: {
-    description: 'Newsletter email subscribers';
-    displayName: 'Newsletter Subscriber';
-    pluralName: 'newsletter-subscribers';
-    singularName: 'newsletter-subscriber';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    email: Schema.Attribute.Email &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::newsletter-subscriber.newsletter-subscriber'
-    > &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    source: Schema.Attribute.Enumeration<
-      ['Homepage', 'Article_Footer', 'Sidebar', 'Popup', 'Other']
-    >;
-    status: Schema.Attribute.Enumeration<['Active', 'Unsubscribed']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'Active'>;
-    subscribedAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiPillarPillar extends Struct.CollectionTypeSchema {
   collectionName: 'pillars';
   info: {
@@ -879,6 +798,53 @@ export interface ApiSubcategorySubcategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiSylvanRequestAccessSylvanRequestAccess
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'sylvan_request_accesses';
+  info: {
+    description: 'Sylvan access request submissions';
+    displayName: 'Sylvan Request Access';
+    pluralName: 'sylvan-request-accesses';
+    singularName: 'sylvan-request-access';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    companyName: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    fullName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sylvan-request-access.sylvan-request-access'
+    > &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    submittedAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    tenant: Schema.Attribute.Relation<'manyToOne', 'api::tenant.tenant'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiTagTag extends Struct.CollectionTypeSchema {
   collectionName: 'tags';
   info: {
@@ -983,6 +949,10 @@ export interface ApiTenantTenant extends Struct.CollectionTypeSchema {
     subcategories: Schema.Attribute.Relation<
       'oneToMany',
       'api::subcategory.subcategory'
+    >;
+    sylvanRequestAccesses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sylvan-request-access.sylvan-request-access'
     >;
     tags: Schema.Attribute.Relation<'oneToMany', 'api::tag.tag'>;
     updatedAt: Schema.Attribute.DateTime;
@@ -1504,12 +1474,11 @@ declare module '@strapi/strapi' {
       'api::article.article': ApiArticleArticle;
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
-      'api::customer.customer': ApiCustomerCustomer;
-      'api::newsletter-subscriber.newsletter-subscriber': ApiNewsletterSubscriberNewsletterSubscriber;
       'api::pillar.pillar': ApiPillarPillar;
       'api::regulatethis-subscriber.regulatethis-subscriber': ApiRegulatethisSubscriberRegulatethisSubscriber;
       'api::site-setting.site-setting': ApiSiteSettingSiteSetting;
       'api::subcategory.subcategory': ApiSubcategorySubcategory;
+      'api::sylvan-request-access.sylvan-request-access': ApiSylvanRequestAccessSylvanRequestAccess;
       'api::tag.tag': ApiTagTag;
       'api::tenant.tenant': ApiTenantTenant;
       'plugin::content-releases.release': PluginContentReleasesRelease;
