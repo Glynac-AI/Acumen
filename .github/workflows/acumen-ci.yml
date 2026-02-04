@@ -1,0 +1,78 @@
+name: CI/CD for Glynac Organization
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "**"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "**"
+
+env:
+  PRODUCT_VERSION: "latest" # or: "latest"
+  IMAGE_TAG: ${{ github.ref_name }}-${{ github.sha }}
+  DOCKER_IMAGE: 65123/frontend
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: 65123
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
+        
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: |
+          ${{ env.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
+          ${{ env.DOCKER_IMAGE }}:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          NEXT_PUBLIC_WS_URL=wss://ws.orchestrator-agent.bastion.glynac.ai/ws
+        
+    - name: Save image tag
+      run: echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup `nomad`
+      uses: hashicorp/setup-nomad@main
+      id: setup
+      with:
+        version: ${{ env.PRODUCT_VERSION }}
+
+    - name: Update Nomad deployment with image tag
+      run: |
+        sed -i "s|IMAGE_TAG_PLACEHOLDER|${{ env.IMAGE_TAG }}|g" nomad/frontend.hcl
+
+    - name: Request deployment to Nomad
+      env:
+        NOMAD_ADDR: ${{ vars.NOMAD_ADDR }}
+        NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+      run: nomad job run nomad/frontend.hcl
