@@ -1,6 +1,7 @@
-job "Frontend-Glynac-Agent" {
+job "Acumen-Web" {
   datacenters = ["glynac-dc"] #disesuaikan
   type = "service"
+  namsespace = "platform"
 
   update {
     max_parallel     = 1
@@ -8,7 +9,7 @@ job "Frontend-Glynac-Agent" {
     min_healthy_time = "30s"
   }
 
-  group "frontend-agent" {
+  group "acumen-web" {
     count = 1
     
     network {
@@ -20,7 +21,7 @@ job "Frontend-Glynac-Agent" {
       }
     
     service {
-      name = "frontend-agent"
+      name = "acumen-web"
       tags = ["apps", "logs.promtail", "agent"]
       port     = "http"
       check {
@@ -33,33 +34,25 @@ job "Frontend-Glynac-Agent" {
       }   
 
     constraint {
-      attribute = "${attr.unique.hostname}"
-#      attribute	= "${meta.duty}"
-#      operator	= "set_contains_any"
-#      value	= "glynac2worker"
-      value     = "Worker-02" 
+#      attribute = "${attr.unique.hostname}"
+      attribute	= "${meta.duty}"
+      operator	= "set_contains_any"
+      value	= "glynac-worker"
+#      value     = "Worker-02" 
     }
 
-    task "rag-agent" {
+    task "acumen-web" {
       driver = "docker"
 
       config {
-        
-        image = "65123/frontend:IMAGE_TAG_PLACEHOLDER"
-        ports = ["http"]
-        dns_servers = ["172.18.0.1", "172.17.0.1", "8.8.8.8", "8.8.4.4"]
-      }
-
-
-      template {
-  data = <<EOF
-{{ with nomadVar "nomad/jobs/Frontend-Glynac-Agent" }}
-NEXT_PUBLIC_WS_URL= {{ .NEXT_PUBLIC_WS_URL }}
-{{ end }}
-		EOF
-        destination = "secrets/.env"
-        env = true
-      }
+          image = "harbor-registry.service.consul:8085/glynac-fe/acumen:IMAGE_TAG_PLACEHOLDER"
+          dns_servers = ["172.17.0.1", "8.8.8.8", "8.8.4.4"]
+          auth {
+        	  username = "admin"
+        	  password = "GlynacP455"
+        	  server_address = "harbor-registry.service.consul:8085"
+      	  } 
+        }
 
       resources {
         cpu = 200
