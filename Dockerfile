@@ -1,40 +1,50 @@
 # syntax=docker/dockerfile:1
 
 FROM node:20-alpine AS base
-WORKDIR /app
-ENV NODE_ENV=production
-RUN apk add --no-cache libc6-compat
 
-# Dependencies
+# Install dependencies only when needed
 FROM base AS deps
-COPY package.json package-lock.json ./
-RUN npm install --omit=dev
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
 
-# Build
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Build the application
 RUN npm run build
 
-# Production runtime
-FROM node:20-alpine AS runner
+# Production image, copy all the files and run next
+FROM base AS runner
 WORKDIR /app
+
 ENV NODE_ENV=production
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
 
-# Non-root user
-RUN addgroup --system --gid 1001 nodejs \
- && adduser --system --uid 1001 nextjs
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# Copy standalone build
+# Copy public assets
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 USER nextjs
+
 EXPOSE 3000
 
 CMD ["node", "server.js"]
