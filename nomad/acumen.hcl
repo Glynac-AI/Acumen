@@ -1,7 +1,7 @@
 job "Acumen-Web" {
   datacenters = ["glynac-dc"] #disesuaikan
   type = "service"
-  namsespace = "platform"
+  namespace = "platform"
 
   update {
     max_parallel     = 1
