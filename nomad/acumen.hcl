@@ -25,7 +25,8 @@ job "Acumen-Web" {
       port     = "http"
       check {
         name     = "api-health"
-        type     = "tcp"
+        type     = "http"
+        path     = "/"
         port     = "http"
         interval = "15s"
         timeout  = "5s"
