@@ -23,7 +23,8 @@ export default function Contact() {
         interest: '',
         message: '',
         meetingTimes: '',
-        consent: false,
+        consentMarketing: false,
+        consentNonMarketing: false,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -249,14 +250,13 @@ export default function Contact() {
                                                 <div className="grid md:grid-cols-2 gap-6">
                                                     <div>
                                                         <label className="block text-sm font-medium text-primary mb-2">
-                                                            Phone *
+                                                            Phone (Optional)
                                                         </label>
                                                         <input
                                                             type="tel"
                                                             name="phone"
                                                             value={formData.phone}
                                                             onChange={handleChange}
-                                                            required
                                                             className="w-full px-4 py-3 border border-primary/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent hover:border-accent/30 transition-colors"
                                                             placeholder="+1 (555) 000-0000"
                                                         />
@@ -333,18 +333,45 @@ export default function Contact() {
                                                     />
                                                 </div>
 
+                                                {/* Marketing SMS Consent */}
                                                 <div className="flex items-start gap-3">
                                                     <input
                                                         type="checkbox"
-                                                        name="consent"
-                                                        checked={formData.consent}
+                                                        name="consentMarketing"
+                                                        checked={formData.consentMarketing}
                                                         onChange={handleChange}
-                                                        required
                                                         className="mt-1 w-4 h-4 text-accent border-primary/20 rounded focus:ring-2 focus:ring-accent"
                                                     />
                                                     <label className="text-sm text-primary/70">
-                                                        I consent to Acumen Strategy collecting and processing my personal information as described in the <a href="/legal/privacy" target="_blank" className="text-accent hover:underline">Privacy Policy</a>. I agree to the <a href="/legal/terms" target="_blank" className="text-accent hover:underline">Terms of Service</a> and understand that I may receive email communications regarding my inquiry and related services. I can unsubscribe at any time. *
+                                                        I consent to receive marketing text messages from Acumen Strategy at the phone number provided. Frequency may vary. Message & data rates may apply. Text HELP for assistance, reply STOP to opt out.
                                                     </label>
+                                                </div>
+
+                                                {/* Non-Marketing SMS Consent */}
+                                                <div className="flex items-start gap-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="consentNonMarketing"
+                                                        checked={formData.consentNonMarketing}
+                                                        onChange={handleChange}
+                                                        className="mt-1 w-4 h-4 text-accent border-primary/20 rounded focus:ring-2 focus:ring-accent"
+                                                    />
+                                                    <label className="text-sm text-primary/70">
+                                                        I consent to receive non-marketing text messages from Acumen Strategy about service updates, appointment reminders, and account notifications. Message & data rates may apply. Text HELP for assistance, reply STOP to opt out.
+                                                    </label>
+                                                </div>
+
+                                                {/* Terms of Service & Privacy Policy */}
+                                                <div className="text-sm text-primary/70 text-center pt-2">
+                                                    By submitting this form, you agree to our{' '}
+                                                    <a href="/legal/terms" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                                                        Terms of Service
+                                                    </a>
+                                                    {' '}and{' '}
+                                                    <a href="/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                                                        Privacy Policy
+                                                    </a>
+                                                    .
                                                 </div>
 
                                                 <button
