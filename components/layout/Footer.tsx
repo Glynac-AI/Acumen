@@ -133,8 +133,21 @@ export default function Footer() {
                     </div>
                 </div>
 
+                {/* SMS Disclosure */}
+                <div className="mt-12 pt-8 border-t border-white/10">
+                    <div className="text-center max-w-3xl mx-auto">
+                        <p className="text-xs text-white/60 leading-relaxed">
+                            By providing your mobile phone number, you consent to receive service-related SMS messages from Acumen Strategy. Message frequency varies. Message and data rates may apply. Reply <strong>STOP</strong> to opt out or <strong>HELP</strong> for assistance. See our{' '}
+                            <Link href="/legal/privacy" className="text-accent hover:underline">
+                                Privacy Policy
+                            </Link>{' '}
+                            for details.
+                        </p>
+                    </div>
+                </div>
+
                 {/* Bottom Bar */}
-                <div className="mt-16 pt-8 border-t border-white/10">
+                <div className="mt-8 pt-8 border-t border-white/10">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-sm text-white/50">
                             © {currentYear} Acumen Strategy. All rights reserved.
