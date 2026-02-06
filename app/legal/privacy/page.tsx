@@ -51,7 +51,8 @@ export default function PrivacyPolicy() {
                                 <h3 className="text-xl font-semibold text-primary mt-6 mb-3">2.1 Information You Provide Directly</h3>
                                 <p>We may collect information you voluntarily provide when using our Services, including</p>
                                 <ul className="list-disc pl-6 mt-3 space-y-2">
-                                    <li>Contact information such as name, email address, telephone number, and business address</li>
+                                    <li>Contact information such as name, email address, and mobile phone number when users register, request services, or provide consent to receive SMS communications</li>
+                                    <li>Business contact information including telephone number and business address</li>
                                     <li>Company and professional information, including job title, company name, and industry</li>
                                     <li>Account credentials and authentication information</li>
                                     <li>Payment and billing information</li>
@@ -103,7 +104,7 @@ export default function PrivacyPolicy() {
                                     <li><strong>With Consent</strong> — When you have provided explicit consent to the disclosure</li>
                                 </ul>
                                 <p className="mt-4">
-                                    We do not sell, rent, or lease personal information to third parties for their marketing purposes without your explicit consent.
+                                    We do not sell, rent, or lease personal information to third parties for their marketing purposes without your explicit consent. We do not sell, rent, or share mobile phone numbers with third parties for marketing purposes.
                                 </p>
                             </section>
 
@@ -133,6 +134,14 @@ export default function PrivacyPolicy() {
                                 </ul>
                                 <p className="mt-4">
                                     You may manage your email preferences or unsubscribe from marketing communications at any time by visiting our <Link href="/legal/unsubscribe" className="text-accent hover:underline">Email Preferences</Link> page or by contacting us directly. Please note that you may continue to receive transactional emails related to your account or ongoing business relationship even after opting out of marketing communications.
+                                </p>
+                                
+                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">SMS Communications</h3>
+                                <p>
+                                    If you provide your mobile phone number and consent, Acumen Strategy may send transactional SMS messages including one-time passcodes (2FA), appointment confirmations and reminders, service notifications, billing alerts, and secure document notifications. Message frequency varies. Message and data rates may apply. You may opt out at any time by replying <strong>STOP</strong>, or receive assistance by replying <strong>HELP</strong>.
+                                </p>
+                                <p className="mt-4">
+                                    We do not use your mobile phone number for unsolicited marketing purposes. SMS communications are strictly limited to service-related notifications that enhance your experience and security when using our Services.
                                 </p>
                             </section>
 
@@ -165,7 +174,10 @@ export default function PrivacyPolicy() {
                                     <li>The right to withdraw consent where processing is based on consent</li>
                                 </ul>
                                 <p className="mt-4">
-                                    To exercise any of these rights, please contact us using the information provided in Section 12. We will respond to your request in accordance with applicable law.
+                                    <strong>SMS Opt-Out:</strong> Users may opt out of SMS communications at any time by replying <strong>STOP</strong> to any SMS message from Acumen Strategy. Opting out of SMS does not affect other services or your ability to use our platform. You may also contact us directly to manage your SMS preferences.
+                                </p>
+                                <p className="mt-4">
+                                    To exercise any of these rights, please contact us using the information provided in Section 13. We will respond to your request in accordance with applicable law.
                                 </p>
                             </section>
 
