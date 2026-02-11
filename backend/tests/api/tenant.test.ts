@@ -1,7 +1,8 @@
 /**
  * Tenant Schema Tests
  * 
- * Tests to validate the tenant content type schema and multitenancy architecture
+ * Tests to validate the tenant content type schema, multitenancy architecture,
+ * and user-tenant RBAC extension.
  */
 
 const tenantSchema = require('../../src/api/tenant/content-types/tenant/schema.json');
@@ -11,8 +12,8 @@ const categorySchema = require('../../src/api/category/content-types/category/sc
 const tagSchema = require('../../src/api/tag/content-types/tag/schema.json');
 const pillarSchema = require('../../src/api/pillar/content-types/pillar/schema.json');
 const subcategorySchema = require('../../src/api/subcategory/content-types/subcategory/schema.json');
-
 const siteSettingSchema = require('../../src/api/site-setting/content-types/site-setting/schema.json');
+const userSchema = require('../../src/extensions/users-permissions/content-types/user/schema.json');
 
 describe('Tenant Schema', () => {
     it('should have correct collection type configuration', () => {
@@ -123,5 +124,30 @@ describe('Site Settings Schema (Converted to CollectionType)', () => {
         expect(siteSettingSchema.attributes.gtmId).toBeDefined();
         expect(siteSettingSchema.attributes.googleAnalyticsId).toBeDefined();
         expect(siteSettingSchema.attributes.metaPixelId).toBeDefined();
+    });
+});
+
+describe('Users-Permissions User Schema Extension (RBAC)', () => {
+    it('should have tenant relation for user-level RBAC', () => {
+        expect(userSchema.attributes.tenant).toBeDefined();
+        expect(userSchema.attributes.tenant.type).toBe('relation');
+        expect(userSchema.attributes.tenant.relation).toBe('manyToOne');
+        expect(userSchema.attributes.tenant.target).toBe('api::tenant.tenant');
+    });
+
+    it('should retain all default user fields', () => {
+        expect(userSchema.attributes.username).toBeDefined();
+        expect(userSchema.attributes.email).toBeDefined();
+        expect(userSchema.attributes.password).toBeDefined();
+        expect(userSchema.attributes.provider).toBeDefined();
+        expect(userSchema.attributes.confirmed).toBeDefined();
+        expect(userSchema.attributes.blocked).toBeDefined();
+        expect(userSchema.attributes.role).toBeDefined();
+    });
+
+    it('should have role as manyToOne relation to users-permissions role', () => {
+        expect(userSchema.attributes.role.type).toBe('relation');
+        expect(userSchema.attributes.role.relation).toBe('manyToOne');
+        expect(userSchema.attributes.role.target).toBe('plugin::users-permissions.role');
     });
 });

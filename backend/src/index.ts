@@ -15,11 +15,22 @@ const defaultTenantData = {
 const sylvianTenantData = {
   name: 'Sylvan',
   slug: 'sylvian',
-  domain: 'sylvan.com',
+  domain: 'sylvannotes.com',
   isActive: true,
   primaryColor: '#000000', // Placeholder, can be updated
   secondaryColor: '#ffffff', // Placeholder, can be updated
   description: 'Standardized structured real estate income platform providing repeatable structure, workflow, and audit-ready documentation for institutional-grade real estate income investing.'
+};
+
+// Seed data for Glynac AI tenant
+const glynacTenantData = {
+  name: 'Glynac AI',
+  slug: 'glynac-ai',
+  domain: 'glynac.ai',
+  isActive: true,
+  primaryColor: '#6366f1',
+  secondaryColor: '#1e1b4b',
+  description: 'Glynac AI platform for intelligent automation and insights'
 };
 
 // Seed data for Pillars
@@ -67,6 +78,45 @@ const pillarsData = [
   },
 ];
 
+// Tenant user account definitions
+const tenantUsers = [
+  {
+    username: 'regulatethis-user',
+    email: 'regulatethis-user@regulatethis.com',
+    password: 'RegulateThis123!',
+    tenantSlug: 'regulatethis',
+    roleName: 'RegulateThis User',
+    roleDescription: 'User role scoped to RegulateThis tenant content only',
+  },
+  {
+    username: 'sylvan-user',
+    email: 'sylvan-user@sylvannotes.com',
+    password: 'Sylvan123!',
+    tenantSlug: 'sylvian',
+    roleName: 'Sylvan User',
+    roleDescription: 'User role scoped to Sylvan tenant content only',
+  },
+  {
+    username: 'glynac-user',
+    email: 'glynac-user@glynac.ai',
+    password: 'GlynacAI123!',
+    tenantSlug: 'glynac-ai',
+    roleName: 'Glynac AI User',
+    roleDescription: 'User role scoped to Glynac AI tenant content only',
+  },
+];
+
+// Content-type API UIDs that tenant users should have access to
+const tenantScopedContentTypes = [
+  'api::article.article',
+  'api::author.author',
+  'api::category.category',
+  'api::tag.tag',
+  'api::pillar.pillar',
+  'api::subcategory.subcategory',
+  'api::site-setting.site-setting',
+  'api::tenant.tenant',
+];
 
 export default {
   /**
@@ -85,50 +135,43 @@ export default {
    * run jobs, or perform some special logic.
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    // Seed Default Tenant
-    let defaultTenant = await strapi.documents('api::tenant.tenant').findFirst({
-      filters: {
-        $or: [
-          { slug: defaultTenantData.slug },
-          { domain: defaultTenantData.domain },
-        ],
-      },
-    });
-
-    if (!defaultTenant) {
-      console.log('⚙️ Seeding default tenant...');
-      defaultTenant = await strapi.documents('api::tenant.tenant').create({
-        data: defaultTenantData,
-        status: 'published',
+    // ─── 1. Seed Tenants ───────────────────────────────────────────────
+    const seedTenant = async (tenantData: typeof defaultTenantData) => {
+      let tenant = await strapi.documents('api::tenant.tenant').findFirst({
+        filters: {
+          $or: [
+            { slug: tenantData.slug },
+            { domain: tenantData.domain },
+          ],
+        },
       });
-      console.log('✅ Default tenant created!');
-    }
 
-    // Seed Sylvian Tenant
-    let sylvianTenant = await strapi.documents('api::tenant.tenant').findFirst({
-      filters: {
-        $or: [
-          { slug: sylvianTenantData.slug },
-          { domain: sylvianTenantData.domain },
-        ],
-      },
-    });
+      if (!tenant) {
+        console.log(`⚙️ Seeding tenant: ${tenantData.name}...`);
+        tenant = await strapi.documents('api::tenant.tenant').create({
+          data: tenantData,
+          status: 'published',
+        });
+        console.log(`✅ Tenant ${tenantData.name} created!`);
+      } else {
+        console.log(`📋 Tenant ${tenantData.name} already exists, skipping seed.`);
+      }
+      return tenant;
+    };
 
-    if (!sylvianTenant) {
-      console.log('⚙️ Seeding Sylvian tenant...');
-      sylvianTenant = await strapi.documents('api::tenant.tenant').create({
-        data: sylvianTenantData,
-        status: 'published',
-      });
-      console.log('✅ Sylvian tenant created!');
-    }
+    const defaultTenant = await seedTenant(defaultTenantData);
+    const sylvianTenant = await seedTenant(sylvianTenantData);
+    const glynacTenant = await seedTenant(glynacTenantData);
 
-    // Seed Pillars
+    // Build a slug-to-tenant map for user creation
+    const tenantMap: Record<string, any> = {};
+    if (defaultTenant) tenantMap[defaultTenantData.slug] = defaultTenant;
+    if (sylvianTenant) tenantMap[sylvianTenantData.slug] = sylvianTenant;
+    if (glynacTenant) tenantMap[glynacTenantData.slug] = glynacTenant;
+
+    // ─── 2. Seed Pillars (for RegulateThis tenant) ────────────────────
     if (defaultTenant) {
       for (const pillar of pillarsData) {
-        // Check if pillar exists by slug (assuming slug is unique globally or sufficient to identify)
-        // We removed the tenant filter to catch existing pillars that might have been created without a tenant relation
-        // or to prevent unique constraint violations if the pillar exists globally.
         const existingPillar = await strapi.documents('api::pillar.pillar').findFirst({
           filters: {
             slug: pillar.slug,
@@ -137,10 +180,7 @@ export default {
 
         if (!existingPillar) {
           console.log(`⚙️ Seeding pillar: ${pillar.name}...`);
-
-          // Remove color from data as it's not in the schema
           const { color, ...pillarData } = pillar as any;
-
           await strapi.documents('api::pillar.pillar').create({
             data: {
               ...pillarData,
@@ -155,51 +195,114 @@ export default {
       }
     }
 
-    // Seed default Site Settings for the tenant
-    const existingSiteSettings = await strapi.documents('api::site-setting.site-setting').findMany({
-      filters: { tenant: { documentId: defaultTenant?.documentId } }
-    });
-
-    if (existingSiteSettings.length === 0 && defaultTenant) {
-      console.log('⚙️ Seeding default site settings...');
-      await strapi.documents('api::site-setting.site-setting').create({
-        data: {
-          siteName: 'RegulateThis',
-          siteDescription: 'Expert insights on wealth management, compliance, and practice management for financial advisors.',
-          gtmEnabled: false,
-          gaEnabled: false,
-          metaPixelEnabled: false,
-          tenant: defaultTenant.documentId,
-        },
-        status: 'published',
-      });
-      console.log('✅ Default site settings created!');
-    } else {
-      console.log('📋 Site settings already exist, skipping seed.');
-    }
-
-    // Seed Sylvian Site Settings
-    if (sylvianTenant) {
-      const existingSylvianSettings = await strapi.documents('api::site-setting.site-setting').findMany({
-        filters: { tenant: { documentId: sylvianTenant.documentId } }
+    // ─── 3. Seed Site Settings ─────────────────────────────────────────
+    const seedSiteSettings = async (
+      tenant: any,
+      siteName: string,
+      siteDescription: string
+    ) => {
+      if (!tenant) return;
+      const existing = await strapi.documents('api::site-setting.site-setting').findMany({
+        filters: { tenant: { documentId: tenant.documentId } }
       });
 
-      if (existingSylvianSettings.length === 0) {
-        console.log('⚙️ Seeding Sylvian site settings...');
+      if (existing.length === 0) {
+        console.log(`⚙️ Seeding ${siteName} site settings...`);
         await strapi.documents('api::site-setting.site-setting').create({
           data: {
-            siteName: 'Sylvan',
-            siteDescription: 'Structure. Yield. Growth.',
+            siteName,
+            siteDescription,
             gtmEnabled: false,
             gaEnabled: false,
             metaPixelEnabled: false,
-            tenant: sylvianTenant.documentId,
+            tenant: tenant.documentId,
           },
           status: 'published',
         });
-        console.log('✅ Sylvian site settings created!');
+        console.log(`✅ ${siteName} site settings created!`);
       } else {
-        console.log('📋 Sylvian site settings already exist, skipping seed.');
+        console.log(`📋 ${siteName} site settings already exist, skipping seed.`);
+      }
+    };
+
+    await seedSiteSettings(
+      defaultTenant,
+      'RegulateThis',
+      'Expert insights on wealth management, compliance, and practice management for financial advisors.'
+    );
+    await seedSiteSettings(
+      sylvianTenant,
+      'Sylvan',
+      'Structure. Yield. Growth.'
+    );
+    await seedSiteSettings(
+      glynacTenant,
+      'Glynac AI',
+      'Intelligent automation and insights powered by Glynac AI.'
+    );
+
+    // ─── 4. Seed Tenant-Scoped Roles & User Accounts ──────────────────
+    for (const userDef of tenantUsers) {
+      const tenant = tenantMap[userDef.tenantSlug];
+      if (!tenant) {
+        console.log(`⚠️ Tenant ${userDef.tenantSlug} not found, skipping user ${userDef.username}`);
+        continue;
+      }
+
+      // Create or find the custom role
+      let role = await strapi.db.query('plugin::users-permissions.role').findOne({
+        where: { name: userDef.roleName },
+      });
+
+      if (!role) {
+        console.log(`⚙️ Creating role: ${userDef.roleName}...`);
+        role = await strapi.db.query('plugin::users-permissions.role').create({
+          data: {
+            name: userDef.roleName,
+            description: userDef.roleDescription,
+            type: userDef.roleName.toLowerCase().replace(/\s+/g, '-'),
+          },
+        });
+
+        // Assign permissions to the role for tenant-scoped content types
+        for (const contentTypeUID of tenantScopedContentTypes) {
+          const apiName = contentTypeUID.split('.')[0].replace('api::', '');
+          const actions = ['find', 'findOne'];
+
+          for (const action of actions) {
+            await strapi.db.query('plugin::users-permissions.permission').create({
+              data: {
+                action: `${contentTypeUID}.${action}`,
+                role: role.id,
+              },
+            });
+          }
+        }
+        console.log(`✅ Role ${userDef.roleName} created with read permissions!`);
+      } else {
+        console.log(`📋 Role ${userDef.roleName} already exists, skipping.`);
+      }
+
+      // Create or find the user
+      const existingUser = await strapi.db.query('plugin::users-permissions.user').findOne({
+        where: { email: userDef.email },
+      });
+
+      if (!existingUser) {
+        console.log(`⚙️ Creating user: ${userDef.username}...`);
+        await strapi.plugins['users-permissions'].services.user.add({
+          username: userDef.username,
+          email: userDef.email,
+          password: userDef.password,
+          confirmed: true,
+          blocked: false,
+          role: role.id,
+          tenant: tenant.id,
+          provider: 'local',
+        });
+        console.log(`✅ User ${userDef.username} created and linked to tenant ${tenant.name}!`);
+      } else {
+        console.log(`📋 User ${userDef.username} already exists, skipping.`);
       }
     }
   },

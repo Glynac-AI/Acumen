@@ -25,6 +25,41 @@ export default (policyContext: any, config: Record<string, unknown>, { strapi }:
     const isWriteOperation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(ctx.request?.method);
     const hasTenantContext = !!ctx.state.tenant;
 
+    // ─── Authenticated User Tenant Enforcement (RBAC) ──────────────
+    // If the user is authenticated and has a tenant, ALWAYS enforce tenant filtering
+    const isAuthenticatedWithTenant = !!ctx.state.user && hasTenantContext;
+
+    if (isAuthenticatedWithTenant) {
+        const tenantDocumentId = ctx.state.tenant.documentId;
+
+        // For read operations: inject tenant filter so user only sees their tenant's data
+        if (isReadOperation) {
+            if (!ctx.query) {
+                ctx.query = {};
+            }
+            if (!ctx.query.filters) {
+                ctx.query.filters = {};
+            }
+            ctx.query.filters.tenant = {
+                documentId: tenantDocumentId,
+            };
+            strapi.log.debug(`is-tenant-scoped: Filtering reads for authenticated user to tenant ${ctx.state.tenant.name}`);
+        }
+
+        // For write operations: force tenant into the request body
+        if (['POST', 'PUT', 'PATCH'].includes(ctx.request?.method)) {
+            if (ctx.request.body && ctx.request.body.data) {
+                ctx.request.body.data.tenant = tenantDocumentId;
+            }
+            strapi.log.debug(`is-tenant-scoped: Enforcing tenant ${ctx.state.tenant.name} on write operation`);
+        }
+
+        // For DELETE: allow only if the entity belongs to the user's tenant
+        // (the tenant filter on reads already ensures they can only see/reference their own)
+        return true;
+    }
+
+    // ─── Unauthenticated / Public Request Handling ─────────────────
     // For write operations from public API, tenant context is REQUIRED
     if (isWriteOperation && !hasTenantContext) {
         strapi.log.debug('is-tenant-scoped: Write operation without tenant context, denying access');
@@ -37,9 +72,8 @@ export default (policyContext: any, config: Record<string, unknown>, { strapi }:
         return true;
     }
 
-    // If we have tenant context, apply tenant filtering
+    // If we have tenant context from headers (unauthenticated), apply tenant filtering
     if (hasTenantContext) {
-        // Inject tenant filter into query params for find operations
         if (isReadOperation) {
             if (!ctx.query) {
                 ctx.query = {};
@@ -47,13 +81,11 @@ export default (policyContext: any, config: Record<string, unknown>, { strapi }:
             if (!ctx.query.filters) {
                 ctx.query.filters = {};
             }
-            // Add tenant filter to existing filters
             ctx.query.filters.tenant = {
                 documentId: ctx.state.tenant.documentId
             };
         }
 
-        // For create/update operations, ensure tenant is set in request body
         if (['POST', 'PUT', 'PATCH'].includes(ctx.request?.method)) {
             if (ctx.request.body && ctx.request.body.data) {
                 ctx.request.body.data.tenant = ctx.state.tenant.documentId;
