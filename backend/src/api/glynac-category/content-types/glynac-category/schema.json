@@ -31,6 +31,12 @@
             "relation": "oneToMany",
             "target": "api::glynac-blog-post.glynac-blog-post",
             "mappedBy": "category"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "glynacCategories"
         }
     }
 }

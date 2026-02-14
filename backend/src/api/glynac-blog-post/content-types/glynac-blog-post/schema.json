@@ -58,6 +58,12 @@
             "relation": "manyToOne",
             "target": "api::glynac-author.glynac-author",
             "inversedBy": "posts"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "glynacBlogPosts"
         }
     }
 }
