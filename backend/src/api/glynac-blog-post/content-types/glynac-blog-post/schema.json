@@ -44,17 +44,20 @@
             "inversedBy": "posts"
         },
         "tags": {
-            "type": "json"
+            "type": "relation",
+            "relation": "manyToMany",
+            "target": "api::glynac-tag.glynac-tag",
+            "inversedBy": "posts"
         },
         "readTime": {
             "type": "string",
             "required": true
         },
         "author": {
-            "type": "component",
-            "repeatable": false,
-            "component": "blog.author",
-            "required": true
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::glynac-author.glynac-author",
+            "inversedBy": "posts"
         }
     }
 }
