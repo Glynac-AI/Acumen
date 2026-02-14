@@ -1,0 +1,36 @@
+{
+    "kind": "collectionType",
+    "collectionName": "glynac_categories",
+    "info": {
+        "singularName": "glynac-category",
+        "pluralName": "glynac-categories",
+        "displayName": "Glynac Category",
+        "description": "Categories for Glynac blog posts"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string",
+            "required": true,
+            "unique": true,
+            "maxLength": 100
+        },
+        "slug": {
+            "type": "uid",
+            "targetField": "name",
+            "required": true
+        },
+        "description": {
+            "type": "text"
+        },
+        "posts": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::glynac-blog-post.glynac-blog-post",
+            "mappedBy": "category"
+        }
+    }
+}
