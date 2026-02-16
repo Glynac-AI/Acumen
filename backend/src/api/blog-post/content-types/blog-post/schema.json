@@ -5,7 +5,7 @@
         "singularName": "blog-post",
         "pluralName": "blog-posts",
         "displayName": "Blog Post",
-        "description": "Standard blog posts"
+        "description": "Blog posts for Glynac tenant"
     },
     "options": {
         "draftAndPublish": true
@@ -14,20 +14,26 @@
     "attributes": {
         "title": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 200,
+            "description": "Blog post title (max 70 chars recommended for SEO)"
         },
         "slug": {
             "type": "uid",
             "targetField": "title",
-            "required": true
+            "required": true,
+            "description": "URL-friendly identifier (auto-generated from title)"
         },
         "excerpt": {
             "type": "text",
-            "required": true
+            "required": true,
+            "maxLength": 500,
+            "description": "Short description for cards and meta tags (2-3 sentences, 120-160 chars ideal for SEO)"
         },
         "content": {
             "type": "richtext",
-            "required": true
+            "required": true,
+            "description": "Main blog post content in markdown format"
         },
         "coverImage": {
             "type": "media",
@@ -35,26 +41,39 @@
             "required": true,
             "allowedTypes": [
                 "images"
-            ]
+            ],
+            "description": "Featured image (recommended: 1600x900px minimum, under 500KB)"
         },
         "category": {
-            "type": "component",
-            "repeatable": false,
-            "component": "blog.category",
-            "required": true
+            "type": "string",
+            "required": true,
+            "maxLength": 100,
+            "description": "Post category (e.g., 'AI & Technology', 'Compliance', 'Technology')"
         },
         "tags": {
-            "type": "json"
+            "type": "json",
+            "required": false,
+            "description": "Array of tags (e.g., ['AI', 'Automation', 'Compliance'])"
         },
         "readTime": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 50,
+            "description": "Estimated reading time (e.g., '5 min read', '8 min read')"
         },
         "author": {
             "type": "component",
             "repeatable": false,
+            "required": true,
             "component": "blog.author",
-            "required": true
+            "description": "Blog post author information"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "blogPosts",
+            "description": "Associated tenant (should be set to Glynac)"
         }
     }
 }

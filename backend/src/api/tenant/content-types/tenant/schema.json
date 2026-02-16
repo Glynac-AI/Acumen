@@ -131,6 +131,12 @@
             "relation": "oneToMany",
             "target": "api::glynac-author.glynac-author",
             "mappedBy": "tenant"
+        },
+        "blogPosts": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::blog-post.blog-post",
+            "mappedBy": "tenant"
         }
     }
 }

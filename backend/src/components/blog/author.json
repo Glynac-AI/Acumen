@@ -2,18 +2,21 @@
     "collectionName": "components_blog_authors",
     "info": {
         "displayName": "Author",
-        "icon": "user",
-        "description": ""
+        "description": "Blog post author information"
     },
     "options": {},
     "attributes": {
         "name": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 100,
+            "description": "Author full name (e.g., 'Sarah Mitchell')"
         },
         "role": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 150,
+            "description": "Author job title (e.g., 'Head of Product, Glynac')"
         }
     }
 }
