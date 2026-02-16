@@ -35,15 +35,12 @@
             "relation": "oneToMany",
             "target": "api::glynac-blog-post.glynac-blog-post",
             "mappedBy": "author"
-<<<<<<< HEAD
-=======
         },
         "tenant": {
             "type": "relation",
             "relation": "manyToOne",
             "target": "api::tenant.tenant",
             "inversedBy": "glynacAuthors"
->>>>>>> ea8749f (Initial commit of local changes)
         }
     }
 }
