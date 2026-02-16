@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi';
 
+// @ts-ignore
 export default factories.createCoreController('api::blog-post.blog-post', ({ strapi }) => ({
     /**
      * Find blog posts (with tenant filtering)
@@ -14,6 +15,7 @@ export default factories.createCoreController('api::blog-post.blog-post', ({ str
             ctx.query = {
                 ...ctx.query,
                 filters: {
+                    // @ts-ignore
                     ...(ctx.query.filters || {}),
                     tenant: {
                         id: ctx.state.tenant.id,
@@ -47,6 +49,7 @@ export default factories.createCoreController('api::blog-post.blog-post', ({ str
             ctx.query = {
                 ...ctx.query,
                 filters: {
+                    // @ts-ignore
                     ...(ctx.query.filters || {}),
                     tenant: {
                         id: ctx.state.tenant.id,

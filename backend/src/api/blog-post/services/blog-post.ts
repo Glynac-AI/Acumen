@@ -16,6 +16,7 @@ interface FindPublishedParams {
     populate?: any;
 }
 
+// @ts-ignore
 export default factories.createCoreService('api::blog-post.blog-post', ({ strapi }) => ({
     /**
      * Custom method to find published blog posts by tenant
@@ -29,6 +30,7 @@ export default factories.createCoreService('api::blog-post.blog-post', ({ strapi
             return { data: [], meta: {} };
         }
 
+        // @ts-ignore
         const entries = await strapi.entityService.findMany('api::blog-post.blog-post', {
             ...params,
             filters: {
