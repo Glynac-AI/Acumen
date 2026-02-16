@@ -4,7 +4,7 @@
 
 import { factories } from '@strapi/strapi';
 
-export default factories.createCoreRouter('api::blog-post.blog-post', {
+export default factories.createCoreRouter('api::blog-post.blog-post' as any, {
     config: {
         find: {
             middlewares: ['api::tenant-context'],
