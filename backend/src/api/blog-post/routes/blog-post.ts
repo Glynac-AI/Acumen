@@ -8,10 +8,12 @@ export default factories.createCoreRouter('api::blog-post.blog-post' as any, {
     config: {
         find: {
             middlewares: ['global::tenant-context'],
+            auth: false,
             policies: [],
         },
         findOne: {
             middlewares: ['global::tenant-context'],
+            auth: false,
             policies: [],
         },
         create: {

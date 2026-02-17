@@ -45,11 +45,10 @@
             "description": "Featured image (recommended: 1600x900px minimum, under 500KB)"
         },
         "category": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::category.category",
-            "inversedBy": "blogPosts",
-            "description": "Post category (select from existing categories)"
+            "type": "string",
+            "required": true,
+            "maxLength": 100,
+            "description": "Post category as plain text (e.g., 'AI & Technology', 'Compliance')"
         },
         "tags": {
             "type": "json",
@@ -63,11 +62,11 @@
             "description": "Estimated reading time (e.g., '5 min read', '8 min read')"
         },
         "author": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::author.author",
-            "inversedBy": "blogPosts",
-            "description": "Blog post author (select from existing authors)"
+            "type": "component",
+            "component": "blog.author",
+            "repeatable": false,
+            "required": true,
+            "description": "Embedded blog post author component"
         },
         "tenant": {
             "type": "relation",
