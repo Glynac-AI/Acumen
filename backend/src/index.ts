@@ -116,6 +116,10 @@ const tenantScopedContentTypes = [
   'api::subcategory.subcategory',
   'api::site-setting.site-setting',
   'api::tenant.tenant',
+  'api::glynac-author.glynac-author',
+  'api::glynac-blog-post.glynac-blog-post',
+  'api::glynac-category.glynac-category',
+  'api::glynac-tag.glynac-tag',
 ];
 
 export default {
