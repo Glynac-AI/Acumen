@@ -55,6 +55,12 @@
             "target": "api::subcategory.subcategory",
             "mappedBy": "category"
         },
+        "blogPosts": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::blog-post.blog-post",
+            "mappedBy": "category"
+        },
         "tenant": {
             "type": "relation",
             "relation": "manyToOne",
