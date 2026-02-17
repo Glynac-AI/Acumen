@@ -78,14 +78,18 @@ export interface StrapiMedia {
 }
 
 // Strapi content types attributes
+import type { Author, Article, Tag, Pillar, PillarName, ArticleStatus } from '@/types';
+
 export interface StrapiAuthorAttributes {
     name: string;
+    slug: string;
     title: string;
     bio: string;
     photo?: { data: StrapiData<StrapiMedia['attributes']> | null };
     linkedin?: string;
     twitter?: string;
     email?: string;
+    isActive: boolean;
     createdAt: string;
     updatedAt: string;
     publishedAt?: string;
@@ -119,6 +123,7 @@ export interface StrapiArticleAttributes {
     publishDate: string;
     readTime: number;
     isFeatured: boolean;
+    articleStatus?: ArticleStatus;
     createdAt: string;
     updatedAt: string;
     publishedAt?: string;
@@ -294,13 +299,13 @@ export async function getSiteSettings(): Promise<SiteSettingsAttributes | null> 
 }
 
 // Transform Strapi data to match existing frontend types
-import type { Author, Article, Tag, Pillar } from '@/types';
 
 export function transformAuthor(strapiAuthor: StrapiData<StrapiAuthorAttributes>): Author {
     const attrs = strapiAuthor.attributes;
     return {
         id: strapiAuthor.id.toString(),
         name: attrs.name,
+        slug: attrs.slug,
         title: attrs.title,
         bio: attrs.bio,
         photo: attrs.photo?.data
@@ -309,6 +314,7 @@ export function transformAuthor(strapiAuthor: StrapiData<StrapiAuthorAttributes>
         linkedin: attrs.linkedin,
         twitter: attrs.twitter,
         email: attrs.email,
+        isActive: attrs.isActive,
     };
 }
 
@@ -343,7 +349,7 @@ export function transformArticle(strapiArticle: StrapiData<StrapiArticleAttribut
         : [];
 
     const pillar: Pillar = attrs.pillar?.data
-        ? (attrs.pillar.data.attributes.name as Pillar)
+        ? (attrs.pillar.data.attributes.name as PillarName)
         : 'Industry Insights';
 
     return {
@@ -362,5 +368,6 @@ export function transformArticle(strapiArticle: StrapiData<StrapiArticleAttribut
         publishDate: attrs.publishDate,
         readTime: attrs.readTime,
         isFeatured: attrs.isFeatured,
+        articleStatus: (attrs.articleStatus as ArticleStatus) || 'Published',
     };
 }

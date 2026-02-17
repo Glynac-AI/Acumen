@@ -28,14 +28,14 @@ export interface Subcategory {
 export interface Author {
     id: string;
     name: string;
-    slug: string;
+    slug?: string;
     title: string;
     bio: string;
     photo: string;
     email?: string;
     linkedin?: string;
     twitter?: string;
-    isActive: boolean;
+    isActive?: boolean;
 }
 
 // Tag
@@ -59,6 +59,14 @@ export interface SEO {
 // Article Status
 export type ArticleStatus = 'Draft' | 'Published' | 'Scheduled' | 'Archived';
 
+// Pillar Name (String Union)
+export type PillarName =
+    | 'Compliance & Regulation'
+    | 'Technology & Operations'
+    | 'Practice Management'
+    | 'Client Strategy'
+    | 'Industry Insights';
+
 // Article
 export interface Article {
     id: string;
@@ -73,10 +81,31 @@ export interface Article {
     articleStatus: ArticleStatus;
     featuredImage: string;
     author: Author;
-    category: Category;
-    subcategories: Subcategory[];
+    pillar: PillarName;
+    subcategories?: Subcategory[];
     tags?: Tag[];
     seo?: SEO;
+}
+
+// Blog Post Author Component
+export interface BlogPostAuthorComponent {
+    name: string;
+    role: string;
+}
+
+// Blog Post
+export interface BlogPost {
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    coverImage: string;
+    category: string;
+    readTime: string;
+    author: BlogPostAuthorComponent;
+    tags?: string[];
+    publishDate?: string;
 }
 
 // Newsletter Subscriber Status
@@ -95,4 +124,4 @@ export interface NewsletterSubscriber {
 }
 
 // Legacy export for backwards compatibility
-export type Pillar = Category;
+export type Pillar = PillarName;
