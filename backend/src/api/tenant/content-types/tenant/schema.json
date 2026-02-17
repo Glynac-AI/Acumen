@@ -108,30 +108,6 @@
             "target": "api::sylvan-request-access.sylvan-request-access",
             "mappedBy": "tenant"
         },
-        "glynacBlogPosts": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::glynac-blog-post.glynac-blog-post",
-            "mappedBy": "tenant"
-        },
-        "glynacCategories": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::glynac-category.glynac-category",
-            "mappedBy": "tenant"
-        },
-        "glynacTags": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::glynac-tag.glynac-tag",
-            "mappedBy": "tenant"
-        },
-        "glynacAuthors": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::glynac-author.glynac-author",
-            "mappedBy": "tenant"
-        },
         "blogPosts": {
             "type": "relation",
             "relation": "oneToMany",
