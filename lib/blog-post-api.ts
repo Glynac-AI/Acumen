@@ -54,7 +54,100 @@ async function fetchAPI<T>(path: string, urlParamsObject = {}, options = {}): Pr
     }
 }
 
-// ... existing code ...
+/**
+ * 1. Get all blog posts with pagination and optional filters.
+ * @param page Page number
+ * @param pageSize Items per page
+ * @param filters Optional filters object
+ */
+export async function getBlogPosts(
+    page = 1,
+    pageSize = 10,
+    filters: BlogPostFilters = {}
+): Promise<BlogPostsResponse> {
+    const queryParams = {
+        populate: {
+            coverImage: true,
+            author: true,
+            tenant: true
+        },
+        pagination: {
+            page,
+            pageSize,
+        },
+        sort: ['publishedAt:desc'],
+        filters: {
+            ...(filters.category && { category: { $eq: filters.category } }),
+            ...(filters.tenantSlug && { tenant: { slug: { $eq: filters.tenantSlug } } }),
+        },
+    };
+
+    return await fetchAPI<BlogPostsResponse>('/blog-posts', queryParams);
+}
+
+/**
+ * 2. Get a single blog post by numeric ID.
+ * @param id The blog post ID
+ */
+export async function getBlogPostById(id: number): Promise<BlogPostResponse> {
+    const queryParams = {
+        populate: {
+            coverImage: true,
+            author: true,
+            tenant: true
+        },
+    };
+
+    return await fetchAPI<BlogPostResponse>(`/blog-posts/${id}`, queryParams);
+}
+
+/**
+ * 3. Get a single blog post by Slug.
+ * @param slug The blog post slug
+ */
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+    const queryParams = {
+        filters: {
+            slug: { $eq: slug },
+        },
+        populate: {
+            coverImage: true,
+            author: true,
+            tenant: true
+        },
+    };
+
+    const response = await fetchAPI<BlogPostsResponse>('/blog-posts', queryParams);
+
+    if (!response.data || response.data.length === 0) {
+        return null;
+    }
+
+    return response.data[0];
+}
+
+/**
+ * 4. Get featured blog posts (logic can be customized, currently most recent).
+ * @param limit Number of posts to return
+ */
+export async function getFeaturedBlogPosts(limit = 3): Promise<BlogPost[]> {
+    const response = await getBlogPosts(1, limit);
+    return response.data;
+}
+
+/**
+ * 5. Get blog posts by specific category.
+ * @param category Category name
+ * @param page Page number
+ * @param pageSize Items per page
+ */
+export async function getBlogPostsByCategory(
+    category: string,
+    page = 1,
+    pageSize = 10
+): Promise<BlogPostsResponse> {
+    return await getBlogPosts(page, pageSize, { category });
+}
 
 /**
  * 6. Get blog posts by tag (server-side filtering).

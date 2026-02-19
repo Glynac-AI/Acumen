@@ -62,10 +62,11 @@
             "description": "Estimated reading time (e.g., '5 min read', '8 min read')"
         },
         "author": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::author.author",
-            "inversedBy": "blogPosts"
+            "type": "component",
+            "component": "blog.author",
+            "repeatable": false,
+            "required": true,
+            "description": "Embedded blog post author component"
         },
         "tenant": {
             "type": "relation",
