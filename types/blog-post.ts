@@ -90,19 +90,6 @@ export interface BlogAuthor {
 }
 
 // ==========================================
-// Collection: Tenant (Minimal Relation)
-// ==========================================
-
-export interface TenantRelationAttributes {
-    name: string;
-    slug: string;
-}
-
-export interface TenantRelation {
-    data: StrapiData<TenantRelationAttributes> | null;
-}
-
-// ==========================================
 // Collection: Blog Post
 // ==========================================
 
@@ -116,7 +103,6 @@ export interface BlogPostAttributes {
     tags: string[] | null; // JSON array of strings
     readTime: string;
     author: BlogAuthor;
-    tenant?: TenantRelation;
     createdAt: string;
     updatedAt: string;
     publishedAt: string | null;
@@ -145,7 +131,6 @@ export interface BlogPostFilters {
     tag?: string;
     authorName?: string;
     searchTerm?: string;
-    tenantSlug?: string;
 }
 
 export interface BlogPostQueryParams {
@@ -172,7 +157,6 @@ export interface BlogPostInput {
             name: string;
             role: string;
         };
-        tenant: number; // ID of the tenant
         publishedAt?: string | null;
     };
 }

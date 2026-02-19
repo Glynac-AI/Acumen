@@ -305,5 +305,42 @@ export default {
         console.log(`📋 User ${userDef.username} already exists, skipping.`);
       }
     }
+
+    // ─── 5. Seed Public Role Permissions for blog-post ─────────────────
+    // This ensures find & findOne are enabled for the Public role on every
+    // fresh deployment — no manual Admin UI step required. Fixes issue #6 / #12.
+    const publicPermissionsToSeed = [
+      'api::blog-post.blog-post.find',
+      'api::blog-post.blog-post.findOne',
+    ];
+
+    const publicRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+      where: { type: 'public' },
+    });
+
+    if (publicRole) {
+      for (const action of publicPermissionsToSeed) {
+        const existing = await strapi.db.query('plugin::users-permissions.permission').findOne({
+          where: { action, role: publicRole.id },
+        });
+
+        if (!existing) {
+          await strapi.db.query('plugin::users-permissions.permission').create({
+            data: { action, role: publicRole.id, enabled: true },
+          });
+          console.log(`✅ Public permission granted: ${action}`);
+        } else if (!existing.enabled) {
+          await strapi.db.query('plugin::users-permissions.permission').update({
+            where: { id: existing.id },
+            data: { enabled: true },
+          });
+          console.log(`✅ Public permission enabled: ${action}`);
+        } else {
+          console.log(`📋 Public permission already set: ${action}`);
+        }
+      }
+    } else {
+      console.warn('⚠️ Could not find Public role — permissions not seeded.');
+    }
   },
 };

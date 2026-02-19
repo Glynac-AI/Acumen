@@ -69,7 +69,6 @@ export async function getBlogPosts(
         populate: {
             coverImage: true,
             author: true,
-            tenant: true
         },
         pagination: {
             page,
@@ -78,7 +77,6 @@ export async function getBlogPosts(
         sort: ['publishedAt:desc'],
         filters: {
             ...(filters.category && { category: { $eq: filters.category } }),
-            ...(filters.tenantSlug && { tenant: { slug: { $eq: filters.tenantSlug } } }),
         },
     };
 
@@ -94,7 +92,6 @@ export async function getBlogPostById(id: number): Promise<BlogPostResponse> {
         populate: {
             coverImage: true,
             author: true,
-            tenant: true
         },
     };
 
@@ -113,7 +110,6 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
         populate: {
             coverImage: true,
             author: true,
-            tenant: true
         },
     };
 
@@ -154,23 +150,10 @@ export async function getBlogPostsByCategory(
  * @param tag Tag string
  */
 export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
-    // Use Strapi's $contains filter for JSON array if supported, or JSON filtering 
-    // Assuming 'tags' is a JSON field that contains simple strings
-    const response = await getBlogPosts(1, 10, {
-        // This assumes Strapi's filtering on JSON fields works this way or via deep filtering
-        // If not, we might need a custom controller, but this is the requested fix.
-        // filters: { tags: { $contains: tag } } 
-        // Note: The Issue 7 fix suggestion was: filters: { tags: { $contains: tag } }
-    } as any);
-
-    // Actually, passing it via the filters argument in getBlogPosts might be cleaner if we update getBlogPosts signature
-    // But let's call fetchAPI directly to be precise
-
     const queryParams = {
         populate: {
             coverImage: true,
             author: true,
-            tenant: true
         },
         filters: {
             tags: {
@@ -193,7 +176,6 @@ export async function getBlogPostsByAuthor(authorName: string): Promise<BlogPost
         populate: {
             coverImage: true,
             author: true,
-            tenant: true
         },
         filters: {
             author: {

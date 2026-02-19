@@ -15,7 +15,6 @@
         "title": {
             "type": "string",
             "required": true,
-            "maxLength": 200,
             "description": "Blog post title (max 70 chars recommended for SEO)"
         },
         "slug": {
@@ -27,7 +26,6 @@
         "excerpt": {
             "type": "text",
             "required": true,
-            "maxLength": 500,
             "description": "Short description for cards and meta tags (2-3 sentences, 120-160 chars ideal for SEO)"
         },
         "content": {
@@ -47,7 +45,6 @@
         "category": {
             "type": "string",
             "required": true,
-            "maxLength": 100,
             "description": "Post category as plain text (e.g., 'AI & Technology', 'Compliance')"
         },
         "tags": {
@@ -58,7 +55,6 @@
         "readTime": {
             "type": "string",
             "required": true,
-            "maxLength": 50,
             "description": "Estimated reading time (e.g., '5 min read', '8 min read')"
         },
         "author": {
@@ -67,13 +63,6 @@
             "repeatable": false,
             "required": true,
             "description": "Embedded blog post author component"
-        },
-        "tenant": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::tenant.tenant",
-            "inversedBy": "blogPosts",
-            "description": "Associated tenant (should be set to Glynac)"
         }
     }
 }
