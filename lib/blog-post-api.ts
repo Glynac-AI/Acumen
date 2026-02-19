@@ -13,18 +13,35 @@ import qs from 'qs';
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603';
 
 /**
- * Helper function to handle fetch requests with proper error handling and headers.
+ * The active tenant slug for this frontend deployment.
+ * The Strapi tenant-context middleware will auto-resolve from the `Origin` header
+ * on browser requests. For server-side (SSR/SSG) calls we also pass X-Tenant-Slug
+ * so the middleware can scope the results correctly.
+ *
+ * Set NEXT_PUBLIC_TENANT_SLUG in your .env file (e.g. "glynac-ai").
  */
-async function fetchAPI<T>(path: string, urlParamsObject = {}, options = {}): Promise<T> {
+const TENANT_SLUG = process.env.NEXT_PUBLIC_TENANT_SLUG || '';
+
+/**
+ * Helper function to handle fetch requests with proper error handling and headers.
+ * Automatically injects X-Tenant-Slug on server-side calls for tenant scoping.
+ */
+async function fetchAPI<T>(path: string, urlParamsObject = {}, options: any = {}): Promise<T> {
     try {
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             ...options.headers,
         };
 
-        // Server-side only: Use the private token
-        if (typeof window === 'undefined' && process.env.STRAPI_API_TOKEN) {
-            headers['Authorization'] = `Bearer ${process.env.STRAPI_API_TOKEN}`;
+        // Server-side only: Use the private API token + tenant slug header
+        if (typeof window === 'undefined') {
+            if (process.env.STRAPI_API_TOKEN) {
+                headers['Authorization'] = `Bearer ${process.env.STRAPI_API_TOKEN}`;
+            }
+            // Pass tenant slug so the backend middleware can scope results
+            if (TENANT_SLUG) {
+                headers['X-Tenant-Slug'] = TENANT_SLUG;
+            }
         }
 
         // Merge default and user options
@@ -56,6 +73,7 @@ async function fetchAPI<T>(path: string, urlParamsObject = {}, options = {}): Pr
 
 /**
  * 1. Get all blog posts with pagination and optional filters.
+ * Results are automatically scoped to the resolved tenant on the backend.
  * @param page Page number
  * @param pageSize Items per page
  * @param filters Optional filters object
@@ -69,6 +87,7 @@ export async function getBlogPosts(
         populate: {
             coverImage: true,
             author: true,
+            tenant: { fields: ['name', 'slug'] },
         },
         pagination: {
             page,
@@ -77,6 +96,9 @@ export async function getBlogPosts(
         sort: ['publishedAt:desc'],
         filters: {
             ...(filters.category && { category: { $eq: filters.category } }),
+            // tenantSlug filter is intentionally NOT sent here — tenant scoping
+            // is handled server-side by the tenant-context middleware via the
+            // X-Tenant-Slug header (server-side) or Origin header (browser).
         },
     };
 
@@ -92,6 +114,7 @@ export async function getBlogPostById(id: number): Promise<BlogPostResponse> {
         populate: {
             coverImage: true,
             author: true,
+            tenant: { fields: ['name', 'slug'] },
         },
     };
 
@@ -110,6 +133,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
         populate: {
             coverImage: true,
             author: true,
+            tenant: { fields: ['name', 'slug'] },
         },
     };
 
@@ -123,7 +147,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
 }
 
 /**
- * 4. Get featured blog posts (logic can be customized, currently most recent).
+ * 4. Get featured blog posts (most recent posts for this tenant).
  * @param limit Number of posts to return
  */
 export async function getFeaturedBlogPosts(limit = 3): Promise<BlogPost[]> {
@@ -146,7 +170,7 @@ export async function getBlogPostsByCategory(
 }
 
 /**
- * 6. Get blog posts by tag (server-side filtering).
+ * 6. Get blog posts by tag (JSON $contains filter).
  * @param tag Tag string
  */
 export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
@@ -154,6 +178,7 @@ export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
         populate: {
             coverImage: true,
             author: true,
+            tenant: { fields: ['name', 'slug'] },
         },
         filters: {
             tags: {
@@ -176,6 +201,7 @@ export async function getBlogPostsByAuthor(authorName: string): Promise<BlogPost
         populate: {
             coverImage: true,
             author: true,
+            tenant: { fields: ['name', 'slug'] },
         },
         filters: {
             author: {
@@ -189,7 +215,7 @@ export async function getBlogPostsByAuthor(authorName: string): Promise<BlogPost
 }
 
 /**
- * 8. Get recent blog posts (alias for default get).
+ * 8. Get recent blog posts.
  * @param limit Number of posts
  */
 export async function getRecentBlogPosts(limit = 5): Promise<BlogPost[]> {
@@ -198,10 +224,10 @@ export async function getRecentBlogPosts(limit = 5): Promise<BlogPost[]> {
 }
 
 /**
- * 9. Get unique list of all blog categories.
+ * 9. Get unique list of all blog categories for this tenant.
  */
 export async function getBlogCategories(): Promise<string[]> {
-    const response = await getBlogPosts(1, 100); // Fetch enough to sample
+    const response = await getBlogPosts(1, 100);
     const categories = new Set<string>();
 
     response.data.forEach(post => {
@@ -214,7 +240,7 @@ export async function getBlogCategories(): Promise<string[]> {
 }
 
 /**
- * 10. Get unique list of all blog tags.
+ * 10. Get unique list of all blog tags for this tenant.
  */
 export async function getBlogTags(): Promise<string[]> {
     const response = await getBlogPosts(1, 100);
@@ -231,8 +257,7 @@ export async function getBlogTags(): Promise<string[]> {
 }
 
 /**
- * 11. Search blog posts.
- * Uses client-side filtering helper for basic search if full-text search backend isn't set up.
+ * 11. Search blog posts (client-side filtering over tenant-scoped results).
  * @param query Search term
  */
 export async function searchBlogPosts(query: string): Promise<BlogPost[]> {
@@ -241,8 +266,7 @@ export async function searchBlogPosts(query: string): Promise<BlogPost[]> {
 }
 
 /**
- * 12. Get related blog posts based on category.
- * Excludes the current post.
+ * 12. Get related blog posts based on category (excludes current post).
  * @param currentPostId ID of the current post
  * @param category Category to match
  * @param limit Limit of related posts
@@ -260,7 +284,7 @@ export async function getRelatedBlogPosts(
 }
 
 /**
- * 13. Prefetch all blog post slugs for static site generation.
+ * 13. Prefetch all blog post slugs for static site generation (scoped to this tenant).
  */
 export async function prefetchBlogPostSlugs(): Promise<string[]> {
     const queryParams = {
@@ -275,7 +299,7 @@ export async function prefetchBlogPostSlugs(): Promise<string[]> {
 }
 
 /**
- * 14. Get count of posts per category.
+ * 14. Get count of posts per category for this tenant.
  */
 export async function getBlogPostCountByCategory(): Promise<Record<string, number>> {
     const response = await getBlogPosts(1, 1000);

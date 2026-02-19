@@ -5,7 +5,7 @@
         "singularName": "blog-post",
         "pluralName": "blog-posts",
         "displayName": "Blog Post",
-        "description": "Blog posts for Glynac tenant"
+        "description": "Blog posts — scoped per tenant (Glynac AI, RegulateThis, Sylvan, etc.)"
     },
     "options": {
         "draftAndPublish": true
@@ -63,6 +63,13 @@
             "repeatable": false,
             "required": true,
             "description": "Embedded blog post author component"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "blogPosts",
+            "description": "Tenant this blog post belongs to — used for multi-tenant scoping"
         }
     }
 }
