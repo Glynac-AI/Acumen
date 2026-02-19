@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '*.onrender.com',
+        hostname: 'acumen-strapi-beta.onrender.com', // Restricted to specific app
         port: '',
         pathname: '/**',
       },

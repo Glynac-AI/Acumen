@@ -4,10 +4,10 @@
  */
 
 // Runtime config cache
-let runtimeConfig: { strapiUrl: string; strapiToken: string } | null = null;
+let runtimeConfig: { strapiUrl: string } | null = null;
 
 // Get runtime config from API (works both client and server side)
-async function getRuntimeConfig(): Promise<{ strapiUrl: string; strapiToken: string }> {
+async function getRuntimeConfig(): Promise<{ strapiUrl: string }> {
     // Return cached config if available
     if (runtimeConfig) {
         return runtimeConfig;
@@ -17,7 +17,6 @@ async function getRuntimeConfig(): Promise<{ strapiUrl: string; strapiToken: str
     if (typeof window === 'undefined') {
         runtimeConfig = {
             strapiUrl: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603',
-            strapiToken: process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || '',
         };
         return runtimeConfig;
     }
@@ -36,7 +35,6 @@ async function getRuntimeConfig(): Promise<{ strapiUrl: string; strapiToken: str
     // Fallback to build-time values (may be empty if not set during build)
     runtimeConfig = {
         strapiUrl: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603',
-        strapiToken: process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || '',
     };
     return runtimeConfig;
 }
@@ -117,6 +115,7 @@ export interface StrapiArticleAttributes {
     content: unknown; // Blocks content
     excerpt: string;
     pillar?: { data: StrapiData<StrapiPillarAttributes> | null };
+    category?: { data: StrapiData<StrapiPillarAttributes> | null }; // Added category support
     tags?: { data: StrapiData<StrapiTagAttributes>[] };
     author?: { data: StrapiData<StrapiAuthorAttributes> | null };
     featuredImage?: { data: StrapiData<StrapiMedia['attributes']> | null };
@@ -141,8 +140,8 @@ async function fetchStrapi<T>(
         ...options.headers,
     };
 
-    if (config.strapiToken) {
-        (headers as Record<string, string>)['Authorization'] = `Bearer ${config.strapiToken}`;
+    if (typeof window === 'undefined' && process.env.STRAPI_API_TOKEN) {
+        (headers as Record<string, string>)['Authorization'] = `Bearer ${process.env.STRAPI_API_TOKEN}`;
     }
 
     const response = await fetch(`${config.strapiUrl}/api${endpoint}`, {
@@ -249,7 +248,7 @@ export async function getArticlesByPillar(
     pillarSlug: string
 ): Promise<StrapiData<StrapiArticleAttributes>[]> {
     const response = await getArticles({
-        filters: { pillar: { slug: { $eq: pillarSlug } } },
+        filters: { category: { slug: { $eq: pillarSlug } } },
         sort: 'publishDate:desc',
     });
 
@@ -348,9 +347,13 @@ export function transformArticle(strapiArticle: StrapiData<StrapiArticleAttribut
         ? attrs.tags.data.map(transformTag)
         : [];
 
-    const pillar: Pillar = attrs.pillar?.data
-        ? (attrs.pillar.data.attributes.name as PillarName)
-        : 'Industry Insights';
+    let pillar: Pillar = 'Industry Insights';
+
+    if (attrs.pillar?.data) {
+        pillar = attrs.pillar.data.attributes.name as PillarName;
+    } else if (attrs.category?.data) {
+        pillar = attrs.category.data.attributes.name as Pillar;
+    }
 
     return {
         id: strapiArticle.id.toString(),

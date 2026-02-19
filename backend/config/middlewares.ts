@@ -51,7 +51,4 @@ export default [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
-
-  // Tenant context middleware - must be after body parsing
-  'global::tenant-context',
 ];

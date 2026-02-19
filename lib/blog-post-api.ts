@@ -10,20 +10,26 @@ import {
 import qs from 'qs';
 
 // Configuration
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-const API_TOKEN = process.env.STRAPI_API_TOKEN;
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603';
 
 /**
  * Helper function to handle fetch requests with proper error handling and headers.
  */
 async function fetchAPI<T>(path: string, urlParamsObject = {}, options = {}): Promise<T> {
     try {
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        };
+
+        // Server-side only: Use the private token
+        if (typeof window === 'undefined' && process.env.STRAPI_API_TOKEN) {
+            headers['Authorization'] = `Bearer ${process.env.STRAPI_API_TOKEN}`;
+        }
+
         // Merge default and user options
         const mergedOptions = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${API_TOKEN}`,
-            },
+            headers,
             ...options,
         };
 
@@ -48,115 +54,41 @@ async function fetchAPI<T>(path: string, urlParamsObject = {}, options = {}): Pr
     }
 }
 
-/**
- * 1. Get all blog posts with pagination and optional filters.
- * @param page Page number
- * @param pageSize Items per page
- * @param filters Optional filters object
- */
-export async function getBlogPosts(
-    page = 1,
-    pageSize = 10,
-    filters: BlogPostFilters = {}
-): Promise<BlogPostsResponse> {
-    const queryParams = {
-        populate: {
-            coverImage: true,
-            author: true,
-            tenant: true
-        },
-        pagination: {
-            page,
-            pageSize,
-        },
-        sort: ['publishedAt:desc'],
-        filters: {
-            ...(filters.category && { category: { $eq: filters.category } }),
-            ...(filters.tenantSlug && { tenant: { slug: { $eq: filters.tenantSlug } } }),
-            // Tags are JSON array, requires specific filtering strategy or handling in frontend if not supported directly by Strapi JSON filter easily
-        },
-    };
-
-    return await fetchAPI<BlogPostsResponse>('/blog-posts', queryParams);
-}
+// ... existing code ...
 
 /**
- * 2. Get a single blog post by numeric ID.
- * @param id The blog post ID
- */
-export async function getBlogPostById(id: number): Promise<BlogPostResponse> {
-    const queryParams = {
-        populate: {
-            coverImage: true,
-            author: true,
-            tenant: true
-        },
-    };
-
-    return await fetchAPI<BlogPostResponse>(`/blog-posts/${id}`, queryParams);
-}
-
-/**
- * 3. Get a single blog post by Slug.
- * @param slug The blog post slug
- */
-export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
-    const queryParams = {
-        filters: {
-            slug: { $eq: slug },
-        },
-        populate: {
-            coverImage: true,
-            author: true,
-            tenant: true
-        },
-    };
-
-    const response = await fetchAPI<BlogPostsResponse>('/blog-posts', queryParams);
-
-    if (!response.data || response.data.length === 0) {
-        return null;
-    }
-
-    return response.data[0];
-}
-
-/**
- * 4. Get featured blog posts (logic can be customized, currently most recent).
- * @param limit Number of posts to return
- */
-export async function getFeaturedBlogPosts(limit = 3): Promise<BlogPost[]> {
-    const response = await getBlogPosts(1, limit);
-    return response.data;
-}
-
-/**
- * 5. Get blog posts by specific category.
- * @param category Category name
- * @param page Page number
- * @param pageSize Items per page
- */
-export async function getBlogPostsByCategory(
-    category: string,
-    page = 1,
-    pageSize = 10
-): Promise<BlogPostsResponse> {
-    return await getBlogPosts(page, pageSize, { category });
-}
-
-/**
- * 6. Get blog posts by tag (filtering done client-side if server doesn't support JSON array filtering cleanly).
- * NOTE: For better performance, this should be optimized with a custom controller or specific JSON filtering plugin.
+ * 6. Get blog posts by tag (server-side filtering).
  * @param tag Tag string
  */
 export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
-    // Fetch a larger set to filter client side for JSON array
-    const response = await getBlogPosts(1, 100);
-    const allPosts = response.data;
+    // Use Strapi's $contains filter for JSON array if supported, or JSON filtering 
+    // Assuming 'tags' is a JSON field that contains simple strings
+    const response = await getBlogPosts(1, 10, {
+        // This assumes Strapi's filtering on JSON fields works this way or via deep filtering
+        // If not, we might need a custom controller, but this is the requested fix.
+        // filters: { tags: { $contains: tag } } 
+        // Note: The Issue 7 fix suggestion was: filters: { tags: { $contains: tag } }
+    } as any);
 
-    return allPosts.filter(post =>
-        Array.isArray(post.attributes.tags) && post.attributes.tags.includes(tag)
-    );
+    // Actually, passing it via the filters argument in getBlogPosts might be cleaner if we update getBlogPosts signature
+    // But let's call fetchAPI directly to be precise
+
+    const queryParams = {
+        populate: {
+            coverImage: true,
+            author: true,
+            tenant: true
+        },
+        filters: {
+            tags: {
+                $contains: tag
+            }
+        },
+        sort: ['publishedAt:desc'],
+    };
+
+    const res = await fetchAPI<BlogPostsResponse>('/blog-posts', queryParams);
+    return res.data;
 }
 
 /**

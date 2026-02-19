@@ -82,6 +82,12 @@
             "target": "api::category.category",
             "inversedBy": "articles"
         },
+        "pillar": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::pillar.pillar",
+            "inversedBy": "articles"
+        },
         "subcategories": {
             "type": "relation",
             "relation": "manyToMany",
