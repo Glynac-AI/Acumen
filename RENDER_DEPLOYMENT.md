@@ -40,6 +40,7 @@ Click **"Advanced"** → **"Add Environment Variable"** and add:
 |-----|-------|
 | `NEXT_PUBLIC_STRAPI_URL` | `https://acumen-strapi-beta.onrender.com` |
 | `NEXT_PUBLIC_STRAPI_API_TOKEN` | Your Strapi API token |
+| `NEXT_PUBLIC_TENANT_SLUG` | `glynac-ai` (or `regulatethis`, `sylvian`) |
 
 ### Getting Your Strapi API Token
 
