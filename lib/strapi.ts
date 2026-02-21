@@ -279,6 +279,11 @@ export interface SiteSettingsAttributes {
     metaPixelEnabled: boolean;
     customHeadScripts?: string;
     customBodyScripts?: string;
+    // SEO fields
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string;
+    ogImage?: { data: StrapiData<StrapiMedia['attributes']> | null };
     createdAt: string;
     updatedAt: string;
     publishedAt?: string;
@@ -286,7 +291,7 @@ export interface SiteSettingsAttributes {
 
 export async function getSiteSettings(): Promise<SiteSettingsAttributes | null> {
     try {
-        const response = await fetchStrapi<StrapiResponse<StrapiData<SiteSettingsAttributes>>>('/site-setting');
+        const response = await fetchStrapi<StrapiResponse<StrapiData<SiteSettingsAttributes>>>('/site-setting?populate=ogImage');
         if (response.data) {
             return response.data.attributes;
         }

@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
@@ -20,6 +21,31 @@ export async function generateStaticParams() {
     return articles.map((article) => ({
         slug: article.slug,
     }));
+}
+
+// Per-post SEO metadata — overrides the tenant-level layout metadata
+export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const article = await getArticleBySlug(slug);
+    if (!article) return {};
+
+    const imageUrl = article.featuredImage;
+
+    return {
+        title: article.title,
+        description: article.excerpt,
+        openGraph: {
+            title: article.title,
+            description: article.excerpt,
+            ...(imageUrl ? { images: [{ url: imageUrl }] } : {}),
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: article.title,
+            description: article.excerpt,
+            ...(imageUrl ? { images: [imageUrl] } : {}),
+        },
+    };
 }
 
 export default async function BlogArticlePage({ params }: BlogPageProps) {

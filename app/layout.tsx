@@ -3,7 +3,7 @@ import { Playfair_Display, Inter } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Analytics, GoogleTagManagerNoScript, CustomScripts } from "@/components/analytics";
-import { getSiteSettings } from "@/lib/strapi";
+import { getSiteSettings, getStrapiMediaUrl } from "@/lib/strapi";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -18,10 +18,36 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "RegulateThis - Insights for Wealth Management Professionals",
-  description: "Educational content for RIA owners, compliance teams, and financial advisors.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  const title =
+    settings?.metaTitle || settings?.siteName || "Acumen Blog";
+  const description =
+    settings?.metaDescription || settings?.siteDescription || "";
+  const keywords = settings?.keywords || undefined;
+
+  const ogImageUrl = settings?.ogImage?.data
+    ? getStrapiMediaUrl(settings.ogImage.data.attributes.url)
+    : undefined;
+
+  return {
+    title,
+    description,
+    ...(keywords ? { keywords } : {}),
+    openGraph: {
+      title,
+      description,
+      ...(ogImageUrl ? { images: [{ url: ogImageUrl }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(ogImageUrl ? { images: [ogImageUrl] } : {}),
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
