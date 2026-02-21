@@ -6,6 +6,7 @@ import { Container } from '@/components/ui/Container';
 import { PillarBadge } from '@/components/article/PillarBadge';
 import { SocialShareButtons } from '@/components/article/SocialShareButtons';
 import { getArticleBySlug, getAllArticles } from '@/lib/data-service';
+import { getBlogPostBySlug } from '@/lib/blog-post-api';
 import { notFound } from 'next/navigation';
 import { BlocksRenderer } from '@strapi/blocks-react-renderer';
 
@@ -23,28 +24,63 @@ export async function generateStaticParams() {
     }));
 }
 
-// Per-post SEO metadata — overrides the tenant-level layout metadata
+// Per-post SEO metadata — uses the shared.seo component fields if filled,
+// falling back to the article's own title / excerpt / coverImage.
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
     const { slug } = await params;
-    const article = await getArticleBySlug(slug);
-    if (!article) return {};
 
-    const imageUrl = article.featuredImage;
+    // Try to get SEO component data from the blog-post entry
+    let seoTitle: string | undefined;
+    let seoDescription: string | undefined;
+    let seoImageUrl: string | undefined;
+    let seoKeywords: string | undefined;
+    let seoCanonical: string | undefined;
+    let noIndex = false;
+
+    try {
+        const blogPost = await getBlogPostBySlug(slug);
+        if (blogPost?.attributes?.seo) {
+            const seo = blogPost.attributes.seo;
+            seoTitle = seo.metaTitle || undefined;
+            seoDescription = seo.metaDescription || undefined;
+            seoKeywords = seo.keywords || undefined;
+            seoCanonical = seo.canonicalURL || undefined;
+            noIndex = seo.noIndex ?? false;
+            // ogImage from the SEO component
+            const ogImgData = seo.ogImage?.data;
+            if (ogImgData?.attributes?.url) {
+                const base = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603';
+                const url = ogImgData.attributes.url;
+                seoImageUrl = url.startsWith('http') ? url : `${base}${url}`;
+            }
+        }
+    } catch {
+        // SEO component unavailable — fall through to article defaults
+    }
+
+    // Fall back to article data
+    const article = await getArticleBySlug(slug);
+    const title = seoTitle || article?.title;
+    const description = seoDescription || article?.excerpt;
+    const imageUrl = seoImageUrl || article?.featuredImage;
 
     return {
-        title: article.title,
-        description: article.excerpt,
+        ...(title ? { title } : {}),
+        ...(description ? { description } : {}),
+        ...(seoKeywords ? { keywords: seoKeywords } : {}),
+        ...(noIndex ? { robots: { index: false, follow: false } } : {}),
         openGraph: {
-            title: article.title,
-            description: article.excerpt,
+            ...(title ? { title } : {}),
+            ...(description ? { description } : {}),
             ...(imageUrl ? { images: [{ url: imageUrl }] } : {}),
         },
         twitter: {
             card: 'summary_large_image',
-            title: article.title,
-            description: article.excerpt,
+            ...(title ? { title } : {}),
+            ...(description ? { description } : {}),
             ...(imageUrl ? { images: [imageUrl] } : {}),
         },
+        ...(seoCanonical ? { alternates: { canonical: seoCanonical } } : {}),
     };
 }
 

@@ -103,6 +103,20 @@ export interface TenantRelation {
 }
 
 // ==========================================
+// Component: Shared SEO
+// ==========================================
+
+export interface BlogPostSeo {
+    id?: number;
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    keywords?: string | null;
+    ogImage?: StrapiMedia;
+    canonicalURL?: string | null;
+    noIndex?: boolean;
+}
+
+// ==========================================
 // Collection: Blog Post
 // ==========================================
 
@@ -117,6 +131,7 @@ export interface BlogPostAttributes {
     readTime: string;
     author: BlogAuthor;
     tenant?: TenantRelation;
+    seo?: BlogPostSeo | null;
     createdAt: string;
     updatedAt: string;
     publishedAt: string | null;

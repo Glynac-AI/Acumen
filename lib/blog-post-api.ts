@@ -88,6 +88,7 @@ export async function getBlogPosts(
             coverImage: true,
             author: true,
             tenant: { fields: ['name', 'slug'] },
+            seo: { populate: ['ogImage'] },
         },
         pagination: {
             page,
@@ -115,6 +116,7 @@ export async function getBlogPostById(id: number): Promise<BlogPostResponse> {
             coverImage: true,
             author: true,
             tenant: { fields: ['name', 'slug'] },
+            seo: { populate: ['ogImage'] },
         },
     };
 
@@ -134,6 +136,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
             coverImage: true,
             author: true,
             tenant: { fields: ['name', 'slug'] },
+            seo: { populate: ['ogImage'] },
         },
     };
 

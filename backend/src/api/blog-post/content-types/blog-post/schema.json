@@ -70,6 +70,13 @@
             "target": "api::tenant.tenant",
             "inversedBy": "blogPosts",
             "description": "Tenant this blog post belongs to — used for multi-tenant scoping"
+        },
+        "seo": {
+            "type": "component",
+            "component": "shared.seo",
+            "repeatable": false,
+            "required": false,
+            "description": "Per-post SEO metadata (overrides tenant-level site settings)"
         }
     }
 }
