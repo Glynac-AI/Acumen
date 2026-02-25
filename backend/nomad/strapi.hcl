@@ -38,7 +38,7 @@ job "Acumen-Strapi" {
 
     constraint {
       attribute = "${attr.unique.hostname}"
-      value     = "worker-08"
+      value     = "Worker-08"
     }
 
     task "strapi" {
@@ -54,6 +54,10 @@ job "Acumen-Strapi" {
         NODE_ENV = "production"
         HOST     = "0.0.0.0"
         PORT     = "5603"
+      }
+
+      vault {
+        role = "acumen"
       }
 
       template {
