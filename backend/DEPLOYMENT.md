@@ -52,7 +52,7 @@ Open in browser: `http://your-droplet-ip:4002/admin`
 
 ## Development Mode Setup
 
-If you want Strapi running in development mode (with hot reload):
+If you want Strapi running in development mode (with hot reload)
 
 ```bash
 cd /opt/strapi
