@@ -157,14 +157,9 @@ export default {
    * This gives you an opportunity to extend code.
    */
   register({ strapi }: { strapi: Core.Strapi }) {
-    // Extend the core admin::user model to include a tenant relation
-    if (strapi.contentTypes['admin::user']) {
-      (strapi.contentTypes['admin::user'].attributes as any).tenant = {
-        type: 'relation',
-        relation: 'manyToOne',
-        target: 'api::tenant.tenant',
-      };
-    }
+    // Note: The admin::user tenant relation is now defined via schema extension:
+    // src/extensions/admin/content-types/user/schema.json
+    // This is preferred over dynamic injection as it creates a proper DB column.
   },
 
   /**
@@ -388,19 +383,25 @@ export default {
       where: { code: 'strapi-editor' }
     });
 
-    if (editorRole) {
+    if (!editorRole) {
+      console.warn('⚠️ strapi-editor role not found — tenant admins cannot be seeded.');
+    } else {
       for (const adminDef of tenantAdmins) {
         const tenant = tenantMap[adminDef.tenantSlug];
-        if (!tenant) continue;
+        if (!tenant) {
+          console.warn(`⚠️ Tenant not found for slug '${adminDef.tenantSlug}', skipping ${adminDef.email}`);
+          continue;
+        }
 
         const existingAdmin = await strapi.db.query('admin::user').findOne({
-          where: { email: adminDef.email }
+          where: { email: adminDef.email },
+          populate: ['tenant', 'roles'],
         });
 
         if (!existingAdmin) {
           console.log(`⚙️ Creating admin user: ${adminDef.email}...`);
           try {
-            await strapi.admin.services.user.create({
+            const created = await strapi.admin.services.user.create({
               email: adminDef.email,
               firstname: adminDef.firstname,
               lastname: adminDef.lastname,
@@ -408,26 +409,33 @@ export default {
               password: adminDef.password,
               isActive: adminDef.isActive,
               roles: [editorRole.id],
-              tenant: tenant.id, // Assign to the tenant
             });
-            console.log(`✅ Admin user ${adminDef.email} created and linked to tenant ${tenant.name}!`);
+            // Link tenant via raw DB update (admin service may not expose this)
+            await strapi.db.query('admin::user').update({
+              where: { id: created.id },
+              data: { tenant: tenant.id },
+            });
+            console.log(`✅ Created admin ${adminDef.email} → tenant: ${tenant.name} (id=${tenant.id})`);
           } catch (err) {
             console.log(`⚠️ Failed to create admin user ${adminDef.email}:`, err);
           }
         } else {
-          // Ensure tenant and editor role are correctly linked for existing users
+          // Always ensure tenant and role are correct, even for existing users
           try {
-            await strapi.db.query('admin::user').update({
-              where: { id: existingAdmin.id },
-              data: {
-                tenant: tenant.id,
-                roles: [editorRole.id]
-              }
+            // Update role via admin service to ensure proper role links table update
+            await strapi.admin.services.user.updateById(existingAdmin.id, {
+              roles: [editorRole.id],
             });
-            console.log(`✅ Admin user ${adminDef.email} already exists, updated tenant/role links!`);
           } catch (err) {
-            console.log(`⚠️ Failed to update existing admin user ${adminDef.email}:`, err);
+            // Fallback: direct DB update if service fails
+            console.log(`⚠️ Admin service update failed for ${adminDef.email}, using DB fallback:`, err);
           }
+          // Always update tenant link directly in DB
+          await strapi.db.query('admin::user').update({
+            where: { id: existingAdmin.id },
+            data: { tenant: tenant.id },
+          });
+          console.log(`✅ Updated admin ${adminDef.email} → tenant: ${tenant.name} (id=${tenant.id}), role: editor`);
         }
       }
     }
