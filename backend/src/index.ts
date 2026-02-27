@@ -386,6 +386,9 @@ export default {
     const editorRole = await strapi.db.query('admin::role').findOne({
       where: { code: 'strapi-editor' }
     });
+    const authorRole = await strapi.db.query('admin::role').findOne({
+      where: { code: 'strapi-author' }
+    });
 
     if (!editorRole) {
       console.warn('⚠️ strapi-editor role not found — tenant admins cannot be seeded.');
@@ -444,8 +447,10 @@ export default {
       }
     }
 
-    // ─── 6b. Grant strapi-editor Role Permissions for Tenant Content ──
-    console.log('⚙️ Ensuring strapi-editor role has permissions for tenant content...');
+    // ─── 6b. Grant Roles Permissions for Tenant Content ──
+    console.log('⚙️ Ensuring strapi-editor and strapi-author roles have permissions for tenant content...');
+    const targetRoles = [editorRole, authorRole].filter(Boolean);
+
     const requiredActions = [
       'plugin::content-manager.explorer.create',
       'plugin::content-manager.explorer.read',
@@ -453,45 +458,46 @@ export default {
       'plugin::content-manager.explorer.delete',
     ];
 
-    for (const uid of tenantScopedContentTypes) {
-      for (const action of requiredActions) {
-        const condition = uid === 'api::tenant.tenant' && action !== 'plugin::content-manager.explorer.read' ? null : undefined;
+    for (const role of targetRoles) {
+      if (!role) continue;
+      for (const uid of tenantScopedContentTypes) {
+        for (const action of requiredActions) {
+          // Skip create/delete for the tenant model itself (admins can only VIEW/UPDATE their tenant)
+          if (uid === 'api::tenant.tenant' && ['plugin::content-manager.explorer.create', 'plugin::content-manager.explorer.delete'].includes(action)) {
+            continue;
+          }
 
-        // Skip create/update/delete for the tenant model itself (admins can only VIEW their tenant)
-        if (uid === 'api::tenant.tenant' && action !== 'plugin::content-manager.explorer.read') {
-          continue;
-        }
+          const cType = strapi.contentType(uid as any);
+          const fields = cType ? Object.keys(cType.attributes).filter(attr => !['createdBy', 'updatedBy'].includes(attr)) : null;
 
-        const cType = strapi.contentType(uid as any);
-        const fields = cType ? Object.keys(cType.attributes).filter(attr => !['createdBy', 'updatedBy'].includes(attr)) : null;
-
-        const existingPermission = await strapi.db.query('admin::permission').findOne({
-          where: {
-            action,
-            subject: uid,
-            role: editorRole.id
-          },
-        });
-
-        const properties = { fields, locales: null };
-
-        if (!existingPermission) {
-          await strapi.db.query('admin::permission').create({
-            data: {
+          const existingPermission = await strapi.db.query('admin::permission').findOne({
+            where: {
               action,
               subject: uid,
-              properties,
-              conditions: [],
-              role: editorRole.id,
+              role: role.id
             },
           });
-          console.log(`✅ Granted ${action} on ${uid} to strapi-editor with all fields`);
-        } else {
-          await strapi.db.query('admin::permission').update({
-            where: { id: existingPermission.id },
-            data: { properties }
-          });
-          console.log(`✅ Updated ${action} on ${uid} for strapi-editor to include all fields`);
+
+          const properties = { fields, locales: null };
+
+          if (!existingPermission) {
+            await strapi.db.query('admin::permission').create({
+              data: {
+                action,
+                subject: uid,
+                properties,
+                conditions: [],
+                role: role.id,
+              },
+            });
+            console.log(`✅ Granted ${action} on ${uid} to ${role.code} with all fields`);
+          } else {
+            await strapi.db.query('admin::permission').update({
+              where: { id: existingPermission.id },
+              data: { properties }
+            });
+            console.log(`✅ Updated ${action} on ${uid} for ${role.code} to include all fields`);
+          }
         }
       }
     }
