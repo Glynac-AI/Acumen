@@ -7,14 +7,27 @@
  */
 
 import type { Core } from '@strapi/strapi';
+import * as fs from 'fs';
+import * as path from 'path';
+
+function debugLog(msg: string) {
+    try {
+        fs.appendFileSync(path.join(process.cwd(), '.tmp', 'middleware-debug.log'), new Date().toISOString() + ' - ' + msg + '\n');
+    } catch (e) { }
+}
 
 export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Strapi }) => {
     return async (ctx: any, next: () => Promise<void>) => {
         const isContentManager = ctx.url.startsWith('/content-manager/');
-        const isPermissions = ctx.url.startsWith('/admin/users/me/permissions');
+        const isAdminApi = ctx.url.startsWith('/admin/');
+        const isPermissions = ctx.url.includes('permissions') || ctx.url.includes('/users/me');
+
+        if (ctx.url.includes('permissions')) {
+            debugLog(`[Incoming Request] Method: ${ctx.request.method} URL: ${ctx.url}`);
+        }
 
         // Only intercept requests to the Content Manager API (Admin Panel operations) & Permissions sync
-        if (!isContentManager && !isPermissions) {
+        if (!isContentManager && !isAdminApi && !isPermissions) {
             return next();
         }
 
@@ -49,9 +62,14 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 const tenantSlug = adminUser.tenant.slug;
 
                 if (isPermissions) {
+                    debugLog(`Intercepted Permissions Request for User: ${adminUser.email} (Tenant: ${tenantSlug})`);
                     await next(); // Wait for Strapi's admin plugin to generate permissions
 
+                    debugLog(`Response Status: ${ctx.response.status}`);
+
                     if (ctx.response.status === 200 && ctx.body && ctx.body.data) {
+                        debugLog(`Body length before: ${JSON.stringify(ctx.body).length}`);
+
                         // Map of tenant slugs to the content-types they own
                         const tenantAllowedTypes: Record<string, string[]> = {
                             'glynac-ai': ['api::blog-post.blog-post'],
@@ -64,21 +82,19 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
                         const originalPermissions = ctx.body.data.permissions || ctx.body.data;
                         const permissionsArray = Array.isArray(originalPermissions) ? originalPermissions : [];
+                        debugLog(`Permissions parsed as array of size: ${permissionsArray.length}`);
 
                         const filteredPermissions = permissionsArray.filter((p: any) => {
                             const uid = p.subject;
-
-                            // 1. Hide Tenant collection from non-superadmins
                             if (uid === 'api::tenant.tenant') return false;
 
-                            // 2. If it's a tenant-specific model, only keep it if it belongs to THIS tenant
                             if (uid && allTenantSpecificModels.includes(uid)) {
                                 return allowedModelsForThisTenant.includes(uid);
                             }
-
-                            // 3. Keep everything else (like global articles, tags, etc.)
                             return true;
                         });
+
+                        debugLog(`Filtered permissions count: ${filteredPermissions.length}`);
 
                         if (Array.isArray(originalPermissions)) {
                             if (ctx.body.data.permissions) {
@@ -86,8 +102,10 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                             } else {
                                 ctx.body.data = filteredPermissions;
                             }
-                            strapi.log.debug(`[Admin RBAC] Filtered permissions payload for the left menu (Tenant: ${tenantSlug})`);
+                            debugLog(`Successfully modified ctx.body payload`);
                         }
+                    } else {
+                        debugLog(`Could not modify ctx.body. ctx.body is: ${typeof ctx.body}`);
                     }
                     return;
                 }
