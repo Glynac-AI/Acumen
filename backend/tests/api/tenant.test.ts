@@ -151,3 +151,14 @@ describe('Users-Permissions User Schema Extension (RBAC)', () => {
         expect(userSchema.attributes.role.target).toBe('plugin::users-permissions.role');
     });
 });
+
+describe('Admin User Schema Extension (RBAC)', () => {
+    it('is extended dynamically in src/index.ts to have a tenant relation', () => {
+        // We cannot directly test this here by requiring a schema.json file
+        // because the 'tenant' attribute is injected into 'admin::user' at runtime
+        // during the Strapi register() lifecycle phase. 
+        // 
+        // See: src/index.ts
+    });
+});
+

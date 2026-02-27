@@ -118,6 +118,37 @@ const tenantScopedContentTypes = [
   'api::tenant.tenant',
 ];
 
+// Tenant admin accounts (Strapi Admin Panel)
+const tenantAdmins = [
+  {
+    firstname: 'RegulateThis',
+    lastname: 'Admin',
+    email: 'admin@regulatethis.com',
+    password: 'RegulateThisAdmin123!',
+    username: 'regulatethisAdmin',
+    tenantSlug: 'regulatethis',
+    isActive: true,
+  },
+  {
+    firstname: 'Sylvan',
+    lastname: 'Admin',
+    email: 'admin@sylvannotes.com',
+    password: 'SylvanAdmin123!',
+    username: 'sylvanAdmin',
+    tenantSlug: 'sylvian',
+    isActive: true,
+  },
+  {
+    firstname: 'Glynac',
+    lastname: 'Admin',
+    email: 'admin@glynac.ai',
+    password: 'GlynacAdmin123!',
+    username: 'glynacAdmin',
+    tenantSlug: 'glynac-ai',
+    isActive: true,
+  },
+];
+
 export default {
   /**
    * An asynchronous register function that runs before
@@ -125,7 +156,16 @@ export default {
    *
    * This gives you an opportunity to extend code.
    */
-  register({ strapi }: { strapi: Core.Strapi }) { },
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // Extend the core admin::user model to include a tenant relation
+    if (strapi.contentTypes['admin::user']) {
+      (strapi.contentTypes['admin::user'].attributes as any).tenant = {
+        type: 'relation',
+        relation: 'manyToOne',
+        target: 'api::tenant.tenant',
+      };
+    }
+  },
 
   /**
    * An asynchronous bootstrap function that runs before
@@ -341,6 +381,54 @@ export default {
       }
     } else {
       console.warn('⚠️ Could not find Public role — permissions not seeded.');
+    }
+
+    // ─── 6. Seed Tenant-Scoped Strapi Admins ──────────────────────────
+    const authorRole = await strapi.db.query('admin::role').findOne({
+      where: { code: 'strapi-author' }
+    });
+
+    if (authorRole) {
+      for (const adminDef of tenantAdmins) {
+        const tenant = tenantMap[adminDef.tenantSlug];
+        if (!tenant) continue;
+
+        const existingAdmin = await strapi.db.query('admin::user').findOne({
+          where: { email: adminDef.email }
+        });
+
+        if (!existingAdmin) {
+          console.log(`⚙️ Creating admin user: ${adminDef.email}...`);
+          // We must hash the password using Strapi's admin service if possible,
+          // but for direct DB creation we might need the crypto utility.
+          // In Strapi v5, we can use the admin user service.
+          try {
+            await strapi.admin.services.user.create({
+              email: adminDef.email,
+              firstname: adminDef.firstname,
+              lastname: adminDef.lastname,
+              username: adminDef.username,
+              password: adminDef.password,
+              isActive: adminDef.isActive,
+              roles: [authorRole.id],
+              tenant: tenant.id, // Assign to the tenant
+            });
+            console.log(`✅ Admin user ${adminDef.email} created and linked to tenant ${tenant.name}!`);
+          } catch (err) {
+            console.log(`⚠️ Failed to create admin user ${adminDef.email}:`, err);
+          }
+        } else {
+          // Ensure tenant is linked if not already
+          if (!existingAdmin.tenant) {
+            await strapi.db.query('admin::user').update({
+              where: { id: existingAdmin.id },
+              data: { tenant: tenant.id }
+            });
+            console.log(`✅ Admin user ${adminDef.email} tenant link updated!`);
+          }
+          console.log(`📋 Admin user ${adminDef.email} already exists, skipping.`);
+        }
+      }
     }
   },
 };
