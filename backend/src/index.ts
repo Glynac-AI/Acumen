@@ -462,77 +462,36 @@ export default {
           continue;
         }
 
+        const cType = strapi.contentType(uid as any);
+        const fields = cType ? Object.keys(cType.attributes).filter(attr => !['createdBy', 'updatedBy'].includes(attr)) : null;
+
         const existingPermission = await strapi.db.query('admin::permission').findOne({
           where: {
             action,
             subject: uid,
+            role: editorRole.id
           },
-          populate: ['role'],
         });
 
-        // If the permission doesn't exist at all, we create it and link it to the editor role
+        const properties = { fields, locales: null };
+
         if (!existingPermission) {
           await strapi.db.query('admin::permission').create({
             data: {
               action,
               subject: uid,
-              properties: {
-                fields: null,
-                locales: null
-              },
+              properties,
               conditions: [],
               role: editorRole.id,
             },
           });
-          console.log(`✅ Granted ${action} on ${uid} to strapi-editor`);
+          console.log(`✅ Granted ${action} on ${uid} to strapi-editor with all fields`);
         } else {
-          // If it exists but isn't linked to the editor role, we should ideally link it, 
-          // but Strapi's admin::permission table usually has 1 row per role+action+subject.
-          // Let's explicitly check for the editor role's permission.
-          const editorPermission = await strapi.db.query('admin::permission').findOne({
-            where: {
-              action,
-              subject: uid,
-              role: editorRole.id
-            }
+          await strapi.db.query('admin::permission').update({
+            where: { id: existingPermission.id },
+            data: { properties }
           });
-
-          if (!editorPermission) {
-            await strapi.db.query('admin::permission').create({
-              data: {
-                action,
-                subject: uid,
-                properties: { fields: null, locales: null },
-                conditions: [],
-                role: editorRole.id,
-              },
-            });
-            console.log(`✅ Granted ${action} on ${uid} to strapi-editor`);
-          } else {
-            // If it exists but isn't linked to the editor role, we should ideally link it,
-            // but Strapi's admin::permission table usually has 1 row per role+action+subject.
-            // Let's explicitly check for the editor role's permission.
-            const editorPermission = await strapi.db.query('admin::permission').findOne({
-              where: {
-                action,
-                subject: uid,
-                role: editorRole.id
-              }
-            });
-
-            if (!editorPermission) {
-              await strapi.db.query('admin::permission').create({
-                data: {
-                  action,
-                  subject: uid,
-                  properties: { fields: null, locales: null },
-                  conditions: [],
-                  role: editorRole.id,
-                },
-              });
-              console.log(`✅ Granted ${action} on ${uid} to strapi-editor`);
-            }
-          }
+          console.log(`✅ Updated ${action} on ${uid} for strapi-editor to include all fields`);
         }
       }
     }
