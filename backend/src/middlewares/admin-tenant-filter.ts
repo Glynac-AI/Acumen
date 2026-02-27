@@ -10,8 +10,11 @@ import type { Core } from '@strapi/strapi';
 
 export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Strapi }) => {
     return async (ctx: any, next: () => Promise<void>) => {
-        // Only intercept requests to the Content Manager API (Admin Panel operations)
-        if (!ctx.url.startsWith('/content-manager/')) {
+        const isContentManager = ctx.url.startsWith('/content-manager/');
+        const isPermissions = ctx.url.startsWith('/admin/users/me/permissions');
+
+        // Only intercept requests to the Content Manager API (Admin Panel operations) & Permissions sync
+        if (!isContentManager && !isPermissions) {
             return next();
         }
 
@@ -43,6 +46,55 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             if (hasTenantRestriction) {
                 const tenantId = adminUser.tenant.id;
                 const tenantDocumentId = adminUser.tenant.documentId;
+                const tenantSlug = adminUser.tenant.slug;
+
+                if (isPermissions) {
+                    await next(); // Wait for Strapi's admin plugin to generate permissions
+
+                    if (ctx.response.status === 200 && ctx.body && ctx.body.data) {
+                        // Map of tenant slugs to the content-types they own
+                        const tenantAllowedTypes: Record<string, string[]> = {
+                            'glynac-ai': ['api::blog-post.blog-post'],
+                            'regulatethis': ['api::regulatethis-subscriber.regulatethis-subscriber'],
+                            'sylvian': ['api::sylvan-request-access.sylvan-request-access']
+                        };
+
+                        const allowedModelsForThisTenant = tenantAllowedTypes[tenantSlug] || [];
+                        const allTenantSpecificModels = Object.values(tenantAllowedTypes).flat();
+
+                        const originalPermissions = ctx.body.data.permissions || ctx.body.data;
+                        const permissionsArray = Array.isArray(originalPermissions) ? originalPermissions : [];
+
+                        const filteredPermissions = permissionsArray.filter((p: any) => {
+                            const uid = p.subject;
+
+                            // 1. Hide Tenant collection from non-superadmins
+                            if (uid === 'api::tenant.tenant') return false;
+
+                            // 2. If it's a tenant-specific model, only keep it if it belongs to THIS tenant
+                            if (uid && allTenantSpecificModels.includes(uid)) {
+                                return allowedModelsForThisTenant.includes(uid);
+                            }
+
+                            // 3. Keep everything else (like global articles, tags, etc.)
+                            return true;
+                        });
+
+                        if (Array.isArray(originalPermissions)) {
+                            if (ctx.body.data.permissions) {
+                                ctx.body.data.permissions = filteredPermissions;
+                            } else {
+                                ctx.body.data = filteredPermissions;
+                            }
+                            strapi.log.debug(`[Admin RBAC] Filtered permissions payload for the left menu (Tenant: ${tenantSlug})`);
+                        }
+                    }
+                    return;
+                }
+
+                // ─────────────────────────────────────────────────────────────
+                // Handling /content-manager/* REST API requests
+                // ─────────────────────────────────────────────────────────────
 
                 // Extract target model and optional document ID
                 const urlParts = ctx.url.split('?')[0].split('/');
