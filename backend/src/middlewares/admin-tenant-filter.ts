@@ -38,8 +38,11 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             }
 
             const hasTenantRestriction = !!adminUser.tenant;
+            strapi.log.debug(`[Admin RBAC] User ${adminUser.email} | tenant: ${adminUser.tenant ? JSON.stringify({ id: adminUser.tenant.id, slug: adminUser.tenant.slug }) : 'NONE'}`);
+
             if (hasTenantRestriction) {
                 const tenantId = adminUser.tenant.id;
+                const tenantDocumentId = adminUser.tenant.documentId;
 
                 // Extract target model and optional document ID
                 const urlParts = ctx.url.split('?')[0].split('/');
@@ -81,11 +84,12 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                     if (!ctx.query.filters) ctx.query.filters = {};
 
                     if (isTenantScopedModel) {
-                        ctx.query.filters.tenant = { id: tenantId };
-                        strapi.log.debug(`[Admin RBAC] Filtering list ${targetModelUid} for tenant ${tenantId}`);
+                        // Try filtering by both id and documentId to handle both Strapi v4/v5 ORM modes
+                        ctx.query.filters.tenant = { id: { $eq: tenantId } };
+                        strapi.log.debug(`[Admin RBAC] Filtering list ${targetModelUid} for tenant id=${tenantId} documentId=${tenantDocumentId}`);
                     } else if (isTenantModel) {
                         // Restricted admins only see their own tenant record
-                        ctx.query.filters.id = tenantId;
+                        ctx.query.filters.id = { $eq: tenantId };
                         strapi.log.debug(`[Admin RBAC] Restricting tenant view to id ${tenantId}`);
                     }
                 }
@@ -103,7 +107,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                     if (!entity) {
                         strapi.log.warn(`[Admin RBAC] Blocked ${method} access to ${targetModelUid}:${documentId} for tenant ${tenantId}`);
                         ctx.status = 403;
-                        ctx.body = { error: 'Access denied: You do not have permission to access content from other tenants.' };
+                        ctx.body = { error: { status: 403, name: 'ForbiddenError', message: 'Access denied: This content does not belong to your tenant.' } };
                         return;
                     }
                 }
@@ -111,7 +115,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 // ─── 4. Write Enforcement ──────────────────────────────────
                 if (['POST', 'PUT'].includes(method) && isTenantScopedModel) {
                     if (!ctx.request.body) ctx.request.body = {};
-                    ctx.request.body.tenant = tenantId;
+                    ctx.request.body.tenant = tenantDocumentId; // Use documentId for writes
                     strapi.log.debug(`[Admin RBAC] Enforcing tenant ${tenantId} on write to ${targetModelUid}`);
                 }
             }
