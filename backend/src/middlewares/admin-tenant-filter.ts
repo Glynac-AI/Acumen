@@ -36,11 +36,13 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 if (!adminUser || !adminUser.tenant) return;
 
                 const isSuperAdmin = adminUser.roles?.some((r: any) => r.code === 'strapi-super-admin');
+                strapi.log.debug(`[Admin RBAC] User ${adminUser.email} | isSuperAdmin: ${isSuperAdmin} | role codes: ${adminUser.roles?.map((r: any) => r.code).join(', ')}`);
                 if (isSuperAdmin) return;
 
                 const tenantSlug = adminUser.tenant.slug;
                 ctx.response.set('X-Tenant-Debug-Target', tenantSlug);
 
+                // Map of tenant slugs to the content-types they own
                 const tenantAllowedTypes: Record<string, string[]> = {
                     'glynac-ai': ['api::blog-post.blog-post'],
                     'regulatethis': ['api::regulatethis-subscriber.regulatethis-subscriber'],
@@ -56,11 +58,24 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
                 const filteredPermissions = permissionsArray.filter((p: any) => {
                     const uid = p.subject;
-                    if (uid === 'api::tenant.tenant') return false;
 
+                    // Tenant record: allow read/update, not create/delete
+                    // (document-level guard in Content Manager Interceptor enforces single-tenant visibility)
+                    if (uid === 'api::tenant.tenant') {
+                        const allowedTenantActions = [
+                            'plugin::content-manager.explorer.read',
+                            'plugin::content-manager.explorer.update',
+                        ];
+                        return allowedTenantActions.includes(p.action);
+                    }
+
+                    // If uid is one of the tenant-exclusive content types (blog-post, regulatethis-subscriber,
+                    // sylvan-request-access), only allow it if it belongs to this tenant's allowed list
                     if (uid && allTenantSpecificModels.includes(uid)) {
                         return allowedModelsForThisTenant.includes(uid);
                     }
+
+                    // All other subjects (shared types, plugins, upload, etc.) pass through
                     return true;
                 });
 
@@ -165,13 +180,37 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                     }
                 }
 
+                // ─── 2b. Block access to other tenants' exclusive content types ──
+                const tenantExclusiveByTenant: Record<string, string[]> = {
+                    'glynac-ai': ['api::blog-post.blog-post'],
+                    'regulatethis': ['api::regulatethis-subscriber.regulatethis-subscriber'],
+                    'sylvian': ['api::sylvan-request-access.sylvan-request-access'],
+                };
+                const allowedForThisTenant = tenantExclusiveByTenant[tenantSlug] || [];
+                const allExclusiveTypes = Object.values(tenantExclusiveByTenant).flat();
+
+                if (allExclusiveTypes.includes(targetModelUid) && !allowedForThisTenant.includes(targetModelUid)) {
+                    strapi.log.warn(`[Admin RBAC] Blocked ${method} access to ${targetModelUid} for tenant ${tenantSlug}`);
+                    ctx.status = 403;
+                    ctx.body = {
+                        error: {
+                            status: 403,
+                            name: 'ForbiddenError',
+                            message: 'Access denied: This content type is not available for your tenant.',
+                        },
+                    };
+                    return;
+                }
+
                 // ─── 3. Single Item Access Protection (Document Level) ──────
                 if (documentId && (isTenantScopedModel || isTenantModel)) {
                     // Check if the entity belongs to the user's tenant
                     const entity = await strapi.db.query(targetModelUid).findOne({
                         where: {
                             documentId: documentId,
-                            ...(isTenantScopedModel ? { tenant: tenantId } : { id: tenantId })
+                            ...(isTenantScopedModel
+                                ? { tenant: tenantId }
+                                : { id: tenantId })  // tenant model uses numeric id — correct as-is
                         }
                     });
 

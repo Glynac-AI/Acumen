@@ -392,113 +392,203 @@ export default {
 
     if (!editorRole) {
       console.warn('⚠️ strapi-editor role not found — tenant admins cannot be seeded.');
-    } else {
-      for (const adminDef of tenantAdmins) {
-        const tenant = tenantMap[adminDef.tenantSlug];
-        if (!tenant) {
-          console.warn(`⚠️ Tenant not found for slug '${adminDef.tenantSlug}', skipping ${adminDef.email}`);
-          continue;
-        }
+    } // REMOVED the else branch here based on new instructions
 
-        const existingAdmin = await strapi.db.query('admin::user').findOne({
-          where: { email: adminDef.email },
-          populate: ['tenant', 'roles'],
+    // ─── Tenant-Specific Admin Roles ───────────────────────────────────────
+    const tenantAdminRoleDefs = [
+      {
+        name: 'Glynac Admin',
+        code: 'glynac-admin',
+        description: 'Admin role scoped exclusively to Glynac AI tenant content',
+        tenantSlug: 'glynac-ai',
+      },
+      {
+        name: 'Sylvan Admin',
+        code: 'sylvan-admin',
+        description: 'Admin role scoped exclusively to Sylvan tenant content',
+        tenantSlug: 'sylvian',
+      },
+      {
+        name: 'RegulateThis Admin',
+        code: 'regulatethis-admin',
+        description: 'Admin role scoped exclusively to RegulateThis tenant content',
+        tenantSlug: 'regulatethis',
+      },
+    ];
+
+    const tenantAdminRoleMap: Record<string, any> = {}; // slug → role object
+
+    for (const roleDef of tenantAdminRoleDefs) {
+      let role = await strapi.db.query('admin::role').findOne({
+        where: { code: roleDef.code },
+      });
+
+      if (!role) {
+        console.log(`⚙️ Creating admin role: ${roleDef.name}...`);
+        role = await strapi.db.query('admin::role').create({
+          data: {
+            name: roleDef.name,
+            code: roleDef.code,
+            description: roleDef.description,
+          },
         });
-
-        if (!existingAdmin) {
-          console.log(`⚙️ Creating admin user: ${adminDef.email}...`);
-          try {
-            const created = await strapi.admin.services.user.create({
-              email: adminDef.email,
-              firstname: adminDef.firstname,
-              lastname: adminDef.lastname,
-              username: adminDef.username,
-              password: adminDef.password,
-              isActive: adminDef.isActive,
-              roles: [editorRole.id],
-            });
-            // Link tenant via raw DB update (admin service may not expose this)
-            await strapi.db.query('admin::user').update({
-              where: { id: created.id },
-              data: { tenant: tenant.id },
-            });
-            console.log(`✅ Created admin ${adminDef.email} → tenant: ${tenant.name} (id=${tenant.id})`);
-          } catch (err) {
-            console.log(`⚠️ Failed to create admin user ${adminDef.email}:`, err);
-          }
-        } else {
-          // Always ensure tenant and role are correct, even for existing users
-          try {
-            // Update role via admin service to ensure proper role links table update
-            await strapi.admin.services.user.updateById(existingAdmin.id, {
-              roles: [editorRole.id],
-            });
-          } catch (err) {
-            // Fallback: direct DB update if service fails
-            console.log(`⚠️ Admin service update failed for ${adminDef.email}, using DB fallback:`, err);
-          }
-          // Always update tenant link directly in DB
-          await strapi.db.query('admin::user').update({
-            where: { id: existingAdmin.id },
-            data: { tenant: tenant.id },
-          });
-          console.log(`✅ Updated admin ${adminDef.email} → tenant: ${tenant.name} (id=${tenant.id}), role: editor`);
-        }
+        console.log(`✅ Admin role ${roleDef.name} created (code: ${roleDef.code})`);
+      } else {
+        console.log(`📋 Admin role ${roleDef.name} already exists, skipping creation.`);
       }
+
+      tenantAdminRoleMap[roleDef.tenantSlug] = role;
     }
 
-    // ─── 6b. Grant Roles Permissions for Tenant Content ──
-    console.log('⚙️ Ensuring strapi-editor and strapi-author roles have permissions for tenant content...');
-    const targetRoles = [editorRole, authorRole].filter(Boolean);
+    // ─── Permission Matrix for Tenant Admin Roles ──────────────────────────
+    const sharedContentTypes = [
+      'api::article.article',
+      'api::author.author',
+      'api::category.category',
+      'api::tag.tag',
+      'api::pillar.pillar',
+      'api::subcategory.subcategory',
+      'api::site-setting.site-setting',
+    ];
 
-    const requiredActions = [
+    const exclusiveContentTypes: Record<string, string[]> = {
+      'glynac-ai': ['api::blog-post.blog-post'],
+      'sylvian': ['api::sylvan-request-access.sylvan-request-access'],
+      'regulatethis': ['api::regulatethis-subscriber.regulatethis-subscriber'],
+    };
+
+    const fullCrudActions = [
       'plugin::content-manager.explorer.create',
       'plugin::content-manager.explorer.read',
       'plugin::content-manager.explorer.update',
       'plugin::content-manager.explorer.delete',
     ];
 
-    for (const role of targetRoles) {
+    const readUpdateOnly = [
+      'plugin::content-manager.explorer.read',
+      'plugin::content-manager.explorer.update',
+    ];
+
+    const upsertAdminPermission = async (
+      roleId: number,
+      action: string,
+      subject: string,
+      allFields: string[] | null
+    ) => {
+      const existing = await strapi.db.query('admin::permission').findOne({
+        where: { action, subject, role: roleId },
+      });
+      const properties = { fields: allFields, locales: null };
+      if (!existing) {
+        await strapi.db.query('admin::permission').create({
+          data: { action, subject, properties, conditions: [], role: roleId },
+        });
+      } else {
+        await strapi.db.query('admin::permission').update({
+          where: { id: existing.id },
+          data: { properties },
+        });
+      }
+    };
+
+    for (const [tenantSlug, role] of Object.entries(tenantAdminRoleMap)) {
       if (!role) continue;
-      for (const uid of tenantScopedContentTypes) {
-        for (const action of requiredActions) {
-          // Skip create/delete for the tenant model itself (admins can only VIEW/UPDATE their tenant)
-          if (uid === 'api::tenant.tenant' && ['plugin::content-manager.explorer.create', 'plugin::content-manager.explorer.delete'].includes(action)) {
-            continue;
-          }
 
-          const cType = strapi.contentType(uid as any);
-          const fields = cType ? Object.keys(cType.attributes).filter(attr => !['createdBy', 'updatedBy'].includes(attr)) : null;
+      console.log(`⚙️ Setting permissions for role: ${role.name}...`);
 
-          const existingPermission = await strapi.db.query('admin::permission').findOne({
-            where: {
-              action,
-              subject: uid,
-              role: role.id
-            },
-          });
+      // Shared types — full CRUD
+      for (const uid of sharedContentTypes) {
+        const cType = strapi.contentType(uid as any);
+        const fields = cType
+          ? Object.keys(cType.attributes).filter(
+            (attr) => !['createdBy', 'updatedBy'].includes(attr)
+          )
+          : null;
 
-          const properties = { fields, locales: null };
-
-          if (!existingPermission) {
-            await strapi.db.query('admin::permission').create({
-              data: {
-                action,
-                subject: uid,
-                properties,
-                conditions: [],
-                role: role.id,
-              },
-            });
-            console.log(`✅ Granted ${action} on ${uid} to ${role.code} with all fields`);
-          } else {
-            await strapi.db.query('admin::permission').update({
-              where: { id: existingPermission.id },
-              data: { properties }
-            });
-            console.log(`✅ Updated ${action} on ${uid} for ${role.code} to include all fields`);
-          }
+        for (const action of fullCrudActions) {
+          await upsertAdminPermission(role.id, action, uid, fields);
         }
+      }
+
+      // Tenant model — read + update only
+      const tenantCType = strapi.contentType('api::tenant.tenant' as any);
+      const tenantFields = tenantCType
+        ? Object.keys(tenantCType.attributes).filter(
+          (attr) => !['createdBy', 'updatedBy'].includes(attr)
+        )
+        : null;
+      for (const action of readUpdateOnly) {
+        await upsertAdminPermission(role.id, action, 'api::tenant.tenant', tenantFields);
+      }
+
+      // Exclusive types — full CRUD for this tenant only
+      const exclusiveTypes = exclusiveContentTypes[tenantSlug] || [];
+      for (const uid of exclusiveTypes) {
+        const cType = strapi.contentType(uid as any);
+        const fields = cType
+          ? Object.keys(cType.attributes).filter(
+            (attr) => !['createdBy', 'updatedBy'].includes(attr)
+          )
+          : null;
+        for (const action of fullCrudActions) {
+          await upsertAdminPermission(role.id, action, uid, fields);
+        }
+      }
+
+      console.log(`✅ Permissions set for role: ${role.name}`);
+    }
+
+    for (const adminDef of tenantAdmins) {
+      const tenant = tenantMap[adminDef.tenantSlug];
+      if (!tenant) {
+        console.warn(`⚠️ Tenant not found for slug '${adminDef.tenantSlug}', skipping ${adminDef.email}`);
+        continue;
+      }
+
+      const tenantSpecificRole = tenantAdminRoleMap[adminDef.tenantSlug];
+      if (!tenantSpecificRole) {
+        console.warn(`⚠️ Tenant-specific admin role not found for slug '${adminDef.tenantSlug}', skipping ${adminDef.email}`);
+        continue;
+      }
+
+      const existingAdmin = await strapi.db.query('admin::user').findOne({
+        where: { email: adminDef.email },
+        populate: ['tenant', 'roles'],
+      });
+
+      if (!existingAdmin) {
+        console.log(`⚙️ Creating admin user: ${adminDef.email}...`);
+        try {
+          const created = await strapi.admin.services.user.create({
+            email: adminDef.email,
+            firstname: adminDef.firstname,
+            lastname: adminDef.lastname,
+            username: adminDef.username,
+            password: adminDef.password,
+            isActive: adminDef.isActive,
+            roles: [tenantSpecificRole.id],
+          });
+          await strapi.db.query('admin::user').update({
+            where: { id: created.id },
+            data: { tenant: tenant.id },
+          });
+          console.log(`✅ Created admin ${adminDef.email} → tenant: ${tenant.name}, role: ${tenantSpecificRole.name}`);
+        } catch (err) {
+          console.log(`⚠️ Failed to create admin user ${adminDef.email}:`, err);
+        }
+      } else {
+        try {
+          await strapi.admin.services.user.updateById(existingAdmin.id, {
+            roles: [tenantSpecificRole.id],
+          });
+        } catch (err) {
+          console.log(`⚠️ Admin service update failed for ${adminDef.email}, using DB fallback:`, err);
+        }
+        await strapi.db.query('admin::user').update({
+          where: { id: existingAdmin.id },
+          data: { tenant: tenant.id },
+        });
+        console.log(`✅ Updated admin ${adminDef.email} → tenant: ${tenant.name}, role: ${tenantSpecificRole.name}`);
       }
     }
 
