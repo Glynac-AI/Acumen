@@ -46,9 +46,13 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 let targetModelUid = '';
                 let documentId = '';
 
-                // Routes: /content-manager/[collection-types|single-types]/[uid](/[documentId])
+                // Routes: 
+                // /content-manager/collection-types/[uid](/[documentId])
+                // /content-manager/single-types/[uid]
+                // /content-manager/relations/[uid]/[relationName]
                 const collectionTypesIndex = urlParts.indexOf('collection-types');
                 const singleTypesIndex = urlParts.indexOf('single-types');
+                const relationsIndex = urlParts.indexOf('relations');
 
                 if (collectionTypesIndex !== -1 && urlParts.length > collectionTypesIndex + 1) {
                     targetModelUid = urlParts[collectionTypesIndex + 1];
@@ -57,6 +61,8 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                     }
                 } else if (singleTypesIndex !== -1 && urlParts.length > singleTypesIndex + 1) {
                     targetModelUid = urlParts[singleTypesIndex + 1];
+                } else if (relationsIndex !== -1 && urlParts.length > relationsIndex + 1) {
+                    targetModelUid = urlParts[relationsIndex + 1];
                 }
 
                 if (!targetModelUid || !strapi.contentTypes[targetModelUid]) {
