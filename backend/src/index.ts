@@ -444,6 +444,99 @@ export default {
       }
     }
 
+    // ─── 6b. Grant strapi-editor Role Permissions for Tenant Content ──
+    console.log('⚙️ Ensuring strapi-editor role has permissions for tenant content...');
+    const requiredActions = [
+      'plugin::content-manager.explorer.create',
+      'plugin::content-manager.explorer.read',
+      'plugin::content-manager.explorer.update',
+      'plugin::content-manager.explorer.delete',
+    ];
+
+    for (const uid of tenantScopedContentTypes) {
+      for (const action of requiredActions) {
+        const condition = uid === 'api::tenant.tenant' && action !== 'plugin::content-manager.explorer.read' ? null : undefined;
+
+        // Skip create/update/delete for the tenant model itself (admins can only VIEW their tenant)
+        if (uid === 'api::tenant.tenant' && action !== 'plugin::content-manager.explorer.read') {
+          continue;
+        }
+
+        const existingPermission = await strapi.db.query('admin::permission').findOne({
+          where: {
+            action,
+            subject: uid,
+          },
+          populate: ['role'],
+        });
+
+        // If the permission doesn't exist at all, we create it and link it to the editor role
+        if (!existingPermission) {
+          await strapi.db.query('admin::permission').create({
+            data: {
+              action,
+              subject: uid,
+              properties: {
+                fields: null,
+                locales: null
+              },
+              conditions: [],
+              role: editorRole.id,
+            },
+          });
+          console.log(`✅ Granted ${action} on ${uid} to strapi-editor`);
+        } else {
+          // If it exists but isn't linked to the editor role, we should ideally link it, 
+          // but Strapi's admin::permission table usually has 1 row per role+action+subject.
+          // Let's explicitly check for the editor role's permission.
+          const editorPermission = await strapi.db.query('admin::permission').findOne({
+            where: {
+              action,
+              subject: uid,
+              role: editorRole.id
+            }
+          });
+
+          if (!editorPermission) {
+            await strapi.db.query('admin::permission').create({
+              data: {
+                action,
+                subject: uid,
+                properties: { fields: null, locales: null },
+                conditions: [],
+                role: editorRole.id,
+              },
+            });
+            console.log(`✅ Granted ${action} on ${uid} to strapi-editor`);
+          } else {
+            // If it exists but isn't linked to the editor role, we should ideally link it,
+            // but Strapi's admin::permission table usually has 1 row per role+action+subject.
+            // Let's explicitly check for the editor role's permission.
+            const editorPermission = await strapi.db.query('admin::permission').findOne({
+              where: {
+                action,
+                subject: uid,
+                role: editorRole.id
+              }
+            });
+
+            if (!editorPermission) {
+              await strapi.db.query('admin::permission').create({
+                data: {
+                  action,
+                  subject: uid,
+                  properties: { fields: null, locales: null },
+                  conditions: [],
+                  role: editorRole.id,
+                },
+              });
+              console.log(`✅ Granted ${action} on ${uid} to strapi-editor`);
+            }
+          }
+        }
+      }
+    }
+
     // ─── 7. Data Repair: Assign Orphan Records to Tenants ──────────────
     console.log('🛠 Running Data Repair: Assigning orphan records to tenants...');
 
