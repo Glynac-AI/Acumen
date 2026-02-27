@@ -116,6 +116,9 @@ const tenantScopedContentTypes = [
   'api::subcategory.subcategory',
   'api::site-setting.site-setting',
   'api::tenant.tenant',
+  'api::blog-post.blog-post',
+  'api::regulatethis-subscriber.regulatethis-subscriber',
+  'api::sylvan-request-access.sylvan-request-access',
 ];
 
 // Tenant admin accounts (Strapi Admin Panel)
@@ -440,5 +443,38 @@ export default {
         }
       }
     }
+
+    // ─── 7. Data Repair: Assign Orphan Records to Tenants ──────────────
+    console.log('🛠 Running Data Repair: Assigning orphan records to tenants...');
+
+    const repairOrphans = async (uid: string, targetTenant: any) => {
+      if (!targetTenant) return;
+      const orphans = await strapi.documents(uid as any).findMany({
+        filters: { tenant: { $null: true } }
+      } as any);
+
+      if (orphans.length > 0) {
+        console.log(`🔧 Repairing ${orphans.length} orphan records for ${uid} -> ${targetTenant.name}`);
+        for (const orphan of orphans) {
+          await strapi.documents(uid as any).update({
+            documentId: orphan.documentId,
+            data: { tenant: targetTenant.documentId },
+            status: 'published',
+          } as any);
+        }
+      }
+    };
+
+    // Articles & Subscribers -> RegulateThis
+    await repairOrphans('api::article.article', defaultTenant);
+    await repairOrphans('api::regulatethis-subscriber.regulatethis-subscriber', defaultTenant);
+
+    // Blog Posts -> Glynac AI
+    await repairOrphans('api::blog-post.blog-post', glynacTenant);
+
+    // Request Access -> Sylvan
+    await repairOrphans('api::sylvan-request-access.sylvan-request-access', sylvianTenant);
+
+    console.log('✅ Data Repair complete.');
   },
 };
