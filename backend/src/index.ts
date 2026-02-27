@@ -124,7 +124,7 @@ const tenantAdmins = [
     firstname: 'RegulateThis',
     lastname: 'Admin',
     email: 'admin@regulatethis.com',
-    password: 'RegulateThisAdmin123!',
+    password: 'RegulateThisAdmin123',
     username: 'regulatethisAdmin',
     tenantSlug: 'regulatethis',
     isActive: true,
@@ -133,7 +133,7 @@ const tenantAdmins = [
     firstname: 'Sylvan',
     lastname: 'Admin',
     email: 'admin@sylvannotes.com',
-    password: 'SylvanAdmin123!',
+    password: 'SylvanAdmin123',
     username: 'sylvanAdmin',
     tenantSlug: 'sylvian',
     isActive: true,
@@ -141,8 +141,8 @@ const tenantAdmins = [
   {
     firstname: 'Glynac',
     lastname: 'Admin',
-    email: 'admin@glynac.ai',
-    password: 'GlynacAdmin123!',
+    email: 'GlynacAdmin@glynac.ai',
+    password: 'GlynacAdmin123',
     username: 'glynacAdmin',
     tenantSlug: 'glynac-ai',
     isActive: true,
@@ -384,11 +384,11 @@ export default {
     }
 
     // ─── 6. Seed Tenant-Scoped Strapi Admins ──────────────────────────
-    const authorRole = await strapi.db.query('admin::role').findOne({
-      where: { code: 'strapi-author' }
+    const editorRole = await strapi.db.query('admin::role').findOne({
+      where: { code: 'strapi-editor' }
     });
 
-    if (authorRole) {
+    if (editorRole) {
       for (const adminDef of tenantAdmins) {
         const tenant = tenantMap[adminDef.tenantSlug];
         if (!tenant) continue;
@@ -399,9 +399,6 @@ export default {
 
         if (!existingAdmin) {
           console.log(`⚙️ Creating admin user: ${adminDef.email}...`);
-          // We must hash the password using Strapi's admin service if possible,
-          // but for direct DB creation we might need the crypto utility.
-          // In Strapi v5, we can use the admin user service.
           try {
             await strapi.admin.services.user.create({
               email: adminDef.email,
@@ -410,7 +407,7 @@ export default {
               username: adminDef.username,
               password: adminDef.password,
               isActive: adminDef.isActive,
-              roles: [authorRole.id],
+              roles: [editorRole.id],
               tenant: tenant.id, // Assign to the tenant
             });
             console.log(`✅ Admin user ${adminDef.email} created and linked to tenant ${tenant.name}!`);
@@ -418,15 +415,19 @@ export default {
             console.log(`⚠️ Failed to create admin user ${adminDef.email}:`, err);
           }
         } else {
-          // Ensure tenant is linked if not already
-          if (!existingAdmin.tenant) {
+          // Ensure tenant and editor role are correctly linked for existing users
+          try {
             await strapi.db.query('admin::user').update({
               where: { id: existingAdmin.id },
-              data: { tenant: tenant.id }
+              data: {
+                tenant: tenant.id,
+                roles: [editorRole.id]
+              }
             });
-            console.log(`✅ Admin user ${adminDef.email} tenant link updated!`);
+            console.log(`✅ Admin user ${adminDef.email} already exists, updated tenant/role links!`);
+          } catch (err) {
+            console.log(`⚠️ Failed to update existing admin user ${adminDef.email}:`, err);
           }
-          console.log(`📋 Admin user ${adminDef.email} already exists, skipping.`);
         }
       }
     }
