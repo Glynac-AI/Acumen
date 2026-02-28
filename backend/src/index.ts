@@ -382,7 +382,6 @@ export default {
       console.warn('⚠️ Could not find Public role — permissions not seeded.');
     }
 
-    // ─── 6. Seed Tenant-Scoped Strapi Admins ──────────────────────────
     const editorRole = await strapi.db.query('admin::role').findOne({
       where: { code: 'strapi-editor' }
     });
@@ -392,7 +391,7 @@ export default {
 
     if (!editorRole) {
       console.warn('⚠️ strapi-editor role not found — tenant admins cannot be seeded.');
-    } // REMOVED the else branch here based on new instructions
+    }
 
     // ─── Tenant-Specific Admin Roles ───────────────────────────────────────
     const tenantAdminRoleDefs = [
@@ -538,6 +537,7 @@ export default {
       console.log(`✅ Permissions set for role: ${role.name}`);
     }
 
+    // ─── 6. Seed Tenant-Scoped Strapi Admins ──────────────────────────────────
     for (const adminDef of tenantAdmins) {
       const tenant = tenantMap[adminDef.tenantSlug];
       if (!tenant) {
@@ -556,40 +556,64 @@ export default {
         populate: ['tenant', 'roles'],
       });
 
+      let adminUserId: number;
+
       if (!existingAdmin) {
+        // ── Create new admin user ──
         console.log(`⚙️ Creating admin user: ${adminDef.email}...`);
         try {
-          const created = await strapi.admin.services.user.create({
-            email: adminDef.email,
-            firstname: adminDef.firstname,
-            lastname: adminDef.lastname,
-            username: adminDef.username,
-            password: adminDef.password,
-            isActive: adminDef.isActive,
-            roles: [tenantSpecificRole.id],
+          // Create WITHOUT roles first (avoids service-layer role assignment issues)
+          const created = await strapi.db.query('admin::user').create({
+            data: {
+              email: adminDef.email,
+              firstname: adminDef.firstname,
+              lastname: adminDef.lastname,
+              username: adminDef.username,
+              // Hash password properly
+              password: await strapi.admin.services.auth.hashPassword(adminDef.password),
+              isActive: adminDef.isActive,
+              registrationToken: null,
+              tenant: tenant.id,
+            },
           });
-          await strapi.db.query('admin::user').update({
-            where: { id: created.id },
-            data: { tenant: tenant.id },
-          });
-          console.log(`✅ Created admin ${adminDef.email} → tenant: ${tenant.name}, role: ${tenantSpecificRole.name}`);
+          adminUserId = created.id;
+          console.log(`✅ Created admin user ${adminDef.email} (id=${adminUserId})`);
         } catch (err) {
-          console.log(`⚠️ Failed to create admin user ${adminDef.email}:`, err);
+          console.error(`⚠️ Failed to create admin user ${adminDef.email}:`, err);
+          continue;
         }
       } else {
-        try {
-          await strapi.admin.services.user.updateById(existingAdmin.id, {
-            roles: [tenantSpecificRole.id],
-          });
-        } catch (err) {
-          console.log(`⚠️ Admin service update failed for ${adminDef.email}, using DB fallback:`, err);
-        }
+        adminUserId = existingAdmin.id;
+        // ── Update tenant link via direct DB ──
         await strapi.db.query('admin::user').update({
-          where: { id: existingAdmin.id },
+          where: { id: adminUserId },
           data: { tenant: tenant.id },
         });
-        console.log(`✅ Updated admin ${adminDef.email} → tenant: ${tenant.name}, role: ${tenantSpecificRole.name}`);
+        console.log(`✅ Ensured tenant link for ${adminDef.email} → ${tenant.name}`);
       }
+
+      // ── Force-assign role via junction table (works for both new and existing users) ──
+      // Step 1: Remove all existing role assignments for this user
+      const knex = strapi.db.connection;
+
+      // Verify the junction table exists before manipulating it
+      const tableExists = await knex.schema.hasTable('admin_users_roles_links');
+      if (!tableExists) {
+        // Try alternate table names used by different Strapi v5 versions
+        const altTableExists = await knex.schema.hasTable('admin_users_roles_lnk');
+        const tableName = altTableExists ? 'admin_users_roles_lnk' : null;
+        if (!tableName) {
+          console.error(`⚠️ Cannot find admin_users_roles_links junction table — role not assigned for user ${adminUserId}`);
+          continue;
+        }
+        await knex(tableName).where({ user_id: adminUserId }).delete();
+        await knex(tableName).insert({ user_id: adminUserId, role_id: tenantSpecificRole.id });
+      } else {
+        await knex('admin_users_roles_links').where({ user_id: adminUserId }).delete();
+        await knex('admin_users_roles_links').insert({ user_id: adminUserId, role_id: tenantSpecificRole.id });
+      }
+
+      console.log(`✅ Role assigned: ${adminDef.email} → ${tenantSpecificRole.name} (role_id=${tenantSpecificRole.id})`);
     }
 
     // ─── 7. Data Repair: Assign Orphan Records to Tenants ──────────────
