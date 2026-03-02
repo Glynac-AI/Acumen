@@ -92,7 +92,20 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             const isSuperAdmin = adminUser.roles?.some((r: any) => r.code === 'strapi-super-admin');
             if (isSuperAdmin) return;
 
-            const tenantSlug: string = adminUser.tenant?.slug || '';
+            let tenantSlug: string = adminUser.tenant?.slug || '';
+
+            // Fallback: If DB relation is missing, infer tenant from known admin emails
+            if (!tenantSlug && adminUser.email) {
+                const fallbackMap: Record<string, string> = {
+                    'glynacadmin@glynac.ai': 'glynac-ai',
+                    'admin@sylvannotes.com': 'sylvian',
+                    'admin@regulatethis.com': 'regulatethis'
+                };
+                tenantSlug = fallbackMap[adminUser.email.toLowerCase()] || '';
+                if (tenantSlug) {
+                    strapi.log.warn(`[Admin RBAC] UPWARD fallback: derived tenantSlug '${tenantSlug}' for ${adminUser.email}`);
+                }
+            }
 
             // Diagnostic log — visible in production (info level)
             strapi.log.info(
@@ -245,11 +258,32 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             const isSuperAdmin = adminUser.roles?.some((r: any) => r.code === 'strapi-super-admin');
             if (isSuperAdmin) return next();
 
-            if (!adminUser.tenant) return next();
+            let tenantId: number | null = adminUser.tenant?.id || null;
+            let tenantDocumentId: string | null = adminUser.tenant?.documentId || null;
+            let tenantSlug: string = adminUser.tenant?.slug || '';
 
-            const tenantId: number = adminUser.tenant.id;
-            const tenantDocumentId: string = adminUser.tenant.documentId;
-            const tenantSlug: string = adminUser.tenant.slug;
+            // Fallback: If DB relation is missing, infer tenant from known admin emails
+            if ((!tenantSlug || !tenantId) && adminUser.email) {
+                const fallbackMap: Record<string, string> = {
+                    'glynacadmin@glynac.ai': 'glynac-ai',
+                    'admin@sylvannotes.com': 'sylvian',
+                    'admin@regulatethis.com': 'regulatethis'
+                };
+                const fbSlug = fallbackMap[adminUser.email.toLowerCase()];
+                if (fbSlug) {
+                    const tenantRec = await strapi.documents('api::tenant.tenant').findFirst({
+                        filters: { slug: fbSlug }
+                    });
+                    if (tenantRec) {
+                        tenantId = tenantRec.id as number;
+                        tenantDocumentId = tenantRec.documentId;
+                        tenantSlug = tenantRec.slug;
+                        strapi.log.warn(`[Admin RBAC] DOWNWARD fallback: derived tenant '${tenantSlug}' for ${adminUser.email}`);
+                    }
+                }
+            }
+
+            if (!tenantId || !tenantDocumentId) return next();
 
             const cleanUrl = url.split('?')[0];
             const urlParts = cleanUrl.split('/').filter(Boolean);
