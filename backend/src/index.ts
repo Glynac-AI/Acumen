@@ -538,66 +538,60 @@ export default {
     }
 
     // ─── 6. Seed Tenant-Scoped Strapi Admins ──────────────────────────────────
-    // Uses bcryptjs directly (strapi.admin.services.auth.hashPassword does not exist in Strapi v5)
+    // Uses bcryptjs directly — strapi.admin.services.auth.hashPassword does not
+    // exist in Strapi v5 and throws a TypeError if called.
     const bcrypt = require('bcryptjs');
-
-    // Detect the correct junction table name (Strapi v5 uses _lnk, Strapi v4 uses _links)
     const knex = strapi.db.connection;
+
+    // Detect the junction table name once — Strapi v5 uses _lnk, Strapi v4 uses _links
     let rolesJunctionTable: string | null = null;
+    for (const candidate of ['admin_users_roles_lnk', 'admin_users_roles_links']) {
+      const exists = await knex.schema.hasTable(candidate);
+      console.log(`[RBAC] Junction table '${candidate}' exists: ${exists}`);
+      if (exists) { rolesJunctionTable = candidate; break; }
+    }
 
-    // Check in priority order: Strapi v5 name first, then v4 fallback
-    const tableNamesToTry = ['admin_users_roles_lnk', 'admin_users_roles_links'];
-    for (const tName of tableNamesToTry) {
-      const exists = await knex.schema.hasTable(tName);
-      console.log(`[RBAC-BOOTSTRAP] Junction table '${tName}' exists: ${exists}`);
-      if (exists) {
-        rolesJunctionTable = tName;
-        break;
+    if (!rolesJunctionTable) {
+      // Last-resort scan: look for any table with both 'admin' and 'roles' in its name
+      try {
+        const isSQLite = ['sqlite', 'sqlite3'].includes(knex.client?.config?.client ?? '');
+        const raw = await knex.raw(
+          isSQLite
+            ? "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '%roles%' AND name LIKE '%admin%'"
+            : "SELECT table_name AS name FROM information_schema.tables WHERE table_name LIKE '%roles%' AND table_name LIKE '%admin%' AND table_schema = current_schema()"
+        );
+        const rows: any[] = raw.rows ?? raw[0] ?? [];
+        const found = rows.map((r: any) => r.name ?? r.table_name).find((n: string) => n);
+        if (found) { rolesJunctionTable = found; }
+      } catch (scanErr) {
+        console.error('[RBAC] Junction table scan failed:', scanErr);
       }
     }
 
     if (!rolesJunctionTable) {
-      // Last resort: scan all tables for anything matching *roles*lnk* or *roles*link*
-      const allTables: string[] = await knex.raw(
-        knex.client.config.client === 'sqlite3' || knex.client.config.client === 'sqlite'
-          ? "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '%roles%'"
-          : "SELECT table_name AS name FROM information_schema.tables WHERE table_name LIKE '%roles%' AND table_schema = current_schema()"
-      ).then((result: any) => {
-        // SQLite returns result.rows or result[0] depending on knex version
-        const rows = result.rows ?? result[0] ?? result;
-        return Array.isArray(rows) ? rows.map((r: any) => r.name ?? r.table_name) : [];
-      });
-      console.log(`[RBAC-BOOTSTRAP] All roles-related tables found: ${JSON.stringify(allTables)}`);
-      const junctionCandidate = allTables.find((t: string) =>
-        t.includes('admin') && t.includes('roles')
-      );
-      if (junctionCandidate) {
-        rolesJunctionTable = junctionCandidate;
-        console.log(`[RBAC-BOOTSTRAP] Using fallback junction table: ${rolesJunctionTable}`);
-      }
-    }
-
-    if (!rolesJunctionTable) {
-      console.error('[RBAC-BOOTSTRAP] CRITICAL: Cannot find admin roles junction table. Role assignment will be skipped. Check your DB schema.');
+      console.error('[RBAC] CRITICAL: Cannot find admin roles junction table. Tenant admin roles will NOT be assigned. Check your DB schema.');
+    } else {
+      console.log(`[RBAC] Using junction table: '${rolesJunctionTable}'`);
     }
 
     for (const adminDef of tenantAdmins) {
-      console.log(`[RBAC-BOOTSTRAP] Processing admin: ${adminDef.email}`);
+      console.log(`[RBAC] Processing admin: ${adminDef.email}`);
 
       const tenant = tenantMap[adminDef.tenantSlug];
       if (!tenant) {
-        console.warn(`[RBAC-BOOTSTRAP] Tenant not found for slug '${adminDef.tenantSlug}', skipping ${adminDef.email}`);
+        console.warn(`[RBAC] Tenant '${adminDef.tenantSlug}' not found — skipping ${adminDef.email}`);
         continue;
       }
 
       const tenantSpecificRole = tenantAdminRoleMap[adminDef.tenantSlug];
       if (!tenantSpecificRole) {
-        console.warn(`[RBAC-BOOTSTRAP] Tenant-specific admin role not found for slug '${adminDef.tenantSlug}', skipping ${adminDef.email}`);
+        console.warn(`[RBAC] Role for slug '${adminDef.tenantSlug}' not found — skipping ${adminDef.email}`);
         continue;
       }
 
-      console.log(`[RBAC-BOOTSTRAP] Target role: ${tenantSpecificRole.name} (id=${tenantSpecificRole.id}) | Tenant: ${tenant.name} (id=${tenant.id})`);
+      console.log(`[RBAC] Target → tenant: ${tenant.name} (id=${tenant.id}) | role: ${tenantSpecificRole.name} (id=${tenantSpecificRole.id})`);
 
+      // Find or create the admin user
       const existingAdmin = await strapi.db.query('admin::user').findOne({
         where: { email: adminDef.email },
         populate: ['tenant', 'roles'],
@@ -606,13 +600,9 @@ export default {
       let adminUserId: number | null = null;
 
       if (!existingAdmin) {
-        console.log(`[RBAC-BOOTSTRAP] Creating new admin user: ${adminDef.email}`);
+        console.log(`[RBAC] Creating admin user: ${adminDef.email}`);
         try {
-          // Hash password using bcryptjs directly — strapi.admin.services.auth.hashPassword
-          // does not exist in Strapi v5.
           const hashedPassword = await bcrypt.hash(adminDef.password, 10);
-          console.log(`[RBAC-BOOTSTRAP] Password hashed successfully for ${adminDef.email}`);
-
           const created = await strapi.db.query('admin::user').create({
             data: {
               email: adminDef.email,
@@ -621,70 +611,58 @@ export default {
               username: adminDef.username,
               password: hashedPassword,
               isActive: adminDef.isActive,
-              registrationToken: null,    // null = registered, not pending invitation
+              registrationToken: null,
               resetPasswordToken: null,
               tenant: tenant.id,
             },
           });
           adminUserId = created.id;
-          console.log(`[RBAC-BOOTSTRAP] ✅ Created admin user ${adminDef.email} (id=${adminUserId})`);
-        } catch (err) {
-          console.error(`[RBAC-BOOTSTRAP] ❌ Failed to create admin user ${adminDef.email}:`, err);
-          continue; // Skip role assignment if user creation failed
+          console.log(`[RBAC] ✅ Created ${adminDef.email} (id=${adminUserId})`);
+        } catch (createErr) {
+          console.error(`[RBAC] ❌ Failed to create ${adminDef.email}:`, createErr);
+          continue;
         }
       } else {
         adminUserId = existingAdmin.id;
-        console.log(`[RBAC-BOOTSTRAP] Admin user ${adminDef.email} already exists (id=${adminUserId})`);
-
-        // Always update tenant link to ensure it's correct
-        try {
-          await strapi.db.query('admin::user').update({
-            where: { id: adminUserId },
-            data: { tenant: tenant.id },
-          });
-          console.log(`[RBAC-BOOTSTRAP] ✅ Tenant link updated: ${adminDef.email} → ${tenant.name}`);
-        } catch (err) {
-          console.error(`[RBAC-BOOTSTRAP] ❌ Failed to update tenant for ${adminDef.email}:`, err);
-        }
+        // Ensure tenant link is correct even for existing users
+        await strapi.db.query('admin::user').update({
+          where: { id: adminUserId },
+          data: { tenant: tenant.id },
+        });
+        console.log(`[RBAC] ✅ Existing user ${adminDef.email} (id=${adminUserId}) — tenant link updated`);
       }
 
       if (adminUserId === null) {
-        console.error(`[RBAC-BOOTSTRAP] adminUserId is null for ${adminDef.email} — skipping role assignment`);
+        console.error(`[RBAC] adminUserId is null for ${adminDef.email} — skipping role assignment`);
         continue;
       }
 
-      // ── Force-assign role via junction table ────────────────────────────────
-      // This is the ONLY reliable way to set admin roles in Strapi v5.
+      // Assign role via junction table — the only reliable method in Strapi v5.
       // strapi.admin.services.user.updateById does NOT reliably update the junction table.
       if (!rolesJunctionTable) {
-        console.error(`[RBAC-BOOTSTRAP] ❌ No junction table found — cannot assign role for ${adminDef.email}`);
+        console.error(`[RBAC] ❌ No junction table — cannot assign role for ${adminDef.email}`);
         continue;
       }
 
       try {
-        // Step 1: Remove all existing role assignments for this user
-        const deleteCount = await knex(rolesJunctionTable)
-          .where({ user_id: adminUserId })
-          .delete();
-        console.log(`[RBAC-BOOTSTRAP] Deleted ${deleteCount} existing role link(s) for user_id=${adminUserId}`);
+        const deleted = await knex(rolesJunctionTable).where({ user_id: adminUserId }).delete();
+        console.log(`[RBAC] Removed ${deleted} existing role link(s) for user_id=${adminUserId}`);
 
-        // Step 2: Insert the correct tenant-specific role
         await knex(rolesJunctionTable).insert({
           user_id: adminUserId,
           role_id: tenantSpecificRole.id,
         });
-        console.log(`[RBAC-BOOTSTRAP] ✅ Role assigned: ${adminDef.email} → ${tenantSpecificRole.name} (role_id=${tenantSpecificRole.id}) via table '${rolesJunctionTable}'`);
-      } catch (err) {
-        console.error(`[RBAC-BOOTSTRAP] ❌ Failed to assign role for ${adminDef.email} via knex:`, err);
-
-        // Fallback: try Strapi's admin service as a last resort
+        console.log(`[RBAC] ✅ Role assigned: ${adminDef.email} → ${tenantSpecificRole.name} via '${rolesJunctionTable}'`);
+      } catch (knexErr) {
+        console.error(`[RBAC] ❌ knex role assignment failed for ${adminDef.email}:`, knexErr);
+        // Service-layer fallback
         try {
           await strapi.admin.services.user.updateById(adminUserId, {
             roles: [tenantSpecificRole.id],
           });
-          console.log(`[RBAC-BOOTSTRAP] ✅ Role assigned via service fallback for ${adminDef.email}`);
-        } catch (serviceErr) {
-          console.error(`[RBAC-BOOTSTRAP] ❌ Service fallback also failed for ${adminDef.email}:`, serviceErr);
+          console.log(`[RBAC] ✅ Role assigned via service fallback for ${adminDef.email}`);
+        } catch (svcErr) {
+          console.error(`[RBAC] ❌ Service fallback also failed for ${adminDef.email}:`, svcErr);
         }
       }
     }
