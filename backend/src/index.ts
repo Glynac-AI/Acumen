@@ -461,6 +461,7 @@ export default {
       'plugin::content-manager.explorer.read',
       'plugin::content-manager.explorer.update',
       'plugin::content-manager.explorer.delete',
+      'plugin::content-manager.explorer.publish',
     ];
 
     const readUpdateOnly = [
