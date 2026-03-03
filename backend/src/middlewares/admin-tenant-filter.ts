@@ -126,6 +126,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                             return isContentTypeAllowed(uid, tenantSlug);
                         });
 
+                        const hasBlogPost = filtered.some((ct: any) => ct.uid === 'api::blog-post.blog-post');
+                        strapi.log.warn(`[DEBUG-RBAC] Sidebar payload has blog-post? ${hasBlogPost}`);
+
                         if (ctx.body?.data !== undefined) {
                             ctx.body.data = filtered;
                         } else {
@@ -166,6 +169,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                                 if (uid === 'api::tenant.tenant') return false;
                                 return isContentTypeAllowed(uid, tenantSlug);
                             });
+
+                            const hasBlogPostInit = filtered.some((ct: any) => ct.uid === 'api::blog-post.blog-post');
+                            strapi.log.warn(`[DEBUG-RBAC] Init payload has blog-post? ${hasBlogPostInit}`);
 
                             if (ctPath === 'root') {
                                 initData.contentTypes = filtered;
@@ -222,6 +228,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
                         return true;
                     });
+
+                    const hasBlogPostPerm = filtered.some((p: any) => p.subject === 'api::blog-post.blog-post' && p.action === 'plugin::content-manager.explorer.read');
+                    strapi.log.warn(`[DEBUG-RBAC] Permissions payload has blog-post read? ${hasBlogPostPerm}`);
 
                     if (permissionsPath === 'root') {
                         ctx.body = filtered;
