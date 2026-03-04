@@ -1,4 +1,5 @@
 import React from 'react';
+import AuthorCard from '@/components/article/AuthorCard';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -87,6 +88,7 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 export default async function BlogArticlePage({ params }: BlogPageProps) {
     // Await params in Next.js 15
     const { slug } = await params;
+    const strapiBaseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || '';
 
     // Find the article by slug
     const article = await getArticleBySlug(slug);
@@ -213,16 +215,7 @@ export default async function BlogArticlePage({ params }: BlogPageProps) {
             <section className="bg-[#F5F2EA]">
                 <Container maxWidth="md">
                     <div className="py-12 md:py-16">
-                        <div className="flex items-start space-x-6">
-                            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-3xl flex-shrink-0">
-                                {article.author.name.charAt(0)}
-                            </div>
-                            <div className="flex-grow">
-                                <p className="text-sm font-semibold tracking-wide uppercase text-[#49648C] mb-2">About the Author</p>
-                                <h3 className="text-2xl font-medium text-[#0B1F3B] mb-2">{article.author.name}</h3>
-                                <p className="text-sm text-gray-600 mb-4">{article.author.role}</p>
-                            </div>
-                        </div>
+                        <AuthorCard author={article.author} strapiBaseUrl={strapiBaseUrl} />
                     </div>
                 </Container>
             </section>

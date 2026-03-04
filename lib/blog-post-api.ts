@@ -86,7 +86,7 @@ export async function getBlogPosts(
     const queryParams = {
         populate: {
             coverImage: true,
-            author: true,
+            author: { populate: { avatar: true } },
             tenant: { fields: ['name', 'slug'] },
             seo: { populate: ['ogImage'] },
         },
@@ -114,7 +114,7 @@ export async function getBlogPostById(id: number): Promise<BlogPostResponse> {
     const queryParams = {
         populate: {
             coverImage: true,
-            author: true,
+            author: { populate: { avatar: true } },
             tenant: { fields: ['name', 'slug'] },
             seo: { populate: ['ogImage'] },
         },
@@ -134,7 +134,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
         },
         populate: {
             coverImage: true,
-            author: true,
+            author: { populate: { avatar: true } },
             tenant: { fields: ['name', 'slug'] },
             seo: { populate: ['ogImage'] },
         },
@@ -180,7 +180,7 @@ export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
     const queryParams = {
         populate: {
             coverImage: true,
-            author: true,
+            author: { populate: { avatar: true } },
             tenant: { fields: ['name', 'slug'] },
         },
         filters: {
@@ -203,7 +203,7 @@ export async function getBlogPostsByAuthor(authorName: string): Promise<BlogPost
     const queryParams = {
         populate: {
             coverImage: true,
-            author: true,
+            author: { populate: { avatar: true } },
             tenant: { fields: ['name', 'slug'] },
         },
         filters: {

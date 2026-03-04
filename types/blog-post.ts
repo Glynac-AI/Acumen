@@ -87,6 +87,17 @@ export interface BlogAuthor {
     id: number;
     name: string;
     role: string;
+    bio?: string;
+    avatar?: {
+        data?: {
+            attributes?: {
+                url: string;
+                alternativeText?: string | null;
+            };
+        };
+    };
+    linkedin?: string;
+    twitter?: string;
 }
 
 // ==========================================
