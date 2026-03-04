@@ -36,6 +36,10 @@ export default function AuthorCard({ author, strapiBaseUrl }: AuthorCardProps) {
                 <h3 className="text-2xl font-medium text-[#0B1F3B] mb-2">{author.name}</h3>
                 <p className="text-sm text-gray-600 mb-4">{author.role}</p>
 
+                {author.description && (
+                    <p className="text-sm text-gray-700 leading-relaxed mt-1 mb-3">{author.description}</p>
+                )}
+
                 {author.bio && (
                     <p className="text-base text-gray-700 leading-relaxed mt-2 mb-4">{author.bio}</p>
                 )}

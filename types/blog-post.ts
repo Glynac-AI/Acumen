@@ -87,6 +87,7 @@ export interface BlogAuthor {
     id: number;
     name: string;
     role: string;
+    description?: string;
     bio?: string;
     avatar?: {
         data?: {

@@ -18,6 +18,12 @@
             "maxLength": 150,
             "description": "Author job title (e.g., 'Head of Product, Glynac')"
         },
+        "description": {
+            "type": "string",
+            "required": false,
+            "maxLength": 300,
+            "description": "Short author description shown under the author widget (max 300 characters)"
+        },
         "bio": {
             "type": "text",
             "required": false,
