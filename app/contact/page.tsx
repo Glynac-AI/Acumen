@@ -282,7 +282,7 @@ export default function Contact() {
                                                 <div className="grid md:grid-cols-2 gap-6">
                                                     <div>
                                                         <label className="block text-sm font-medium text-primary mb-2">
-                                                            Phone (Optional)
+                                                            Phone (Optional unless opting into SMS)
                                                         </label>
                                                         <input
                                                             type="tel"
