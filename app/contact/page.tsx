@@ -27,11 +27,30 @@ export default function Contact() {
         consentNonMarketing: false,
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In production, send to backend
-        console.log('Form submitted:', formData);
-        setIsSubmitted(true);
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    sourcePage: '/contact',
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit form');
+            }
+
+            console.log('Form submitted successfully');
+            setIsSubmitted(true);
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('There was an error submitting your request. Please try again.');
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -343,7 +362,7 @@ export default function Contact() {
                                                         className="mt-1 w-4 h-4 text-accent border-primary/20 rounded focus:ring-2 focus:ring-accent"
                                                     />
                                                     <label className="text-sm text-primary/70">
-                                                        I consent to receive marketing text messages from Acumen Strategy at the phone number provided. Frequency may vary. Message & data rates may apply. Text HELP for assistance, reply STOP to opt out.
+                                                        I agree to receive marketing SMS from Acumen Strategy, including service announcements, educational updates, event invitations, and promotional offers. Message frequency varies. Msg & data rates may apply. Reply HELP for help and STOP to unsubscribe.
                                                     </label>
                                                 </div>
 
@@ -357,7 +376,7 @@ export default function Contact() {
                                                         className="mt-1 w-4 h-4 text-accent border-primary/20 rounded focus:ring-2 focus:ring-accent"
                                                     />
                                                     <label className="text-sm text-primary/70">
-                                                        I consent to receive non-marketing text messages from Acumen Strategy about service updates, appointment reminders, and account notifications. Message & data rates may apply. Text HELP for assistance, reply STOP to opt out.
+                                                        I agree to receive transactional SMS from Acumen Strategy, including service updates, appointment reminders, account notifications, support updates, billing alerts, and verification-related messages. Message frequency varies. Msg & data rates may apply. Reply HELP for help and STOP to unsubscribe.
                                                     </label>
                                                 </div>
 

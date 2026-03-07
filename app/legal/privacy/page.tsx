@@ -47,7 +47,7 @@ export default function PrivacyPolicy() {
 
                             <section>
                                 <h2 className="text-2xl font-bold text-primary mb-4">2. Information We Collect</h2>
-                                
+
                                 <h3 className="text-xl font-semibold text-primary mt-6 mb-3">2.1 Information You Provide Directly</h3>
                                 <p>We may collect information you voluntarily provide when using our Services, including</p>
                                 <ul className="list-disc pl-6 mt-3 space-y-2">
@@ -135,13 +135,16 @@ export default function PrivacyPolicy() {
                                 <p className="mt-4">
                                     You may manage your email preferences or unsubscribe from marketing communications at any time by visiting our <Link href="/legal/unsubscribe" className="text-accent hover:underline">Email Preferences</Link> page or by contacting us directly. Please note that you may continue to receive transactional emails related to your account or ongoing business relationship even after opting out of marketing communications.
                                 </p>
-                                
+
                                 <h3 className="text-xl font-semibold text-primary mt-6 mb-3">SMS Communications</h3>
                                 <p>
-                                    If you provide your mobile phone number and consent, Acumen Strategy may send transactional SMS messages including one-time passcodes (2FA), appointment confirmations and reminders, service notifications, billing alerts, and secure document notifications. Message frequency varies. Message and data rates may apply. You may opt out at any time by replying <strong>STOP</strong>, or receive assistance by replying <strong>HELP</strong>.
+                                    If you provide your mobile phone number and consent, Acumen Strategy may send transactional SMS messages including one-time passcodes (2FA), appointment confirmations and reminders, service notifications, billing alerts, secure document notifications, support updates, and account-related messages. Message frequency varies. Message and data rates may apply. You may opt out at any time by replying STOP, or receive assistance by replying HELP.
                                 </p>
                                 <p className="mt-4">
-                                    We do not use your mobile phone number for unsolicited marketing purposes. SMS communications are strictly limited to service-related notifications that enhance your experience and security when using our Services.
+                                    If you separately opt in to marketing SMS, Acumen Strategy may also send marketing text messages including service announcements, educational updates, event invitations, and promotional offers related to our services. Marketing SMS consent is optional and is not required to use our services.
+                                </p>
+                                <p className="mt-4">
+                                    We do not sell, rent, or share mobile phone numbers with third parties for their own marketing purposes.
                                 </p>
                             </section>
 

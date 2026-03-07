@@ -137,7 +137,7 @@ export default function Footer() {
                 <div className="mt-12 pt-8 border-t border-white/10">
                     <div className="text-center max-w-3xl mx-auto">
                         <p className="text-xs text-white/60 leading-relaxed">
-                            By providing your mobile phone number, you consent to receive service-related SMS messages from Acumen Strategy. Message frequency varies. Message and data rates may apply. Reply <strong>STOP</strong> to opt out or <strong>HELP</strong> for assistance. See our{' '}
+                            By providing your mobile phone number and opting in, you consent to receive SMS messages from Acumen Strategy, including transactional messages such as service updates and account notifications, and, where separately consented, marketing messages such as announcements, educational updates, event invitations, and promotional offers. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out or HELP for assistance. See our{' '}
                             <Link href="/legal/privacy" className="text-accent hover:underline">
                                 Privacy Policy
                             </Link>{' '}
