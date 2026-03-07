@@ -13,6 +13,7 @@ import { fadeInUp } from '@/lib/animations';
 
 export default function Contact() {
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const [formData, setFormData] = useState({
         companyName: '',
         contactName: '',
@@ -29,6 +30,13 @@ export default function Contact() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrorMessage('');
+
+        if ((formData.consentMarketing || formData.consentNonMarketing) && !formData.phone.trim()) {
+            setErrorMessage('A phone number is required to opt into SMS messages.');
+            return;
+        }
+
         try {
             const response = await fetch('/api/contact', {
                 method: 'POST',
@@ -41,15 +49,15 @@ export default function Contact() {
                 }),
             });
 
+            const data = await response.json().catch(() => ({}));
+
             if (!response.ok) {
-                throw new Error('Failed to submit form');
+                throw new Error(data.error || 'Failed to submit form');
             }
 
-            console.log('Form submitted successfully');
             setIsSubmitted(true);
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('There was an error submitting your request. Please try again.');
+            setErrorMessage(error instanceof Error ? error.message : 'There was an error submitting your request. Please try again.');
         }
     };
 
@@ -201,6 +209,11 @@ export default function Contact() {
                                         <div className="p-8">
                                             <div className="w-12 h-1 bg-accent rounded-full mb-6"></div>
                                             <h2 className="text-2xl font-bold text-primary mb-6">Request a Demo</h2>
+                                            {errorMessage && (
+                                                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
+                                                    {errorMessage}
+                                                </div>
+                                            )}
                                             <form onSubmit={handleSubmit} className="space-y-6">
                                                 <div className="grid md:grid-cols-2 gap-6">
                                                     <div>
