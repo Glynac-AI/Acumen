@@ -138,6 +138,10 @@ export default function Footer() {
                     <div className="text-center max-w-3xl mx-auto">
                         <p className="text-xs text-white/60 leading-relaxed">
                             By providing your mobile phone number and opting in, you consent to receive SMS messages from Acumen Strategy, including transactional messages such as service updates and account notifications, and, where separately consented, marketing messages such as announcements, educational updates, event invitations, and promotional offers. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out or HELP for assistance. See our{' '}
+                            <Link href="/legal/sms-terms" className="text-accent hover:underline">
+                                SMS Terms & Conditions
+                            </Link>
+                            {' '}and{' '}
                             <Link href="/legal/privacy" className="text-accent hover:underline">
                                 Privacy Policy
                             </Link>{' '}
@@ -153,6 +157,9 @@ export default function Footer() {
                             © {currentYear} Acumen Strategy. All rights reserved.
                         </p>
                         <div className="flex gap-8">
+                            <Link href="/legal/sms-terms" className="text-sm text-white/50 hover:text-accent transition-colors duration-300">
+                                SMS Terms & Conditions
+                            </Link>
                             <Link href="/legal/privacy" className="text-sm text-white/50 hover:text-accent transition-colors duration-300">
                                 Privacy Policy
                             </Link>

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Container from '@/components/ui/Container';
 import Section from '@/components/ui/Section';
+import Link from 'next/link';
 
 export default function TermsOfService() {
     return (
@@ -167,31 +168,38 @@ export default function TermsOfService() {
                             </section>
 
                             <section>
-                                <h2 className="text-2xl font-bold text-primary mb-4">15. Miscellaneous</h2>
+                                <h2 className="text-2xl font-bold text-primary mb-4">15. SMS and Mobile Communications</h2>
+                                <p>
+                                    Acumen Strategy offers transactional and marketing mobile messaging programs. By electing to provide your mobile number and separately opting in to either of these programs via our website, you agree to our <Link href="/legal/sms-terms" className="text-accent hover:underline">SMS Terms & Conditions</Link>, which govern those communications. Message frequency varies. Message and data rates may apply. You may opt out of these communications at any time by replying <strong>STOP</strong> to any message we send, and you may request support by replying <strong>HELP</strong>. We handle your mobile information in accordance with our <Link href="/legal/privacy" className="text-accent hover:underline">Privacy Policy</Link>.
+                                </p>
+                            </section>
 
-                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">15.1 Entire Agreement</h3>
+                            <section>
+                                <h2 className="text-2xl font-bold text-primary mb-4">16. Miscellaneous</h2>
+
+                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">16.1 Entire Agreement</h3>
                                 <p>
                                     These Terms, together with our Privacy Policy and any additional terms applicable to specific Services, constitute the entire agreement between you and Acumen Strategy regarding the Services and supersede all prior agreements and understandings.
                                 </p>
 
-                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">15.2 Severability</h3>
+                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">16.2 Severability</h3>
                                 <p>
                                     If any provision of these Terms is held to be invalid or unenforceable, such provision shall be modified to the minimum extent necessary to make it valid and enforceable, and the remaining provisions shall continue in full force and effect.
                                 </p>
 
-                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">15.3 Waiver</h3>
+                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">16.3 Waiver</h3>
                                 <p>
                                     No waiver of any term or condition set forth in these Terms shall be deemed a further or continuing waiver of such term or any other term, and Acumen Strategy&apos;s failure to assert any right or provision under these Terms shall not constitute a waiver of such right or provision.
                                 </p>
 
-                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">15.4 Assignment</h3>
+                                <h3 className="text-xl font-semibold text-primary mt-6 mb-3">16.4 Assignment</h3>
                                 <p>
                                     You may not assign or transfer these Terms or your rights hereunder without the prior written consent of Acumen Strategy. Acumen Strategy may assign these Terms without restriction.
                                 </p>
                             </section>
 
                             <section>
-                                <h2 className="text-2xl font-bold text-primary mb-4">16. Contact Information</h2>
+                                <h2 className="text-2xl font-bold text-primary mb-4">17. Contact Information</h2>
                                 <p>
                                     If you have any questions or concerns about these Terms, please contact us.
                                 </p>

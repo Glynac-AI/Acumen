@@ -399,9 +399,13 @@ export default function Contact() {
                                                     <a href="/legal/terms" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
                                                         Terms of Service
                                                     </a>
-                                                    {' '}and{' '}
+                                                    ,{' '}
                                                     <a href="/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
                                                         Privacy Policy
+                                                    </a>
+                                                    ,{' '}and{' '}
+                                                    <a href="/legal/sms-terms" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                                                        SMS Terms & Conditions
                                                     </a>
                                                     .
                                                 </div>
