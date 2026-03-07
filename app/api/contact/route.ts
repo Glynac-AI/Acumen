@@ -2,20 +2,23 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
-        let body;
+        let body: Record<string, unknown>;
         try {
             body = await request.json();
+            if (!body || typeof body !== 'object') {
+                throw new Error('Not an object');
+            }
         } catch (e) {
             return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
         }
 
         const requiredFields = ['companyName', 'contactName', 'role', 'email', 'firmSize', 'interest', 'message'];
 
-        const trimmedBody: Record<string, any> = {};
+        const trimmedBody: Record<string, string | boolean | undefined> = {};
         for (const [key, value] of Object.entries(body)) {
             if (typeof value === 'string') {
                 trimmedBody[key] = value.trim();
-            } else {
+            } else if (typeof value === 'boolean') {
                 trimmedBody[key] = value;
             }
         }
