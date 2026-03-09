@@ -373,7 +373,8 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             }
 
             // ── Force tenant on write operations ──────────────────────────────
-            if (['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel) {
+            const isActionRoute = url.includes('/actions/');
+            if (['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel && !isActionRoute) {
                 if (!ctx.request.body) ctx.request.body = {};
                 ctx.request.body.tenant = tenantDocumentId;
             }
