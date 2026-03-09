@@ -641,11 +641,16 @@ export default {
 
       const targetEmail = adminDef.email.toLowerCase().trim();
 
-      // Find or create the admin user
-      const existingAdmin = await strapi.db.query('admin::user').findOne({
-        where: { email: { $ilike: targetEmail } },
+      // Find or create the admin user safely, dodging $ilike ORM crashes
+      const candidateAdmins = await strapi.db.query('admin::user').findMany({
+        where: { email: { $containsi: targetEmail } },
         populate: ['tenant', 'roles'],
       });
+
+      // Strict case-insensitive evaluation in memory
+      const existingAdmin = candidateAdmins.find(
+        (admin: any) => admin.email && admin.email.toLowerCase().trim() === targetEmail
+      );
 
       let adminUserId: number | null = null;
 
