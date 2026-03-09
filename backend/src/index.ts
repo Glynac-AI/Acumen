@@ -673,18 +673,54 @@ export default {
 
     const repairOrphans = async (uid: string, targetTenant: any) => {
       if (!targetTenant) return;
-      const orphans = await strapi.documents(uid as any).findMany({
-        filters: { tenant: { $null: true } }
-      } as any);
 
-      if (orphans.length > 0) {
-        console.log(`🔧 Repairing ${orphans.length} orphan records for ${uid} -> ${targetTenant.name}`);
-        for (const orphan of orphans) {
-          await strapi.documents(uid as any).update({
-            documentId: orphan.documentId,
-            data: { tenant: targetTenant.documentId },
-            status: 'published',
-          } as any);
+      // Find orphans in both draft and published states.
+      // strapi.documents().findMany() with no status filter returns 'draft' by default
+      // in Strapi v5. We must explicitly check both states so that documents that were
+      // created but never published (draft-only) are also repaired.
+      const [draftOrphans, publishedOrphans] = await Promise.all([
+        strapi.documents(uid as any).findMany({
+          filters: { tenant: { $null: true } },
+          status: 'draft',
+        } as any),
+        strapi.documents(uid as any).findMany({
+          filters: { tenant: { $null: true } },
+          status: 'published',
+        } as any),
+      ]);
+
+      // De-duplicate by documentId (a doc may appear in both lists)
+      const seen = new Set<string>();
+      const allOrphans = [...draftOrphans, ...publishedOrphans].filter((o: any) => {
+        if (seen.has(o.documentId)) return false;
+        seen.add(o.documentId);
+        return true;
+      });
+
+      if (allOrphans.length > 0) {
+        console.log(`🔧 Repairing ${allOrphans.length} orphan records for ${uid} -> ${targetTenant.name}`);
+        for (const orphan of allOrphans) {
+          try {
+            // Update the draft version first (always present)
+            await strapi.documents(uid as any).update({
+              documentId: orphan.documentId,
+              data: { tenant: targetTenant.documentId },
+              status: 'draft',
+            } as any);
+
+            // If a published version exists, update that too so the FK is consistent
+            // across both DB rows (Strapi v5 stores draft and published as separate rows).
+            const isPublished = publishedOrphans.some((p: any) => p.documentId === orphan.documentId);
+            if (isPublished) {
+              await strapi.documents(uid as any).update({
+                documentId: orphan.documentId,
+                data: { tenant: targetTenant.documentId },
+                status: 'published',
+              } as any);
+            }
+          } catch (repairErr) {
+            console.error(`🔥 Failed to repair orphan ${orphan.documentId} for ${uid}:`, repairErr);
+          }
         }
       }
     };

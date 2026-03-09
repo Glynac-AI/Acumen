@@ -299,16 +299,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
             let targetModelUid = '';
             let documentId = '';
-
-            const isActionOrComponentRoute = urlParts.some(p => ['actions', 'components', 'clone', 'publish', 'unpublish'].includes(p));
-
-            const extractDocId = (idx: number) => {
-                const id = urlParts[idx];
-                if (id && ['actions', 'components', 'clone', 'publish', 'unpublish'].includes(id)) {
-                    return ''; // System route segment, not a document ID
-                }
-                return id || '';
-            };
+            // Track whether this is a sub-action (e.g. /actions/publish, /actions/unpublish)
+            // These are POST requests to a specific document, not CRUD on the entity itself.
+            let isSubAction = false;
 
             const collIdx = urlParts.indexOf('collection-types');
             const singleIdx = urlParts.indexOf('single-types');
@@ -317,7 +310,13 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             if (collIdx !== -1 && urlParts.length > collIdx + 1) {
                 targetModelUid = urlParts[collIdx + 1];
                 if (urlParts.length > collIdx + 2) {
-                    documentId = extractDocId(collIdx + 2);
+                    documentId = urlParts[collIdx + 2];
+                }
+                // Detect /actions/* sub-routes: .../collection-types/{uid}/{docId}/actions/{action}
+                // e.g. publish, unpublish, discard-draft
+                const actionsIdx = urlParts.indexOf('actions', collIdx + 2);
+                if (actionsIdx !== -1) {
+                    isSubAction = true;
                 }
             } else if (singleIdx !== -1 && urlParts.length > singleIdx + 1) {
                 targetModelUid = urlParts[singleIdx + 1];
@@ -348,7 +347,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             }
 
             // ── Inject tenant filter on list GET requests ──────────────────────
-            if (method === 'GET' && !documentId && !isActionOrComponentRoute) {
+            if (method === 'GET' && !documentId) {
                 if (!ctx.query) ctx.query = {};
                 if (!ctx.query.filters) ctx.query.filters = {};
 
@@ -360,13 +359,37 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             }
 
             // ── Document-level access protection ──────────────────────────────
+            // For sub-actions (publish/unpublish/discard-draft), we still verify
+            // ownership but via a separate query that handles draft-only documents.
             if (documentId && (isTenantScopedModel || isTenantModel)) {
-                const entity = await strapi.db.query(targetModelUid).findOne({
-                    where: {
-                        documentId,
-                        ...(isTenantScopedModel ? { tenant: tenantId } : { id: tenantId }),
-                    },
-                });
+                let entity: any = null;
+
+                if (isTenantScopedModel) {
+                    // Try both draft and published states for draftAndPublish types.
+                    // strapi.db.query returns DB rows (not versioned documents), so
+                    // querying by documentId without status filter covers both states.
+                    entity = await strapi.db.query(targetModelUid).findOne({
+                        where: {
+                            document_id: documentId,
+                            tenant: tenantId,
+                        },
+                    });
+
+                    // Fallback: Strapi v5 uses 'document_id' column but some versions
+                    // may expose it as 'documentId'. Try the alternate field name.
+                    if (!entity) {
+                        entity = await strapi.db.query(targetModelUid).findOne({
+                            where: {
+                                documentId,
+                                tenant: tenantId,
+                            },
+                        });
+                    }
+                } else if (isTenantModel) {
+                    entity = await strapi.db.query(targetModelUid).findOne({
+                        where: { id: tenantId },
+                    });
+                }
 
                 if (!entity) {
                     strapi.log.info(`[Admin RBAC] BLOCKED ${method} ${targetModelUid}:${documentId} for tenant id=${tenantId}`);
@@ -383,9 +406,25 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             }
 
             // ── Force tenant on write operations ──────────────────────────────
-            if (['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel && !isActionOrComponentRoute) {
+            // Sub-actions (publish/unpublish) do not accept a body for the tenant
+            // relation — they operate on the existing document. Skip body injection
+            // for those routes; ownership is already verified above.
+            //
+            // For create (POST without documentId) and update (PUT/PATCH with documentId),
+            // inject the tenant using the Strapi v5 Document Service relation format:
+            //   { connect: [{ documentId: tenantDocumentId }] }
+            // A plain string is NOT accepted by the content-manager API for relations.
+            if (!isSubAction && ['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel) {
                 if (!ctx.request.body) ctx.request.body = {};
-                ctx.request.body.tenant = tenantDocumentId;
+
+                // Strapi v5 content-manager API expects relations in connect/disconnect format.
+                // Setting a plain string breaks the relation silently — tenant stays NULL,
+                // which then causes the document-level check to block the publish action.
+                ctx.request.body.tenant = {
+                    connect: [{ documentId: tenantDocumentId }],
+                };
+
+                strapi.log.info(`[Admin RBAC] Injected tenant relation for ${method} ${targetModelUid} (tenantDocumentId=${tenantDocumentId})`);
             }
 
         } catch (error) {
