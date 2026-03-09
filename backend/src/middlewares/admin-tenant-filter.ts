@@ -11,58 +11,54 @@
  *
  * Superadmins (role code: strapi-super-admin) bypass ALL restrictions.
  *
- * Tenant → exclusive content type mapping:
- *   glynac-ai    → api::blog-post.blog-post
- *   regulatethis → api::regulatethis-subscriber.regulatethis-subscriber
- *   sylvian      → api::sylvan-request-access.sylvan-request-access
+ * ─── FIXES IN THIS VERSION ───────────────────────────────────────────────────
  *
- * Shared content types (all tenants, data filtered by tenant relation):
- *   article, author, category, tag, pillar, subcategory, site-setting
+ * FIX 1 — CRITICAL: Tenant injection silently skipped due to missing integer id
+ *   The fallback tenant resolution used strapi.documents().findFirst() which
+ *   returns the Document Service result. Document Service records contain only
+ *   the `documentId` UUID field — they do NOT include the integer `id` column.
+ *   As a result, tenantRec.id was `undefined`, the guard `if (!tenantId)` fired,
+ *   and the middleware returned next() without injecting anything.
+ *   Every new document was saved with tenant = NULL.
+ *   NULL tenant → document-level ownership check (WHERE tenant = tenantId)
+ *   finds nothing → 403 on every subsequent GET/PUT/PATCH → user cannot save
+ *   or publish the document.
+ *   Fix: Changed to strapi.db.query().findOne() which always returns the DB row
+ *   including the integer `id` and `documentId` columns.
  *
- * api::tenant.tenant: visible (read/update only), data filtered to own tenant
+ * FIX 2 — CRITICAL: Wrong relation format for content-manager admin API
+ *   The Strapi v5 content-manager admin panel processes relation fields using
+ *   the internal integer DB id, not the documentId UUID. The format must be:
+ *     { connect: [{ id: <integer> }] }
+ *   Using documentId UUID in connect[] is silently discarded by the admin API,
+ *   leaving tenant = NULL. This was already correct in the previous version but
+ *   is documented here for clarity.
  *
- * ─── PATCHES ─────────────────────────────────────────────────────────────────
- *
- * PATCH 1 — api::article.article 404 for Glynac Admin
+ * FIX 3 — api::article.article 404 for Glynac Admin
  *   Glynac AI uses blog-post, not article. Article is added to TENANT_HIDDEN_TYPES
- *   for glynac-ai, removing it from the sidebar/init/permissions and hard-blocking
- *   any direct request to it — eliminating the 404 from the content-manager trying
- *   to load a schema the admin has permission to see but shouldn't.
+ *   for glynac-ai, removing it from sidebar/init/permissions and hard-blocking
+ *   any direct request with 403 instead of a confusing 404.
  *
- * PATCH 2 — countDraftRelations → 403
- *   URL pattern: /collection-types/{uid}/actions/countDraftRelations
- *   isSubAction=true routes now short-circuit to next() IMMEDIATELY after the
- *   hard-block check, instead of falling through to the tenant-filter injection
- *   path. Previously the injection could set ctx.query.filters.tenant on the
- *   type-level action request, which has no documentId context and causes Strapi's
- *   own RBAC to reject the unfiltered countDraftRelations call with 403.
+ * FIX 4 — countDraftRelations → 403
+ *   Type-level sub-actions (/actions/countDraftRelations etc.) short-circuit to
+ *   next() immediately after the hard-block check.
  *
- * PATCH 3 — Preview URL 404 console spam
- *   Strapi 5.x renders a "Preview" button even when no previewUrl is configured
- *   in the schema's pluginOptions. The resulting call to
- *   /content-manager/preview/url/{uid}?documentId=... hits an unregistered route
- *   and throws a noisy unhandled-route 404. We intercept it early and return a
- *   clean JSON 404 response for both blog-post and article.
+ * FIX 5 — Preview URL 404 console spam
+ *   Intercepts /content-manager/preview/url/* early and returns clean JSON 404.
  *
- * PATCH 4 — useRBAC "first argument should be an array" warning
- *   The Strapi admin useRBAC() hook expects its first argument to be an array.
- *   The /users/me response shape is { data: { permissions: [...], ...user } }.
- *   The old code detected permissionsPath='data.permissions' correctly but then
- *   wrote ctx.body = filtered (an array) at the ROOT level, replacing the entire
- *   user object with a bare permissions array. The useRBAC hook received an object
- *   instead of an array and logged the deprecation warning. Fixed by writing the
- *   filtered array back to the exact sub-path it was read from.
+ * FIX 6 — useRBAC "first argument should be an array" warning
+ *   Detects the exact response path (root / data / data.permissions) and writes
+ *   the filtered array back to that exact path, preserving the body shape.
  *
- * PATCH 5 — TENANT_HIDDEN_TYPES applied in permissions + init + sidebar filters
- *   The permissions filter previously only stripped EXCLUSIVE types from other
- *   tenants. Hidden types (shared types a tenant doesn't use) were left in the
- *   permissions response, causing stale permission entries to trigger RBAC errors
- *   and the useRBAC warning on every navigation event.
+ * FIX 7 — TENANT_HIDDEN_TYPES applied at every interception point
+ *   Hidden types are stripped from sidebar, init, permissions, and blocked on
+ *   direct request consistently.
  */
 
 import type { Core } from '@strapi/strapi';
 
 // ─── Tenant RBAC configuration ────────────────────────────────────────────────
+
 const TENANT_EXCLUSIVE_TYPES: Record<string, string[]> = {
     'glynac-ai': ['api::blog-post.blog-post'],
     'regulatethis': ['api::regulatethis-subscriber.regulatethis-subscriber'],
@@ -73,31 +69,22 @@ const ALL_EXCLUSIVE_TYPES: string[] = Object.values(TENANT_EXCLUSIVE_TYPES).flat
 
 /**
  * Shared content types hidden for specific tenants.
- * These are "shared" types that a tenant simply does not use.
- * They are stripped from the sidebar, init state, and permissions,
- * and any direct request to them is blocked with 403.
- *
- * PATCH 1: glynac-ai uses blog-post for content — article is hidden.
+ * FIX 3: glynac-ai uses blog-post for content — article is hidden and hard-blocked.
  */
 const TENANT_HIDDEN_TYPES: Record<string, string[]> = {
     'glynac-ai': ['api::article.article'],
 };
 
-/**
- * Returns true if `uid` is visible and accessible for `tenantSlug`.
- * Blocks: exclusive types owned by another tenant, and hidden types for this tenant.
- */
+/** Returns true if uid is visible and accessible for tenantSlug. */
 function isContentTypeAllowed(uid: string, tenantSlug: string): boolean {
-    // Exclusive type → only allowed for the tenant that owns it
     if (ALL_EXCLUSIVE_TYPES.includes(uid)) {
         return (TENANT_EXCLUSIVE_TYPES[tenantSlug] || []).includes(uid);
     }
-    // Hidden type → not allowed for this tenant
     const hidden = TENANT_HIDDEN_TYPES[tenantSlug] || [];
     return !hidden.includes(uid);
 }
 
-/** Resolves the full admin::user record including tenant + roles. */
+/** Resolves the full admin::user record including tenant + roles populated. */
 async function resolveAdminUser(ctx: any, strapi: Core.Strapi): Promise<any | null> {
     const userId = ctx.state?.user?.id;
     if (!userId) return null;
@@ -112,10 +99,8 @@ async function resolveAdminUser(ctx: any, strapi: Core.Strapi): Promise<any | nu
 }
 
 /**
- * Email-to-tenant-slug fallback (keys are lowercased).
+ * Email → tenant slug fallback map (keys lowercased).
  * Used when the tenant DB relation is not populated on the admin::user record.
- * NOTE: The seeded Glynac admin email is 'GlynacAdmin@glynac.ai' —
- *       always lowercase before looking up in this map.
  */
 const EMAIL_TENANT_FALLBACK: Record<string, string> = {
     'glynacadmin@glynac.ai': 'glynac-ai',
@@ -130,7 +115,6 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
         const method: string = ctx.request?.method || 'GET';
 
         // ── Route classification ────────────────────────────────────────────
-        // Exact match: /content-manager/content-types  (no trailing path segments)
         const isContentManagerContentTypes = /\/content-manager\/content-types(\?|$)/.test(url);
         const isContentManagerInit = /\/content-manager\/init(\?|$)/.test(url);
         const isPermissionsEndpoint =
@@ -140,15 +124,11 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
         const isContentManager = url.startsWith('/content-manager/');
         const isAdminRoute = url.startsWith('/admin/');
 
-        // Skip entirely if not an admin or content-manager route
         if (!isContentManager && !isAdminRoute) {
             return next();
         }
 
-        // ── PATCH 3: Silently handle preview URL requests ───────────────────
-        // Strapi 5.x fires preview button requests even when no previewUrl is
-        // configured in the content type's pluginOptions. Without this guard the
-        // request hits an unregistered route and Strapi logs a noisy 404 error.
+        // ── FIX 5: Clean 404 for preview URL requests ───────────────────────
         if (/\/content-manager\/preview\/url\//.test(url)) {
             ctx.status = 404;
             ctx.body = {
@@ -167,7 +147,6 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
         if (isContentManagerContentTypes || isContentManagerInit || isPermissionsEndpoint) {
             await next();
 
-            // Only process successful responses
             if (ctx.response.status !== 200 || !ctx.body) return;
 
             const adminUser = await resolveAdminUser(ctx, strapi);
@@ -187,18 +166,15 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 }
             }
 
-            // Diagnostic log — visible in production (info level)
             strapi.log.info(
                 `[Admin RBAC] UPWARD ${method} ${url.substring(0, 80)} | ` +
-                `user=${adminUser.email} | tenant='${tenantSlug}' | ` +
-                `roles=${adminUser.roles?.map((r: any) => r.code).join(',') || 'none'}`
+                `user=${adminUser.email} | tenant='${tenantSlug}'`
             );
 
-            // ── 1. Filter /content-manager/content-types (SIDEBAR) ────────────
+            // ── Filter /content-manager/content-types (SIDEBAR) ───────────────
             if (isContentManagerContentTypes) {
                 try {
                     const responseData = ctx.body?.data ?? ctx.body;
-
                     if (Array.isArray(responseData)) {
                         const before = responseData.length;
                         const filtered = responseData.filter((ct: any) => {
@@ -206,18 +182,14 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                             if (uid === 'api::tenant.tenant') return false;
                             return isContentTypeAllowed(uid, tenantSlug);
                         });
-
                         if (ctx.body?.data !== undefined) {
                             ctx.body.data = filtered;
                         } else {
                             ctx.body = filtered;
                         }
-
                         ctx.response.set('X-RBAC-CT-Before', before.toString());
                         ctx.response.set('X-RBAC-CT-After', filtered.length.toString());
-                        strapi.log.info(
-                            `[Admin RBAC] Sidebar: ${before} → ${filtered.length} types for '${tenantSlug}'`
-                        );
+                        strapi.log.info(`[Admin RBAC] Sidebar: ${before} → ${filtered.length} for '${tenantSlug}'`);
                     }
                 } catch (e) {
                     strapi.log.error('[Admin RBAC] Content-types filter error:', e);
@@ -225,13 +197,11 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 return;
             }
 
-            // ── 1b. Filter /content-manager/init (FRONTEND STATE) ─────────────
+            // ── Filter /content-manager/init (FRONTEND STATE) ─────────────────
             if (isContentManagerInit) {
                 try {
                     const initData = ctx.body?.data ?? ctx.body;
-
                     if (initData && typeof initData === 'object') {
-                        // Handle both { contentTypes: [...] } and { data: { contentTypes: [...] } }
                         let ctArray: any[] | null = null;
                         let ctPath: 'root' | 'data' = 'root';
 
@@ -250,15 +220,12 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                                 if (uid === 'api::tenant.tenant') return false;
                                 return isContentTypeAllowed(uid, tenantSlug);
                             });
-
                             if (ctPath === 'root') {
                                 initData.contentTypes = filtered;
                             } else {
                                 initData.data.contentTypes = filtered;
                             }
-                            strapi.log.info(
-                                `[Admin RBAC] Init: ${before} → ${filtered.length} types for '${tenantSlug}'`
-                            );
+                            strapi.log.info(`[Admin RBAC] Init: ${before} → ${filtered.length} for '${tenantSlug}'`);
                         }
                     }
                 } catch (e) {
@@ -267,9 +234,8 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 return;
             }
 
-            // ── 2. Filter /admin/permissions and /admin/users/me ──────────────
-            // PATCH 4: Write the filtered array back to the EXACT path it was
-            // read from to preserve the response body shape that useRBAC() expects.
+            // ── Filter /admin/permissions and /admin/users/me ─────────────────
+            // FIX 6: Detect path then write filtered array back to exact same path.
             if (isPermissionsEndpoint) {
                 try {
                     let permissionsArray: any[] = [];
@@ -282,7 +248,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                         permissionsArray = ctx.body.data;
                         permissionsPath = 'data';
                     } else if (Array.isArray(ctx.body?.data?.permissions)) {
-                        // /users/me shape: { data: { permissions: [...], ...userFields } }
+                        // /users/me shape: { data: { permissions: [...], ...user } }
                         permissionsArray = ctx.body.data.permissions;
                         permissionsPath = 'data.permissions';
                     }
@@ -294,32 +260,27 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
                     const before = permissionsArray.length;
 
-                    // PATCH 5: Filter both exclusive AND hidden types
+                    // FIX 7: Filter both exclusive AND hidden types
                     const filtered = permissionsArray.filter((p: any) => {
                         const uid: string = p.subject || '';
-
-                        // Tenant model: read + update only
                         if (uid === 'api::tenant.tenant') {
                             return (
                                 p.action === 'plugin::content-manager.explorer.read' ||
                                 p.action === 'plugin::content-manager.explorer.update'
                             );
                         }
-
                         return isContentTypeAllowed(uid, tenantSlug);
                     });
 
-                    strapi.log.info(
-                        `[Admin RBAC] Permissions: ${before} → ${filtered.length} for '${tenantSlug}'`
-                    );
+                    strapi.log.info(`[Admin RBAC] Permissions: ${before} → ${filtered.length} for '${tenantSlug}'`);
 
-                    // PATCH 4: Restore filtered array to exact path to preserve body shape
+                    // FIX 6: Restore to exact path — never write bare array to ctx.body
+                    // when the original shape was { data: { permissions: [...] } }
                     if (permissionsPath === 'root') {
                         ctx.body = filtered;
                     } else if (permissionsPath === 'data') {
                         ctx.body.data = filtered;
                     } else {
-                        // 'data.permissions' — keep { data: { ...user, permissions: filtered } }
                         ctx.body.data.permissions = filtered;
                     }
 
@@ -338,10 +299,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
         // DOWNWARD CYCLE — intercept the REQUEST before Strapi processes it
         // ════════════════════════════════════════════════════════════════════
 
-        // ── Early exit: /content-manager/relations/* ───────────────────────
-        // Relation picker dropdown data. Strapi's own RBAC handles access.
+        // Relation picker data — Strapi's own RBAC handles it.
         // Injecting tenant filters here causes "An error occurred while fetching
-        // draft relations on this document." errors in the UI.
+        // draft relations on this document." in the UI.
         if (url.startsWith('/content-manager/relations/')) {
             return next();
         }
@@ -357,38 +317,39 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             const isSuperAdmin = adminUser.roles?.some((r: any) => r.code === 'strapi-super-admin');
             if (isSuperAdmin) return next();
 
-            // Resolve tenant — DB relation first, email fallback second
+            // Resolve tenant — DB relation first, email fallback second.
             let tenantId: number | null = adminUser.tenant?.id || null;
-            let tenantDocumentId: string | null = adminUser.tenant?.documentId || null;
             let tenantSlug: string = adminUser.tenant?.slug || '';
 
+            // FIX 1: Use strapi.db.query() — NOT strapi.documents() — for fallback.
+            // strapi.documents().findFirst() returns Document Service records that omit
+            // the integer `id` column. tenantRec.id would be `undefined`, causing
+            // `if (!tenantId)` to fire and skip all injection silently.
+            // strapi.db.query().findOne() returns the raw DB row including integer `id`.
             if ((!tenantSlug || !tenantId) && adminUser.email) {
                 const fbSlug = EMAIL_TENANT_FALLBACK[adminUser.email.toLowerCase()];
                 if (fbSlug) {
-                    const tenantRec = await strapi.documents('api::tenant.tenant').findFirst({
-                        filters: { slug: fbSlug }
+                    const tenantRec = await strapi.db.query('api::tenant.tenant').findOne({
+                        where: { slug: fbSlug },
                     });
                     if (tenantRec) {
                         tenantId = tenantRec.id as number;
-                        tenantDocumentId = tenantRec.documentId;
                         tenantSlug = tenantRec.slug;
                         strapi.log.warn(
-                            `[Admin RBAC] DOWNWARD fallback: tenant='${tenantSlug}' for ${adminUser.email}`
+                            `[Admin RBAC] DOWNWARD fallback: tenant='${tenantSlug}' (id=${tenantId}) for ${adminUser.email}`
                         );
                     }
                 }
             }
 
-            if (!tenantId || !tenantDocumentId) return next();
+            if (!tenantId) return next();
 
+            // ── Parse URL ──────────────────────────────────────────────────────
             const cleanUrl = url.split('?')[0];
             const urlParts = cleanUrl.split('/').filter(Boolean);
 
             let targetModelUid = '';
             let documentId = '';
-            // isSubAction: true for type-level actions (/actions/countDraftRelations)
-            // and document-level sub-routes (/actions/publish, /relations/field).
-            // In both cases skip ownership check and body injection.
             let isSubAction = false;
 
             const collIdx = urlParts.indexOf('collection-types');
@@ -399,15 +360,12 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 targetModelUid = urlParts[collIdx + 1];
                 const candidateSegment = urlParts.length > collIdx + 2 ? urlParts[collIdx + 2] : '';
 
-                // Shape A — TYPE-LEVEL action (no documentId):
-                //   /collection-types/{uid}/actions/{action}
-                //   e.g. countDraftRelations, bulkDelete
-                //   candidateSegment === 'actions' → NOT a documentId.
                 if (candidateSegment === 'actions') {
+                    // Shape A: /collection-types/{uid}/actions/{action}  (type-level, no docId)
                     isSubAction = true;
                 } else if (candidateSegment) {
                     documentId = candidateSegment;
-                    // Shape B — DOCUMENT-LEVEL sub-route after documentId
+                    // Shape B: /collection-types/{uid}/{docId}/actions/{action}
                     const segmentsAfterDocId = urlParts.slice(collIdx + 3);
                     if (segmentsAfterDocId[0] === 'actions' || segmentsAfterDocId[0] === 'relations') {
                         isSubAction = true;
@@ -423,17 +381,12 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 return next();
             }
 
-            // ── Unified access check: exclusive + hidden types ─────────────────
-            // PATCH 1 + PATCH 2: Check isBlocked BEFORE the isSubAction short-circuit
-            // so that forbidden types are always hard-blocked, then let allowed
-            // sub-actions (countDraftRelations etc.) pass through cleanly.
-            const isBlocked = !isContentTypeAllowed(targetModelUid, tenantSlug)
-                || (TENANT_HIDDEN_TYPES[tenantSlug] || []).includes(targetModelUid);
+            // ── Hard block forbidden / hidden types ───────────────────────────
+            // FIX 3 + FIX 4: Always check isBlocked first, then short-circuit sub-actions.
+            const isBlocked = !isContentTypeAllowed(targetModelUid, tenantSlug);
 
             if (isBlocked) {
-                strapi.log.info(
-                    `[Admin RBAC] HARD BLOCK: ${method} ${targetModelUid} for tenant '${tenantSlug}'`
-                );
+                strapi.log.info(`[Admin RBAC] HARD BLOCK: ${method} ${targetModelUid} for '${tenantSlug}'`);
                 ctx.status = 403;
                 ctx.body = {
                     error: {
@@ -445,10 +398,8 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 return;
             }
 
-            // PATCH 2: After confirming the type is allowed, let sub-actions
-            // (countDraftRelations, publish, unpublish, bulkDelete etc.) pass
-            // directly to Strapi without any tenant injection — these endpoints
-            // operate on already-verified documents and have no ownership context.
+            // FIX 4: Allowed sub-actions pass through immediately after block check.
+            // These have no documentId ownership context and require no body injection.
             if (isSubAction) {
                 return next();
             }
@@ -474,12 +425,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 let entity: any = null;
 
                 if (isTenantScopedModel) {
-                    // strapi.db.query returns DB rows — querying by document_id without
-                    // status filter covers both draft and published versions.
                     entity = await strapi.db.query(targetModelUid).findOne({
                         where: { document_id: documentId, tenant: tenantId },
                     });
-                    // Fallback: some Strapi v5 builds expose it as 'documentId'
                     if (!entity) {
                         entity = await strapi.db.query(targetModelUid).findOne({
                             where: { documentId, tenant: tenantId },
@@ -507,16 +455,15 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 }
             }
 
-            // ── Force tenant on write operations ──────────────────────────────
-            // Strapi v5 content-manager API expects relations in connect/disconnect
-            // format. A plain string/id is silently ignored, leaving tenant NULL
-            // which then blocks the subsequent publish action with 403.
+            // ── FIX 2: Force tenant on write operations ────────────────────────
+            // MUST use integer id in connect[]. The Strapi v5 content-manager admin
+            // API processes relation payloads with integer DB ids. Using documentId
+            // UUID in connect[] is silently discarded, leaving tenant = NULL.
             if (['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel) {
                 if (!ctx.request.body) ctx.request.body = {};
                 ctx.request.body.tenant = {
                     connect: [{ id: tenantId }],
                 };
-
                 strapi.log.info(
                     `[Admin RBAC] Injected tenant for ${method} ${targetModelUid} (tenantId=${tenantId})`
                 );

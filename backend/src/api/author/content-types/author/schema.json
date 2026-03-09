@@ -59,12 +59,6 @@
             "default": true,
             "required": true
         },
-        "blogPosts": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::blog-post.blog-post",
-            "mappedBy": "author"
-        },
         "tenant": {
             "type": "relation",
             "relation": "manyToOne",

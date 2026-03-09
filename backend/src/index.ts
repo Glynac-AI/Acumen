@@ -440,7 +440,12 @@ export default {
     }
 
     // ─── Permission Matrix for Tenant Admin Roles ──────────────────────────
-    const sharedContentTypes = [
+    //
+    // Base shared content types for all tenants.
+    // Per-tenant exclusions prevent stale permissions that cause 404 schema fetches:
+    // e.g. glynac-ai gets article excluded because they use blog-post instead.
+    // Without this, Strapi tries to load the article schema for glynac-admin → 404.
+    const baseSharedContentTypes = [
       'api::article.article',
       'api::author.author',
       'api::category.category',
@@ -449,6 +454,15 @@ export default {
       'api::subcategory.subcategory',
       'api::site-setting.site-setting',
     ];
+
+    const TENANT_EXCLUDED_SHARED: Record<string, string[]> = {
+      'glynac-ai': ['api::article.article'],
+    };
+
+    const getSharedContentTypes = (slug: string): string[] => {
+      const excluded = TENANT_EXCLUDED_SHARED[slug] || [];
+      return baseSharedContentTypes.filter(uid => !excluded.includes(uid));
+    };
 
     const exclusiveContentTypes: Record<string, string[]> = {
       'glynac-ai': ['api::blog-post.blog-post'],
@@ -496,7 +510,8 @@ export default {
 
       console.log(`⚙️ Setting permissions for role: ${role.name}...`);
 
-      // Shared types — full CRUD
+      // Shared types — full CRUD (per-tenant list excludes irrelevant types)
+      const sharedContentTypes = getSharedContentTypes(tenantSlug);
       for (const uid of sharedContentTypes) {
         const cType = strapi.contentType(uid as any);
         const fields = cType

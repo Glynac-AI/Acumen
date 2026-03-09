@@ -1,15 +1,22 @@
 /**
  * Tenant Context Middleware
- * 
- * This middleware identifies the tenant from incoming requests and injects
- * the tenant context into the Strapi context for use by policies and controllers.
- * 
- * Tenant identification strategies (in order of priority):
- * 1. Authenticated user's tenant relation (highest priority for RBAC)
- * 2. X-Tenant-Domain header
- * 3. X-Tenant-Slug header
- * 4. Origin header (for browser requests)
- * 5. Referer header fallback
+ *
+ * Identifies the tenant from incoming requests and injects tenant context
+ * into ctx.state for use by policies and controllers.
+ *
+ * Tenant identification strategies (priority order):
+ *   1. Authenticated user's tenant relation (highest priority for RBAC)
+ *   2. X-Tenant-Domain header
+ *   3. X-Tenant-Slug header
+ *   4. Origin header (for browser requests)
+ *   5. Referer header fallback
+ *
+ * FIX: All tenant lookups now use strapi.db.query() instead of strapi.documents().
+ * strapi.documents() (Document Service) returns records WITHOUT the integer `id`
+ * column — only the documentId UUID. This caused ctx.state.tenant.id = undefined,
+ * breaking any downstream code that needs the integer FK (e.g. is-tenant-scoped
+ * policy, document-level checks). strapi.db.query() always returns the full DB row
+ * including both `id` (integer) and `documentId` (UUID).
  */
 
 import type { Core } from '@strapi/strapi';
@@ -23,7 +30,6 @@ interface TenantContext {
     isActive: boolean;
 }
 
-// Extend Strapi's context state type
 declare module 'koa' {
     interface DefaultState {
         tenant?: TenantContext;
@@ -42,15 +48,16 @@ const extractDomain = (url: string | undefined): string | null => {
 
 export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Strapi }) => {
     return async (ctx: any, next: () => Promise<void>) => {
-        // Skip tenant resolution for admin routes
+
+        // Skip tenant resolution for admin and health routes
         if (ctx.url.startsWith('/admin') || ctx.url.startsWith('/_health')) {
             return next();
         }
 
-        // ─── Strategy 1: Resolve tenant from authenticated user ────────
-        // If the user is logged in and has a tenant relation, use it (RBAC)
+        // ─── Strategy 1: Resolve tenant from authenticated user ────────────
         if (ctx.state?.user?.id) {
             try {
+                // strapi.db.query ensures we get the integer id alongside documentId
                 const userWithTenant = await strapi.db.query('plugin::users-permissions.user').findOne({
                     where: { id: ctx.state.user.id },
                     populate: ['tenant'],
@@ -69,49 +76,47 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                     return next();
                 }
             } catch (error) {
-                strapi.log.error('Tenant middleware: Error resolving tenant from user:', error);
+                strapi.log.error('[Tenant Context] Error resolving tenant from user:', error);
             }
         }
 
-        // ─── Strategy 2-5: Header-based tenant resolution ──────────────
-        const tenantDomain =
+        // ─── Strategy 2-5: Header-based tenant resolution ──────────────────
+        const tenantIdentifier =
             ctx.request.headers['x-tenant-domain'] ||
             ctx.request.headers['x-tenant-slug'] ||
             extractDomain(ctx.request.headers['origin']) ||
             extractDomain(ctx.request.headers['referer']);
 
-        if (!tenantDomain) {
-            // Allow requests without tenant for public routes that don't need tenant context
-            // Tenant-requiring routes will be protected by the is-tenant-scoped policy
+        if (!tenantIdentifier) {
             return next();
         }
 
         try {
-            // Look up tenant by domain or slug
-            const tenants = await strapi.documents('api::tenant.tenant').findMany({
-                filters: {
+            // Use strapi.db.query() to guarantee both integer id and documentId
+            // are present on the result. strapi.documents().findMany() omits the
+            // integer id, which breaks is-tenant-scoped policy FK checks.
+            const tenant = await strapi.db.query('api::tenant.tenant').findOne({
+                where: {
                     $or: [
-                        { domain: tenantDomain },
-                        { slug: tenantDomain }
+                        { domain: tenantIdentifier },
+                        { slug: tenantIdentifier },
                     ],
-                    isActive: true
+                    isActive: true,
                 },
-                limit: 1
             });
 
-            if (tenants && tenants.length > 0) {
-                const tenant = tenants[0];
+            if (tenant) {
                 ctx.state.tenant = {
                     id: tenant.id,
                     documentId: tenant.documentId,
                     name: tenant.name,
                     slug: tenant.slug,
                     domain: tenant.domain,
-                    isActive: tenant.isActive
+                    isActive: tenant.isActive,
                 } as TenantContext;
             }
         } catch (error) {
-            strapi.log.error('Tenant middleware error:', error);
+            strapi.log.error('[Tenant Context] Error resolving tenant from header:', error);
         }
 
         return next();
