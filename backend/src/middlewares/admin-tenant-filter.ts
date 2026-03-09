@@ -256,6 +256,25 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
         // DOWNWARD CYCLE — intercept the REQUEST before Strapi processes it
         // ════════════════════════════════════════════════════════════════════
 
+        // ── Early exit: /content-manager/relations/* ───────────────────────
+        // In Strapi v5, the relation picker dropdown data is fetched via:
+        //   GET /content-manager/relations/{uid}/{fieldName}            (new doc)
+        //   GET /content-manager/relations/{uid}/{documentId}/{field}   (existing doc)
+        //
+        // This URL starts with /content-manager/relations, NOT /content-manager/collection-types.
+        // Without this guard, the relIdx branch below fires, extracts targetModelUid correctly,
+        // then the list-GET filter injects { tenant: { id: X } } onto the relation search query.
+        // Strapi passes those filters to the related model's query, which fails because the
+        // related model (e.g. api::tenant.tenant) has no 'tenant' attribute of its own.
+        // Strapi's admin frontend catches the failure and shows:
+        //   "An error occurred while fetching draft relations on this document."
+        //
+        // Fix: pass all /content-manager/relations/* requests straight through.
+        // Strapi's own RBAC already controls what the user can see in the picker.
+        if (url.startsWith('/content-manager/relations/')) {
+            return next();
+        }
+
         if (!ctx.state?.user?.id) {
             return next();
         }
