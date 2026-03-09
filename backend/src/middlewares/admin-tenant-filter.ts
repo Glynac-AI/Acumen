@@ -299,8 +299,13 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
             let targetModelUid = '';
             let documentId = '';
-            // Track whether this is a sub-action (e.g. /actions/publish, /actions/unpublish)
-            // These are POST requests to a specific document, not CRUD on the entity itself.
+            // isSubAction: true when the URL targets a sub-resource on an existing document.
+            // This covers two cases:
+            //   1. /actions/{action}  — POST: publish, unpublish, discard-draft
+            //   2. /relations/{field} — GET:  author, category, pillar, tags, etc.
+            // For both cases we skip the document-level ownership block and body injection.
+            // The /relations fetch is a read-only metadata call — blocking it causes Strapi
+            // to show "An error occurred while fetching draft relations on this document."
             let isSubAction = false;
 
             const collIdx = urlParts.indexOf('collection-types');
@@ -312,10 +317,13 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 if (urlParts.length > collIdx + 2) {
                     documentId = urlParts[collIdx + 2];
                 }
-                // Detect /actions/* sub-routes: .../collection-types/{uid}/{docId}/actions/{action}
-                // e.g. publish, unpublish, discard-draft
-                const actionsIdx = urlParts.indexOf('actions', collIdx + 2);
-                if (actionsIdx !== -1) {
+                // Detect sub-routes that appear after {documentId}:
+                //   /actions/{action}  — publish, unpublish, discard-draft  (POST)
+                //   /relations/{field} — author, category, pillar, tags     (GET)
+                // Blocking these causes "An error occurred while fetching draft relations"
+                // because Strapi's frontend can't load relation pickers for the form.
+                const segmentsAfterDocId = urlParts.slice(collIdx + 3);
+                if (segmentsAfterDocId[0] === 'actions' || segmentsAfterDocId[0] === 'relations') {
                     isSubAction = true;
                 }
             } else if (singleIdx !== -1 && urlParts.length > singleIdx + 1) {
@@ -359,9 +367,11 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             }
 
             // ── Document-level access protection ──────────────────────────────
-            // For sub-actions (publish/unpublish/discard-draft), we still verify
-            // ownership but via a separate query that handles draft-only documents.
-            if (documentId && (isTenantScopedModel || isTenantModel)) {
+            // Skip for sub-resource requests (/relations, /actions) — those are either
+            // read-only metadata calls (relations) or operate on already-verified documents
+            // (actions). Blocking /relations causes the "draft relations" error in the UI.
+            // Ownership for write actions is enforced by the body injection below.
+            if (!isSubAction && documentId && (isTenantScopedModel || isTenantModel)) {
                 let entity: any = null;
 
                 if (isTenantScopedModel) {
