@@ -70,7 +70,7 @@ Blog Post Collection Type
    - Click **Create new entry**
    - Fill in:
      * **Name**: `Glynac`
-     * **Slug**: `glynac` (auto-generated)
+     * **Slug**: `glynac-ai`
      * **Domain**: `glynac.com` (or your actual domain)
      * **Is Active**: ✅ Checked
      * **Primary Color**: `#49648C` (or your brand color)
@@ -350,7 +350,7 @@ Your Strapi has two content types for blog content:
 ### Issue: Tenant filter not working
 **Solution**: Add tenant filter in your API queries:
 ```
-/api/blog-posts?filters[tenant][slug][$eq]=glynac
+/api/blog-posts?filters[tenant][slug][$eq]=glynac-ai
 ```
 
 ---

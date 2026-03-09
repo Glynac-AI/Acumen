@@ -4,7 +4,7 @@
 
 ### Initial Setup (Do Once):
 1. ✅ Configure API Permissions: Settings → Users & Permissions → Public → Enable `find` and `findOne` for blog-post
-2. ✅ Create Glynac Tenant: Content Manager → Tenant → Create (name: "Glynac", slug: "glynac")
+2. ✅ Create Glynac Tenant: Content Manager → Tenant → Create (name: "Glynac", slug: "glynac-ai")
 3. ✅ Create Author (optional): Content Manager → Author → Create and link to Glynac tenant
 
 ### Creating a Blog Post:
@@ -63,7 +63,7 @@ Discover how [technology/approach] is [transforming/revolutionizing]
 - List posts: `http://localhost:4002/api/blog-posts`
 - Single post: `http://localhost:4002/api/blog-posts/{id}`
 - With relations: `http://localhost:4002/api/blog-posts?populate=*`
-- Filter by tenant: `http://localhost:4002/api/blog-posts?filters[tenant][slug][$eq]=glynac`
+- Filter by tenant: `http://localhost:4002/api/blog-posts?filters[tenant][slug][$eq]=glynac-ai`
 
 ### Admin Panel:
 - Access: `http://localhost:4002/admin`
