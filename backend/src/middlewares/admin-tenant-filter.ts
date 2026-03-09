@@ -300,6 +300,16 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             let targetModelUid = '';
             let documentId = '';
 
+            const isActionOrComponentRoute = urlParts.some(p => ['actions', 'components', 'clone', 'publish', 'unpublish'].includes(p));
+
+            const extractDocId = (idx: number) => {
+                const id = urlParts[idx];
+                if (id && ['actions', 'components', 'clone', 'publish', 'unpublish'].includes(id)) {
+                    return ''; // System route segment, not a document ID
+                }
+                return id || '';
+            };
+
             const collIdx = urlParts.indexOf('collection-types');
             const singleIdx = urlParts.indexOf('single-types');
             const relIdx = urlParts.indexOf('relations');
@@ -307,7 +317,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             if (collIdx !== -1 && urlParts.length > collIdx + 1) {
                 targetModelUid = urlParts[collIdx + 1];
                 if (urlParts.length > collIdx + 2) {
-                    documentId = urlParts[collIdx + 2];
+                    documentId = extractDocId(collIdx + 2);
                 }
             } else if (singleIdx !== -1 && urlParts.length > singleIdx + 1) {
                 targetModelUid = urlParts[singleIdx + 1];
@@ -338,7 +348,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             }
 
             // ── Inject tenant filter on list GET requests ──────────────────────
-            if (method === 'GET' && !documentId) {
+            if (method === 'GET' && !documentId && !isActionOrComponentRoute) {
                 if (!ctx.query) ctx.query = {};
                 if (!ctx.query.filters) ctx.query.filters = {};
 
@@ -373,8 +383,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             }
 
             // ── Force tenant on write operations ──────────────────────────────
-            const isActionRoute = url.includes('/actions/');
-            if (['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel && !isActionRoute) {
+            if (['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel && !isActionOrComponentRoute) {
                 if (!ctx.request.body) ctx.request.body = {};
                 ctx.request.body.tenant = tenantDocumentId;
             }
