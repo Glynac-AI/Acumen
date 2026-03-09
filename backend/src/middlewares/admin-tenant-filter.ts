@@ -327,7 +327,8 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             // `if (!tenantId)` to fire and skip all injection silently.
             // strapi.db.query().findOne() returns the raw DB row including integer `id`.
             if ((!tenantSlug || !tenantId) && adminUser.email) {
-                const fbSlug = EMAIL_TENANT_FALLBACK[adminUser.email.toLowerCase()];
+                const normalizedEmail = adminUser.email.toLowerCase().trim();
+                const fbSlug = EMAIL_TENANT_FALLBACK[normalizedEmail];
                 if (fbSlug) {
                     const tenantRec = await strapi.db.query('api::tenant.tenant').findOne({
                         where: { slug: fbSlug },
@@ -336,7 +337,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                         tenantId = tenantRec.id as number;
                         tenantSlug = tenantRec.slug;
                         strapi.log.warn(
-                            `[Admin RBAC] DOWNWARD fallback: tenant='${tenantSlug}' (id=${tenantId}) for ${adminUser.email}`
+                            `[Admin RBAC] DOWNWARD fallback: tenant='${tenantSlug}' (id=${tenantId}) for ${normalizedEmail}`
                         );
                     }
                 }
@@ -440,8 +441,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                 }
 
                 if (!entity) {
-                    strapi.log.info(
-                        `[Admin RBAC] BLOCKED ${method} ${targetModelUid}:${documentId} for tenant id=${tenantId}`
+                    const normalizedEmail = adminUser.email ? adminUser.email.toLowerCase().trim() : 'UNKNOWN';
+                    strapi.log.error(
+                        `[Admin RBAC] PUBLISH DENIED / TENANT MISMATCH: User ${adminUser.id} (${normalizedEmail}) has session tenant_id=${tenantId}. Blocked ${method} ${targetModelUid}:${documentId}.`
                     );
                     ctx.status = 403;
                     ctx.body = {

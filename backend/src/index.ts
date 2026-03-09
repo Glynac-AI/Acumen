@@ -639,21 +639,23 @@ export default {
 
       console.log(`[RBAC] Target → tenant: ${tenant.name} (id=${tenant.id}) | role: ${tenantSpecificRole.name} (id=${tenantSpecificRole.id})`);
 
+      const targetEmail = adminDef.email.toLowerCase().trim();
+
       // Find or create the admin user
       const existingAdmin = await strapi.db.query('admin::user').findOne({
-        where: { email: adminDef.email },
+        where: { email: { $ilike: targetEmail } },
         populate: ['tenant', 'roles'],
       });
 
       let adminUserId: number | null = null;
 
       if (!existingAdmin) {
-        console.log(`[RBAC] Creating admin user: ${adminDef.email}`);
+        strapi.log.info(`[RBAC] Creating admin user: ${targetEmail}`);
         try {
           const hashedPassword = await bcrypt.hash(adminDef.password, 10);
           const created = await strapi.db.query('admin::user').create({
             data: {
-              email: adminDef.email,
+              email: targetEmail,
               firstname: adminDef.firstname,
               lastname: adminDef.lastname,
               username: adminDef.username,
@@ -665,9 +667,9 @@ export default {
             },
           });
           adminUserId = created.id;
-          console.log(`[RBAC] ✅ Created ${adminDef.email} (id=${adminUserId})`);
+          strapi.log.info(`[RBAC] ✅ Created ${targetEmail} (id=${adminUserId})`);
         } catch (createErr) {
-          console.error(`[RBAC] ❌ Failed to create ${adminDef.email}:`, createErr);
+          strapi.log.error(`[RBAC] ❌ Failed to create ${targetEmail}:`, createErr);
           continue;
         }
       } else {
@@ -677,7 +679,7 @@ export default {
           where: { id: adminUserId },
           data: { tenant: tenant.id },
         });
-        console.log(`[RBAC] ✅ Existing user ${adminDef.email} (id=${adminUserId}) — tenant link updated`);
+        strapi.log.info(`[RBAC] ✅ Existing user ${existingAdmin.email} (id=${adminUserId}) — tenant link updated`);
       }
 
       if (adminUserId === null) {
