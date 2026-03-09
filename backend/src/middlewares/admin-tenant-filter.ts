@@ -318,13 +318,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
             let targetModelUid = '';
             let documentId = '';
-            // isSubAction: true when the URL targets a sub-resource on an existing document.
-            // This covers two cases:
-            //   1. /actions/{action}  — POST: publish, unpublish, discard-draft
-            //   2. /relations/{field} — GET:  author, category, pillar, tags, etc.
-            // For both cases we skip the document-level ownership block and body injection.
-            // The /relations fetch is a read-only metadata call — blocking it causes Strapi
-            // to show "An error occurred while fetching draft relations on this document."
+            // isSubAction: true when the URL targets a sub-resource on an existing document,
+            // OR a type-level action on the collection itself (e.g. countDraftRelations, bulkDelete).
+            // In both cases we skip the document-level ownership check and body injection.
             let isSubAction = false;
 
             const collIdx = urlParts.indexOf('collection-types');
@@ -333,17 +329,35 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
             if (collIdx !== -1 && urlParts.length > collIdx + 1) {
                 targetModelUid = urlParts[collIdx + 1];
-                if (urlParts.length > collIdx + 2) {
-                    documentId = urlParts[collIdx + 2];
-                }
-                // Detect sub-routes that appear after {documentId}:
-                //   /actions/{action}  — publish, unpublish, discard-draft  (POST)
-                //   /relations/{field} — author, category, pillar, tags     (GET)
-                // Blocking these causes "An error occurred while fetching draft relations"
-                // because Strapi's frontend can't load relation pickers for the form.
-                const segmentsAfterDocId = urlParts.slice(collIdx + 3);
-                if (segmentsAfterDocId[0] === 'actions' || segmentsAfterDocId[0] === 'relations') {
+                const candidateSegment = urlParts.length > collIdx + 2 ? urlParts[collIdx + 2] : '';
+
+                // Strapi v5 has two distinct URL shapes under /collection-types/{uid}/:
+                //
+                //   Shape A — TYPE-LEVEL action (no documentId):
+                //     /collection-types/{uid}/actions/{action}
+                //     e.g. /actions/countDraftRelations
+                //     Here urlParts[collIdx+2] = 'actions' — NOT a documentId.
+                //     Naively assigning it as documentId then running the ownership check
+                //     produces documentId='actions', finds no entity, and returns 403.
+                //
+                //   Shape B — DOCUMENT-LEVEL requests:
+                //     /collection-types/{uid}/{docId}                   (read/write)
+                //     /collection-types/{uid}/{docId}/actions/{action}  (publish etc.)
+                //     /collection-types/{uid}/{docId}/relations/{field} (handled by early exit above)
+                //
+                // Fix: if the segment immediately after {uid} IS 'actions', treat the whole
+                // request as a type-level sub-action with no documentId — skip all ownership
+                // checks and body injection, let Strapi handle it natively.
+                if (candidateSegment === 'actions') {
+                    // Type-level action — no documentId, skip ownership check
                     isSubAction = true;
+                } else if (candidateSegment) {
+                    documentId = candidateSegment;
+                    // Check the segment after {documentId} for doc-level sub-routes
+                    const segmentsAfterDocId = urlParts.slice(collIdx + 3);
+                    if (segmentsAfterDocId[0] === 'actions' || segmentsAfterDocId[0] === 'relations') {
+                        isSubAction = true;
+                    }
                 }
             } else if (singleIdx !== -1 && urlParts.length > singleIdx + 1) {
                 targetModelUid = urlParts[singleIdx + 1];
