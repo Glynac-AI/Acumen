@@ -649,19 +649,37 @@ export default {
         const deleted = await knex(rolesJunctionTable).where({ user_id: adminUserId }).delete();
         console.log(`[RBAC] Removed ${deleted} existing role link(s) for user_id=${adminUserId}`);
 
+        // role_order is a DECIMAL NOT NULL column in Strapi v5's junction table.
+        // Omitting it causes a NOT NULL constraint violation on PostgreSQL,
+        // silently dropping the role assignment and leaving the user with no role
+        // (which Strapi's RBAC then rejects with 403 on every content-manager action).
         await knex(rolesJunctionTable).insert({
           user_id: adminUserId,
           role_id: tenantSpecificRole.id,
+          role_order: 1,
         });
         console.log(`[RBAC] ✅ Role assigned: ${adminDef.email} → ${tenantSpecificRole.name} via '${rolesJunctionTable}'`);
+
+        // Verify the insert actually worked by reading it back
+        const verify = await knex(rolesJunctionTable)
+          .where({ user_id: adminUserId, role_id: tenantSpecificRole.id })
+          .first();
+        if (verify) {
+          console.log(`[RBAC] ✅ VERIFIED role row exists for user_id=${adminUserId} role_id=${tenantSpecificRole.id}`);
+        } else {
+          console.error(`[RBAC] ❌ VERIFY FAILED: role row NOT found after insert for ${adminDef.email}`);
+        }
       } catch (knexErr) {
         console.error(`[RBAC] ❌ knex role assignment failed for ${adminDef.email}:`, knexErr);
-        // Service-layer fallback
+        // Service-layer fallback — use the Strapi v5 service path
+        // NOTE: strapi.admin.services.user does NOT exist in Strapi v5.
+        //       The correct accessor is strapi.service('admin::user').
         try {
-          await strapi.admin.services.user.updateById(adminUserId, {
+          const userService = strapi.service('admin::user' as any) as any;
+          await userService.updateById(adminUserId, {
             roles: [tenantSpecificRole.id],
           });
-          console.log(`[RBAC] ✅ Role assigned via service fallback for ${adminDef.email}`);
+          console.log(`[RBAC] ✅ Role assigned via strapi.service('admin::user') fallback for ${adminDef.email}`);
         } catch (svcErr) {
           console.error(`[RBAC] ❌ Service fallback also failed for ${adminDef.email}:`, svcErr);
         }
