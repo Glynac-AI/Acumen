@@ -174,9 +174,14 @@ export default {
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     // ─── 1. Seed Tenants ───────────────────────────────────────────────
+    // FIX A: seedTenant always returns an object with integer `id` AND `documentId`.
+    // strapi.documents() (Document Service) omits the integer `id` column.
+    // Without integer id: admin user's tenant FK is written as `undefined` → stays NULL in DB.
+    // repairOrphans also receives targetTenant.id=undefined → silently skips all repairs.
     const seedTenant = async (tenantData: typeof defaultTenantData) => {
-      let tenant = await strapi.documents('api::tenant.tenant').findFirst({
-        filters: {
+      // strapi.db.query guarantees integer id in result
+      let tenant = await strapi.db.query('api::tenant.tenant').findOne({
+        where: {
           $or: [
             { slug: tenantData.slug },
             { domain: tenantData.domain },
@@ -186,13 +191,18 @@ export default {
 
       if (!tenant) {
         console.log(`⚙️ Seeding tenant: ${tenantData.name}...`);
-        tenant = await strapi.documents('api::tenant.tenant').create({
+        // Use Document Service for create (handles status:'published' correctly)
+        await strapi.documents('api::tenant.tenant').create({
           data: tenantData,
           status: 'published',
         });
-        console.log(`✅ Tenant ${tenantData.name} created!`);
+        // Re-fetch via db.query to get the integer id
+        tenant = await strapi.db.query('api::tenant.tenant').findOne({
+          where: { slug: tenantData.slug },
+        });
+        console.log(`✅ Tenant ${tenantData.name} created! (db id=${tenant?.id})`);
       } else {
-        console.log(`📋 Tenant ${tenantData.name} already exists, skipping seed.`);
+        console.log(`📋 Tenant ${tenantData.name} already exists (db id=${tenant.id}), skipping seed.`);
       }
       return tenant;
     };
@@ -505,6 +515,28 @@ export default {
       }
     };
 
+    // FIX C: Delete stale permission rows from the live DB before re-seeding.
+    // upsertAdminPermission only INSERTs or UPDATEs — it never deletes.
+    // If a type was seeded for a role in a previous deploy (e.g. article for glynac-admin)
+    // and is now excluded, the DB row persists. Strapi reads it on /users/me →
+    // tries to load the article schema → 404 → useRBAC warning → Publish may be blocked.
+    const STALE_PERMISSIONS: Record<string, string[]> = {
+      'glynac-admin': ['api::article.article'],
+    };
+    for (const [roleCode, staleUids] of Object.entries(STALE_PERMISSIONS)) {
+      const staleRole = await strapi.db.query('admin::role').findOne({ where: { code: roleCode } });
+      if (!staleRole) continue;
+      for (const staleUid of staleUids) {
+        const deleted = await strapi.db.query('admin::permission').deleteMany({
+          where: { subject: staleUid, role: staleRole.id },
+        });
+        const count = Array.isArray(deleted) ? deleted.length : (deleted as any)?.count ?? 0;
+        if (count > 0) {
+          console.log(`🧹 Deleted ${count} stale permission row(s) for '${staleUid}' from role '${roleCode}'`);
+        }
+      }
+    }
+
     for (const [tenantSlug, role] of Object.entries(tenantAdminRoleMap)) {
       if (!role) continue;
 
@@ -704,57 +736,58 @@ export default {
     // ─── 7. Data Repair: Assign Orphan Records to Tenants ──────────────
     console.log('🛠 Running Data Repair: Assigning orphan records to tenants...');
 
+    // FIX B: repairOrphans uses strapi.db.query() for both find AND update.
+    //
+    // WHY the previous version silently failed:
+    // 1. targetTenant.id was `undefined` (from Bug A — seedTenant used strapi.documents()).
+    //    No guard existed so the function ran anyway and used targetTenant.documentId
+    //    for the update. But:
+    // 2. strapi.documents().update({ data: { tenant: rawUuidString } }) for a manyToOne
+    //    relation field is SILENTLY DISCARDED by Strapi v5 Document Service. The update
+    //    returns success but writes nothing to the DB column. The correct DS format would
+    //    be { tenant: { connect: [{documentId: X}] } } — but even that is unreliable in
+    //    bootstrap context before lifecycle hooks are fully initialised.
+    // 3. strapi.db.query().update({ data: { tenant: integerFK } }) writes directly to
+    //    the DB column with no ORM lifecycle overhead — guaranteed to work in bootstrap.
+    // 4. Strapi v5 stores draft + published as SEPARATE DB rows with the same document_id.
+    //    strapi.db.query().findMany() (no status filter) returns ALL rows in one call —
+    //    both draft and published rows get repaired correctly.
     const repairOrphans = async (uid: string, targetTenant: any) => {
       if (!targetTenant) return;
+      if (!targetTenant.id) {
+        console.warn(`⚠️ repairOrphans: targetTenant.id is undefined for ${uid} — skipping. Check seedTenant fix.`);
+        return;
+      }
 
-      // Find orphans in both draft and published states.
-      // strapi.documents().findMany() with no status filter returns 'draft' by default
-      // in Strapi v5. We must explicitly check both states so that documents that were
-      // created but never published (draft-only) are also repaired.
-      const [draftOrphans, publishedOrphans] = await Promise.all([
-        strapi.documents(uid as any).findMany({
-          filters: { tenant: { $null: true } },
-          status: 'draft',
-        } as any),
-        strapi.documents(uid as any).findMany({
-          filters: { tenant: { $null: true } },
-          status: 'published',
-        } as any),
-      ]);
+      try {
+        // findMany with no status filter returns ALL rows (draft + published)
+        const orphanRows = await strapi.db.query(uid).findMany({
+          where: { tenant: null },
+        });
 
-      // De-duplicate by documentId (a doc may appear in both lists)
-      const seen = new Set<string>();
-      const allOrphans = [...draftOrphans, ...publishedOrphans].filter((o: any) => {
-        if (seen.has(o.documentId)) return false;
-        seen.add(o.documentId);
-        return true;
-      });
+        if (orphanRows.length === 0) {
+          console.log(`✅ No orphan rows for ${uid}`);
+          return;
+        }
 
-      if (allOrphans.length > 0) {
-        console.log(`🔧 Repairing ${allOrphans.length} orphan records for ${uid} -> ${targetTenant.name}`);
-        for (const orphan of allOrphans) {
+        console.log(`🔧 Repairing ${orphanRows.length} orphan row(s) for ${uid} → tenant id=${targetTenant.id} (${targetTenant.name})`);
+
+        for (const row of orphanRows) {
           try {
-            // Update the draft version first (always present)
-            await strapi.documents(uid as any).update({
-              documentId: orphan.documentId,
-              data: { tenant: targetTenant.documentId },
-              status: 'draft',
-            } as any);
-
-            // If a published version exists, update that too so the FK is consistent
-            // across both DB rows (Strapi v5 stores draft and published as separate rows).
-            const isPublished = publishedOrphans.some((p: any) => p.documentId === orphan.documentId);
-            if (isPublished) {
-              await strapi.documents(uid as any).update({
-                documentId: orphan.documentId,
-                data: { tenant: targetTenant.documentId },
-                status: 'published',
-              } as any);
-            }
-          } catch (repairErr) {
-            console.error(`🔥 Failed to repair orphan ${orphan.documentId} for ${uid}:`, repairErr);
+            // Direct integer FK write — the only reliable method during bootstrap
+            await strapi.db.query(uid).update({
+              where: { id: row.id },
+              data: { tenant: targetTenant.id },
+            });
+          } catch (rowErr) {
+            console.error(`🔥 Failed to repair row id=${row.id} for ${uid}:`, rowErr);
           }
         }
+
+        const remaining = await strapi.db.query(uid).count({ where: { tenant: null } });
+        console.log(`✅ Repair complete for ${uid}: ${remaining} orphan rows remaining after fix`);
+      } catch (repairErr) {
+        console.error(`🔥 repairOrphans failed entirely for ${uid}:`, repairErr);
       }
     };
 
