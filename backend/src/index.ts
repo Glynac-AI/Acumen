@@ -164,7 +164,6 @@ export default {
     // Note: The admin::user tenant relation is now defined via schema extension:
     // src/extensions/admin/content-types/user/schema.json
     // This is preferred over dynamic injection as it creates a proper DB column.
-
     // Register Document Middleware for Wiki.js Sync
     strapi.documents.use(async (context, next) => {
       // We only care about create, update, publish, and delete
