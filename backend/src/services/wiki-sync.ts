@@ -118,7 +118,7 @@ const wikiGraphQLRequest = async (query: string, variables: any, config: WikiSyn
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as { data?: any, errors?: any };
     
     if (data.errors) {
       throw new Error(`GraphQL Error: ${JSON.stringify(data.errors)}`);

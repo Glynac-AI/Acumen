@@ -177,7 +177,7 @@ export default {
 
       // Ensure we have a valid entry from the result
       // 'delete' might return the deleted document depending on the exact operation
-      const entry = result || context.params.data;
+      const entry = result || (context.params as any).data;
       if (!entry) return result;
 
       const uid = context.uid;
