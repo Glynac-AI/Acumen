@@ -839,6 +839,115 @@ export default {
     // Request Access -> Sylvan
     await repairOrphans('api::sylvan-request-access.sylvan-request-access', sylvianTenant);
 
+    // ─── 8. Seed Wiki JS Admin Role & User ────────────────────────────────────
+    console.log('⚙️ Seeding Wiki JS Admin role and user...');
+    const wikiJsAdminCode = 'wiki-js-admin';
+    let wikiJsAdminRole = await strapi.db.query('admin::role').findOne({
+      where: { code: wikiJsAdminCode },
+    });
+
+    if (!wikiJsAdminRole) {
+      wikiJsAdminRole = await strapi.db.query('admin::role').create({
+        data: {
+          name: 'Wiki JS Admin',
+          code: wikiJsAdminCode,
+          description: 'Admin role scoped exclusively to Wiki JS Content',
+        },
+      });
+      console.log(`✅ Admin role Wiki JS Admin created`);
+    } else {
+      console.log(`📋 Admin role Wiki JS Admin already exists`);
+    }
+
+    if (wikiJsAdminRole) {
+      // Set permissions for Wiki JS Admin Role
+      const wikiJsContentUid = 'api::wiki-js-content.wiki-js-content';
+      const wikiJsCType = strapi.contentType(wikiJsContentUid as any);
+      const wikiJsFields = wikiJsCType
+        ? Object.keys(wikiJsCType.attributes).filter(
+          (attr) => !['createdBy', 'updatedBy'].includes(attr)
+        )
+        : null;
+
+      const fullCrudActions = [
+        'plugin::content-manager.explorer.create',
+        'plugin::content-manager.explorer.read',
+        'plugin::content-manager.explorer.update',
+        'plugin::content-manager.explorer.delete',
+        'plugin::content-manager.explorer.publish',
+      ];
+
+      for (const action of fullCrudActions) {
+        const existing = await strapi.db.query('admin::permission').findOne({
+          where: { action, subject: wikiJsContentUid, role: wikiJsAdminRole.id },
+        });
+        const properties = { fields: wikiJsFields, locales: null };
+        if (!existing) {
+          await strapi.db.query('admin::permission').create({
+            data: { action, subject: wikiJsContentUid, properties, conditions: [], role: wikiJsAdminRole.id },
+          });
+        } else {
+          await strapi.db.query('admin::permission').update({
+            where: { id: existing.id },
+            data: { properties },
+          });
+        }
+      }
+      console.log(`✅ Permissions set for Wiki JS Admin role`);
+
+      // Create Admin User
+      const wikiJsAdminEmail = 'wikiadmin@glynac.ai';
+      const existingWikiJsAdmin = await strapi.db.query('admin::user').findOne({
+        where: { email: { $containsi: wikiJsAdminEmail } },
+        populate: ['roles'],
+      });
+
+      let wikiJsAdminUserId: number | null = null;
+      if (!existingWikiJsAdmin) {
+         try {
+           const hashedPassword = await bcrypt.hash('WikiAdmin123!', 10);
+           const created = await strapi.db.query('admin::user').create({
+             data: {
+               email: wikiJsAdminEmail,
+               firstname: 'Wiki',
+               lastname: 'Admin',
+               username: 'wikiAdmin',
+               password: hashedPassword,
+               isActive: true,
+               registrationToken: null,
+               resetPasswordToken: null,
+             },
+           });
+           wikiJsAdminUserId = created.id;
+           console.log(`✅ Created ${wikiJsAdminEmail} (id=${wikiJsAdminUserId})`);
+         } catch (e) {
+             console.error(`Failed to create Wiki JS Admin:`, e);
+         }
+      } else {
+         wikiJsAdminUserId = existingWikiJsAdmin.id;
+      }
+
+      if (wikiJsAdminUserId !== null && rolesJunctionTable) {
+        try {
+          const verify = await knex(rolesJunctionTable)
+            .where({ user_id: wikiJsAdminUserId, role_id: wikiJsAdminRole.id })
+            .first();
+
+          if (!verify) {
+            await knex(rolesJunctionTable).where({ user_id: wikiJsAdminUserId }).delete();
+            await knex(rolesJunctionTable).insert({
+              user_id: wikiJsAdminUserId,
+              role_id: wikiJsAdminRole.id,
+              role_order: 1,
+            });
+            console.log(`✅ Role Wiki JS Admin assigned to ${wikiJsAdminEmail}`);
+          }
+        } catch (e) {
+            console.error(`Failed to assign role to Wiki JS Admin:`, e);
+        }
+      }
+    }
+
     console.log('✅ Data Repair complete.');
   },
 };
