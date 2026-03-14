@@ -334,48 +334,117 @@ const deletePage = async (entry: StrapiEntry, collectionName: string) => {
 // ─── Dedicated sync for api::wiki-js-content.wiki-js-content ────────────────
 // Unlike the generic sync, this is strictly OPT-IN:
 //   • syncToWiki MUST be true on the entry.
-//   • Only create/update/publish actions are handled here (delete is omitted deliberately).
-//   • The markdown renderer is scoped to the wiki-js-content schema fields only:
-//     title, summary, body — no product/persona/category metadata.
-//   • Default path prefix is /wiki-js-content/<slug>, matching the user's intent.
+//   • Only create/update/publish actions are handled here (delete via deletePageById).
+//   • The markdown renderer is scoped to the wiki-js-content schema fields only.
+//   • Status is written back using strapi.db.query() — NOT strapi.documents() —
+//     to avoid re-triggering the Document Service middleware (infinite loop).
 
+const WIKI_JS_CONTENT_UID = 'api::wiki-js-content.wiki-js-content';
+
+// ─── Tier 2: Professional markdown with TOC, source banner, and footer ───────
 const renderWikiJsContentMarkdown = (entry: StrapiEntry): string => {
   const title = entry.title || 'Untitled';
   const summary = entry.summary || '';
+  // body is stored as richtext (plain text / markdown string in Strapi 5 by default)
   const body = entry.body ? String(entry.body) : '';
+  const syncTimestamp = new Date().toLocaleString('en-US', { timeZone: 'UTC' });
+  const strapiBaseUrl = process.env.PUBLIC_STRAPI_URL || process.env.STRAPI_URL || 'https://your-strapi-url';
 
   let md = `# ${title}\n\n`;
+
+  // Automatic Table of Contents (Wiki.js markdown extension)
+  md += `[[toc]]\n\n---\n\n`;
+
+  // Source and sync meta banner
+  md += `> 📘 **Source:** Managed in [Strapi](${strapiBaseUrl})\n`;
+  md += `> **Last Sync:** ${syncTimestamp} UTC\n\n`;
+
   if (summary) {
-    md += `> ${summary}\n\n`;
+    md += `## Summary\n\n${summary}\n\n`;
   }
-  md += body;
+
+  md += `## Content\n\n${body}\n\n`;
+
+  md += `---\n\n_Internal Document - Glynac Ops_\n`;
   return md;
 };
 
-const syncWikiJsContent = async (entry: StrapiEntry): Promise<void> => {
-  // Opt-in: only sync when the checkbox is explicitly checked
+// ─── Tier 3: Delete a Wiki.js page by its stored integer ID ─────────────────
+const deletePageById = async (wikiPageId: number): Promise<void> => {
+  const config = getConfig();
+  if (!config.enabled) return;
+
+  const deleteMutation = `
+    mutation($id: Int!) {
+      pages {
+        delete(id: $id) {
+          responseResult {
+            succeeded
+            message
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const result = await wikiGraphQLRequest(deleteMutation, { id: wikiPageId }, config);
+    if (result?.data?.pages?.delete?.responseResult?.succeeded) {
+      console.log(`[wiki-sync] wiki-js-content page deleted (wikiPageId=${wikiPageId})`);
+    } else {
+      console.error(`[wiki-sync] wiki-js-content delete failed (wikiPageId=${wikiPageId}):`, result?.data?.pages?.delete?.responseResult);
+    }
+  } catch (err) {
+    console.error(`[wiki-sync] error deleting wiki-js-content page (wikiPageId=${wikiPageId}):`, err);
+  }
+};
+
+// ─── Tier 1: Sync with status write-back ────────────────────────────────────
+// strapiInstance is the Strapi Core instance, passed in from the middleware.
+// Status is written via strapi.db.query() to bypass the Document Service
+// middleware and prevent an infinite-loop.
+const syncWikiJsContent = async (entry: StrapiEntry, strapiInstance?: any): Promise<void> => {
+  // Opt-in guard: only sync when the editor explicitly checks syncToWiki
   if (!entry || entry.syncToWiki !== true) return;
 
   const config = getConfig();
   if (!config.enabled) return;
 
+  // Helper: write status back to DB without triggering middleware
+  const writeStatus = async (status: 'success' | 'failed' | 'pending', extra: Record<string, any> = {}) => {
+    if (!strapiInstance || !entry.id) return;
+    try {
+      await strapiInstance.db.query(WIKI_JS_CONTENT_UID).update({
+        where: { id: entry.id },
+        data: { lastSyncStatus: status, ...extra },
+      });
+    } catch (dbErr) {
+      console.error('[wiki-sync] failed to write sync status back to Strapi:', dbErr);
+    }
+  };
+
   const slug = entry.slug || entry.documentId;
   const rawPath = entry.wikiPath || `/wiki-js-content/${slug}`;
-  // Use simple path normalisation — preserve the prefix, just ensure leading slash
   const path = rawPath.startsWith('/') ? rawPath : `/${rawPath}`;
 
   const content = renderWikiJsContentMarkdown(entry);
   const description = entry.summary || '';
   const tags: string[] = entry.wikiTags
-    ? String(entry.wikiTags).split(',').map(t => t.trim()).filter(Boolean)
+    ? String(entry.wikiTags).split(',').map((t: string) => t.trim()).filter(Boolean)
     : [];
   const title = entry.title || 'Untitled';
 
+  // Mark as pending before starting
+  await writeStatus('pending', { lastSyncError: null });
+
   try {
-    const existingId = await checkPageExists(path, config.defaultLocale, config);
+    // Use stored wikiPageId first to avoid a round-trip "guess by path" query
+    const storedPageId: number | null = entry.wikiPageId || null;
+    const existingId = storedPageId || await checkPageExists(path, config.defaultLocale, config);
+    let returnedPageId: number | null = null;
 
     if (existingId) {
-      // Update
+      // UPDATE
       const updateMutation = `
         mutation($id:Int!,$content:String!,$description:String!,$editor:String!,$isPrivate:Boolean!,$locale:String!,$path:String!,$tags:[String]!,$title:String!,$isPublished:Boolean!){
           pages{update(id:$id,content:$content,description:$description,editor:$editor,isPrivate:$isPrivate,locale:$locale,path:$path,tags:$tags,title:$title,isPublished:$isPublished){
@@ -396,13 +465,14 @@ const syncWikiJsContent = async (entry: StrapiEntry): Promise<void> => {
         isPublished: true,
       }, config);
 
-      if (result?.data?.pages?.update?.responseResult?.succeeded) {
-        console.log(`[wiki-sync] wiki-js-content updated: ${path}`);
-      } else {
-        console.error(`[wiki-sync] wiki-js-content update failed at ${path}:`, result?.data?.pages?.update?.responseResult);
+      if (!result?.data?.pages?.update?.responseResult?.succeeded) {
+        throw new Error(result?.data?.pages?.update?.responseResult?.message || 'Wiki.js update mutation failed');
       }
+
+      returnedPageId = existingId; // ID doesn't change on update
+      console.log(`[wiki-sync] wiki-js-content updated: ${path}`);
     } else {
-      // Create
+      // CREATE
       const createMutation = `
         mutation($content:String!,$description:String!,$editor:String!,$isPrivate:Boolean!,$isPublished:Boolean!,$locale:String!,$path:String!,$tags:[String]!,$title:String!){
           pages{create(content:$content,description:$description,editor:$editor,isPrivate:$isPrivate,isPublished:$isPublished,locale:$locale,path:$path,tags:$tags,title:$title){
@@ -423,25 +493,47 @@ const syncWikiJsContent = async (entry: StrapiEntry): Promise<void> => {
         title,
       }, config);
 
-      if (result?.data?.pages?.create?.responseResult?.succeeded) {
-        console.log(`[wiki-sync] wiki-js-content created: ${path}`);
-      } else {
-        console.error(`[wiki-sync] wiki-js-content create failed at ${path}:`, result?.data?.pages?.create?.responseResult);
+      if (!result?.data?.pages?.create?.responseResult?.succeeded) {
+        throw new Error(result?.data?.pages?.create?.responseResult?.message || 'Wiki.js create mutation failed');
       }
+
+      returnedPageId = result?.data?.pages?.create?.page?.id || null;
+      console.log(`[wiki-sync] wiki-js-content created: ${path} (wikiPageId=${returnedPageId})`);
     }
-  } catch (err) {
-    console.error(`[wiki-sync] error syncing wiki-js-content at ${path}:`, err);
+
+    // Write SUCCESS status back to Strapi entry
+    await writeStatus('success', {
+      lastSyncedAt: new Date(),
+      lastSyncError: null,
+      ...(returnedPageId !== null ? { wikiPageId: returnedPageId } : {}),
+    });
+
+  } catch (err: any) {
+    const errorMessage = err?.message || String(err);
+    console.error(`[wiki-sync] error syncing wiki-js-content at ${path}:`, errorMessage);
+
+    // Write FAILED status back so the editor can see what went wrong
+    await writeStatus('failed', {
+      lastSyncError: errorMessage,
+    });
   }
 };
 
 export const wikiSyncService = {
+  // Generic multi-collection sync
   createOrUpdatePage,
   deletePage,
+  // wiki-js-content dedicated sync (opt-in, with status write-back)
   syncWikiJsContent,
+  deletePageById,
+  // Renderers (exported for testing)
   renderMarkdown,
   renderWikiJsContentMarkdown,
+  // Utilities
   normalizePath,
   wikiGraphQLRequest,
 };
 
 export default wikiSyncService;
+
+

@@ -36,6 +36,19 @@
     },
     "wikiTags": {
       "type": "string"
+    },
+    "lastSyncedAt": {
+      "type": "datetime"
+    },
+    "lastSyncStatus": {
+      "type": "enumeration",
+      "enum": ["success", "failed", "pending"]
+    },
+    "lastSyncError": {
+      "type": "text"
+    },
+    "wikiPageId": {
+      "type": "integer"
     }
   }
 }

@@ -193,10 +193,20 @@ export default {
 
       const uid = ctx.uid;
 
-      // PATH A: wiki-js-content — dedicated opt-in sync (no delete mirroring)
+      // PATH A: wiki-js-content — dedicated opt-in sync (with status write-back)
       if (uid === WIKI_JS_CONTENT_UID) {
-        if (['create', 'update', 'publish'].includes(ctx.action)) {
-          wikiSyncService.syncWikiJsContent(entry as any)
+        if (ctx.action === 'delete') {
+          // Tier 3: Delete the mirrored Wiki.js page using the stored integer ID.
+          // Falls back to no-op gracefully if wikiPageId was never stored.
+          const wikiPageId = entry.wikiPageId;
+          if (wikiPageId) {
+            wikiSyncService.deletePageById(Number(wikiPageId))
+              .catch(err => console.error(`[wiki-sync] wiki-js-content delete error (wikiPageId=${wikiPageId}):`, err));
+          }
+        } else if (['create', 'update', 'publish'].includes(ctx.action)) {
+          // Pass the strapi instance so syncWikiJsContent can write status back
+          // via strapi.db.query() — bypassing the middleware to prevent infinite loops
+          wikiSyncService.syncWikiJsContent(entry as any, strapi)
             .catch(err => console.error(`[wiki-sync] wiki-js-content sync error:`, err));
         }
         return result;
