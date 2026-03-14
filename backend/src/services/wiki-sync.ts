@@ -331,12 +331,117 @@ const deletePage = async (entry: StrapiEntry, collectionName: string) => {
   }
 };
 
+// ─── Dedicated sync for api::wiki-js-content.wiki-js-content ────────────────
+// Unlike the generic sync, this is strictly OPT-IN:
+//   • syncToWiki MUST be true on the entry.
+//   • Only create/update/publish actions are handled here (delete is omitted deliberately).
+//   • The markdown renderer is scoped to the wiki-js-content schema fields only:
+//     title, summary, body — no product/persona/category metadata.
+//   • Default path prefix is /wiki-js-content/<slug>, matching the user's intent.
+
+const renderWikiJsContentMarkdown = (entry: StrapiEntry): string => {
+  const title = entry.title || 'Untitled';
+  const summary = entry.summary || '';
+  const body = entry.body ? String(entry.body) : '';
+
+  let md = `# ${title}\n\n`;
+  if (summary) {
+    md += `> ${summary}\n\n`;
+  }
+  md += body;
+  return md;
+};
+
+const syncWikiJsContent = async (entry: StrapiEntry): Promise<void> => {
+  // Opt-in: only sync when the checkbox is explicitly checked
+  if (!entry || entry.syncToWiki !== true) return;
+
+  const config = getConfig();
+  if (!config.enabled) return;
+
+  const slug = entry.slug || entry.documentId;
+  const rawPath = entry.wikiPath || `/wiki-js-content/${slug}`;
+  // Use simple path normalisation — preserve the prefix, just ensure leading slash
+  const path = rawPath.startsWith('/') ? rawPath : `/${rawPath}`;
+
+  const content = renderWikiJsContentMarkdown(entry);
+  const description = entry.summary || '';
+  const tags: string[] = entry.wikiTags
+    ? String(entry.wikiTags).split(',').map(t => t.trim()).filter(Boolean)
+    : [];
+  const title = entry.title || 'Untitled';
+
+  try {
+    const existingId = await checkPageExists(path, config.defaultLocale, config);
+
+    if (existingId) {
+      // Update
+      const updateMutation = `
+        mutation($id:Int!,$content:String!,$description:String!,$editor:String!,$isPrivate:Boolean!,$locale:String!,$path:String!,$tags:[String]!,$title:String!,$isPublished:Boolean!){
+          pages{update(id:$id,content:$content,description:$description,editor:$editor,isPrivate:$isPrivate,locale:$locale,path:$path,tags:$tags,title:$title,isPublished:$isPublished){
+            responseResult{succeeded message}
+          }}
+        }
+      `;
+      const result = await wikiGraphQLRequest(updateMutation, {
+        id: existingId,
+        content,
+        description,
+        editor: config.defaultEditor,
+        isPrivate: config.defaultPrivate,
+        locale: config.defaultLocale,
+        path,
+        tags,
+        title,
+        isPublished: true,
+      }, config);
+
+      if (result?.data?.pages?.update?.responseResult?.succeeded) {
+        console.log(`[wiki-sync] wiki-js-content updated: ${path}`);
+      } else {
+        console.error(`[wiki-sync] wiki-js-content update failed at ${path}:`, result?.data?.pages?.update?.responseResult);
+      }
+    } else {
+      // Create
+      const createMutation = `
+        mutation($content:String!,$description:String!,$editor:String!,$isPrivate:Boolean!,$isPublished:Boolean!,$locale:String!,$path:String!,$tags:[String]!,$title:String!){
+          pages{create(content:$content,description:$description,editor:$editor,isPrivate:$isPrivate,isPublished:$isPublished,locale:$locale,path:$path,tags:$tags,title:$title){
+            responseResult{succeeded message}
+            page{id}
+          }}
+        }
+      `;
+      const result = await wikiGraphQLRequest(createMutation, {
+        content,
+        description,
+        editor: config.defaultEditor,
+        isPrivate: config.defaultPrivate,
+        isPublished: true,
+        locale: config.defaultLocale,
+        path,
+        tags,
+        title,
+      }, config);
+
+      if (result?.data?.pages?.create?.responseResult?.succeeded) {
+        console.log(`[wiki-sync] wiki-js-content created: ${path}`);
+      } else {
+        console.error(`[wiki-sync] wiki-js-content create failed at ${path}:`, result?.data?.pages?.create?.responseResult);
+      }
+    }
+  } catch (err) {
+    console.error(`[wiki-sync] error syncing wiki-js-content at ${path}:`, err);
+  }
+};
+
 export const wikiSyncService = {
   createOrUpdatePage,
   deletePage,
+  syncWikiJsContent,
   renderMarkdown,
+  renderWikiJsContentMarkdown,
   normalizePath,
-  wikiGraphQLRequest
+  wikiGraphQLRequest,
 };
 
 export default wikiSyncService;

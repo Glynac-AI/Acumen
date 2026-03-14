@@ -164,30 +164,49 @@ export default {
     // Note: The admin::user tenant relation is now defined via schema extension:
     // src/extensions/admin/content-types/user/schema.json
     // This is preferred over dynamic injection as it creates a proper DB column.
-    // Register Document Middleware for Wiki.js Sync
+
+    // ─── Document Service Middleware: Wiki.js Sync ────────────────────────────
+    // TWO separate code-paths:
+    //
+    // PATH A — api::wiki-js-content.wiki-js-content
+    //   • Dedicated sync via wikiSyncService.syncWikiJsContent()
+    //   • OPT-IN: entry.syncToWiki must be explicitly `true`.
+    //   • Watches: create | update | publish  (NOT delete)
+    //
+    // PATH B — all other collections in WIKI_SYNC_COLLECTIONS
+    //   • Generic sync via wikiSyncService.createOrUpdatePage() / deletePage().
+
+    const WIKI_JS_CONTENT_UID = 'api::wiki-js-content.wiki-js-content';
+
     strapi.documents.use(async (context, next) => {
-      // We only care about create, update, publish, and delete
+      const ctx = context as any;
       const targetActions = ['create', 'update', 'publish', 'delete'];
-      if (!targetActions.includes(context.action)) {
+      if (!targetActions.includes(ctx.action)) {
         return next();
       }
 
       // Execute the database operation first
       const result = await next();
 
-      // Ensure we have a valid entry from the result
-      // 'delete' might return the deleted document depending on the exact operation
-      const entry = result || (context.params as any).data;
+      const entry = result || (ctx.params as any).data;
       if (!entry) return result;
 
-      const uid = context.uid;
+      const uid = ctx.uid;
 
-      // Run sync asynchronously so we don't block the Strapi response
-      if (context.action === 'delete') {
+      // PATH A: wiki-js-content — dedicated opt-in sync (no delete mirroring)
+      if (uid === WIKI_JS_CONTENT_UID) {
+        if (['create', 'update', 'publish'].includes(ctx.action)) {
+          wikiSyncService.syncWikiJsContent(entry as any)
+            .catch(err => console.error(`[wiki-sync] wiki-js-content sync error:`, err));
+        }
+        return result;
+      }
+
+      // PATH B: generic collections via WIKI_SYNC_COLLECTIONS env var
+      if (ctx.action === 'delete') {
         wikiSyncService.deletePage(entry as any, uid)
           .catch(err => console.error(`[wiki-sync] async delete error for ${uid}:`, err));
       } else {
-        // create, update, publish
         wikiSyncService.createOrUpdatePage(entry as any, uid)
           .catch(err => console.error(`[wiki-sync] async sync error for ${uid}:`, err));
       }
