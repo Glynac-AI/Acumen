@@ -494,6 +494,7 @@ export default {
       'api::pillar.pillar',
       'api::subcategory.subcategory',
       'api::site-setting.site-setting',
+      'api::wiki-js-content.wiki-js-content',
     ];
 
     const TENANT_EXCLUDED_SHARED: Record<string, string[]> = {
@@ -943,7 +944,16 @@ export default {
             console.log(`✅ Role Wiki JS Admin assigned to ${wikiJsAdminEmail}`);
           }
         } catch (e) {
-            console.error(`Failed to assign role to Wiki JS Admin:`, e);
+            console.error(`Failed to assign role to Wiki JS Admin via knex, attempting service fallback:`, e);
+            try {
+              const userService = strapi.service('admin::user' as any) as any;
+              await userService.updateById(wikiJsAdminUserId, {
+                roles: [wikiJsAdminRole.id],
+              });
+              console.log(`✅ Role Wiki JS Admin assigned via strapi.service('admin::user') fallback`);
+            } catch (svcErr) {
+              console.error(`❌ Service fallback also failed for Wiki JS Admin:`, svcErr);
+            }
         }
       }
     }
