@@ -32,18 +32,19 @@ export default factories.createCoreService('api::blog-post.blog-post', ({ strapi
             return { data: [], meta: {} };
         }
 
-        // @ts-ignore
-        const entries = await strapi.entityService.findMany('api::blog-post.blog-post', {
-            ...params,
-            filters: {
+        const entries = await strapi.db.query('api::blog-post.blog-post').findMany({
+            where: {
                 ...(params.filters || {}),
                 tenant: { id: tenant.id },
                 publishedAt: { $notNull: true },
             },
+            orderBy: { publishedAt: 'desc' },
             populate: {
-                author: true,
+                author: {
+                    populate: { photo: true },
+                },
                 coverImage: true,
-                tenant: { fields: ['name', 'slug'] },
+                tenant: { select: ['name', 'slug'] },
             },
         });
 
@@ -69,9 +70,11 @@ export default factories.createCoreService('api::blog-post.blog-post', ({ strapi
                 publishedAt: { $notNull: true },
             },
             populate: {
-                author: true,
+                author: {
+                    populate: { photo: true },
+                },
                 coverImage: true,
-                tenant: { fields: ['name', 'slug'] },
+                tenant: { select: ['name', 'slug'] },
             },
         });
 

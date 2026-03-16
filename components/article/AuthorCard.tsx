@@ -1,18 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { BlogAuthor as BlogPostAuthor } from '@/types/blog-post';
+import type { Author } from '@/types';
 
 interface AuthorCardProps {
-    author: BlogPostAuthor;
+    author: Author;
     strapiBaseUrl: string;
 }
 
 export default function AuthorCard({ author, strapiBaseUrl }: AuthorCardProps) {
-    const attrs = author.attributes;
-    const photoUrl = attrs.photo?.data?.attributes?.url
-        ? (attrs.photo.data.attributes.url.startsWith('http')
-            ? attrs.photo.data.attributes.url
-            : strapiBaseUrl + attrs.photo.data.attributes.url)
+    const photoUrl = author.photo
+        ? (author.photo.startsWith('http')
+            ? author.photo
+            : `${strapiBaseUrl}${author.photo}`)
         : null;
 
     return (
@@ -20,32 +19,32 @@ export default function AuthorCard({ author, strapiBaseUrl }: AuthorCardProps) {
             {photoUrl ? (
                 <Image
                     src={photoUrl}
-                    alt={attrs.name}
+                    alt={author.name}
                     width={80}
                     height={80}
                     className="rounded-full object-cover w-20 h-20 flex-shrink-0"
                 />
             ) : (
                 <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-3xl flex-shrink-0">
-                    {attrs.name.charAt(0)}
+                    {author.name.charAt(0)}
                 </div>
             )}
             <div className="flex-grow">
                 <p className="text-sm font-semibold tracking-wide uppercase text-[#49648C] mb-2">
                     About the Author
                 </p>
-                <h3 className="text-2xl font-medium text-[#0B1F3B] mb-2">{attrs.name}</h3>
-                <p className="text-sm text-gray-600 mb-4">{attrs.title}</p>
+                <h3 className="text-2xl font-medium text-[#0B1F3B] mb-2">{author.name}</h3>
+                <p className="text-sm text-gray-600 mb-4">{author.title}</p>
 
-                {attrs.bio && (
-                    <p className="text-base text-gray-700 leading-relaxed mt-2 mb-4">{attrs.bio}</p>
+                {author.bio && (
+                    <p className="text-base text-gray-700 leading-relaxed mt-2 mb-4">{author.bio}</p>
                 )}
 
-                {(attrs.linkedin || attrs.twitter) && (
+                {(author.linkedin || author.twitter) && (
                     <div className="flex items-center gap-4 mt-2">
-                        {attrs.linkedin && (
+                        {author.linkedin && (
                             <a
-                                href={attrs.linkedin}
+                                href={author.linkedin}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="LinkedIn profile"
@@ -54,12 +53,12 @@ export default function AuthorCard({ author, strapiBaseUrl }: AuthorCardProps) {
                                 LinkedIn
                             </a>
                         )}
-                        {attrs.linkedin && attrs.twitter && (
+                        {author.linkedin && author.twitter && (
                             <span className="text-gray-300">|</span>
                         )}
-                        {attrs.twitter && (
+                        {author.twitter && (
                             <a
-                                href={attrs.twitter}
+                                href={author.twitter}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="Twitter / X profile"
