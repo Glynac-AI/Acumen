@@ -563,7 +563,7 @@ export default {
       const existing = await strapi.db.query('admin::permission').findOne({
         where: { action, subject, role: roleId },
       });
-      const properties = { fields: allFields, locales: null };
+      const properties = allFields ? { fields: allFields } : {};
       if (!existing) {
         await strapi.db.query('admin::permission').create({
           data: { action, subject, properties, conditions: [], role: roleId },
@@ -606,15 +606,8 @@ export default {
       // Shared types — full CRUD (per-tenant list excludes irrelevant types)
       const sharedContentTypes = getSharedContentTypes(tenantSlug);
       for (const uid of sharedContentTypes) {
-        const cType = strapi.contentType(uid as any);
-        const fields = cType
-          ? Object.keys(cType.attributes).filter(
-            (attr) => !['createdBy', 'updatedBy'].includes(attr)
-          )
-          : null;
-
         for (const action of fullCrudActions) {
-           await upsertAdminPermission(role.id, action, uid, fields);
+           await upsertAdminPermission(role.id, action, uid, null);
         }
       }
 
@@ -632,27 +625,15 @@ export default {
       }
 
       // Tenant model — read + update only
-      const tenantCType = strapi.contentType('api::tenant.tenant' as any);
-      const tenantFields = tenantCType
-        ? Object.keys(tenantCType.attributes).filter(
-          (attr) => !['createdBy', 'updatedBy'].includes(attr)
-        )
-        : null;
       for (const action of readUpdateOnly) {
-        await upsertAdminPermission(role.id, action, 'api::tenant.tenant', tenantFields);
+        await upsertAdminPermission(role.id, action, 'api::tenant.tenant', null);
       }
 
       // Exclusive types — full CRUD for this tenant only
       const exclusiveTypes = exclusiveContentTypes[tenantSlug] || [];
       for (const uid of exclusiveTypes) {
-        const cType = strapi.contentType(uid as any);
-        const fields = cType
-          ? Object.keys(cType.attributes).filter(
-            (attr) => !['createdBy', 'updatedBy'].includes(attr)
-          )
-          : null;
         for (const action of fullCrudActions) {
-          await upsertAdminPermission(role.id, action, uid, fields);
+          await upsertAdminPermission(role.id, action, uid, null);
         }
       }
 
@@ -905,12 +886,6 @@ export default {
     if (wikiJsAdminRole) {
       // Set permissions for Wiki JS Admin Role
       const wikiJsContentUid = 'api::wiki-js-content.wiki-js-content';
-      const wikiJsCType = strapi.contentType(wikiJsContentUid as any);
-      const wikiJsFields = wikiJsCType
-        ? Object.keys(wikiJsCType.attributes).filter(
-          (attr) => !['createdBy', 'updatedBy'].includes(attr)
-        )
-        : null;
 
       const fullCrudActions = [
         'plugin::content-manager.explorer.create',
@@ -924,7 +899,7 @@ export default {
         const existing = await strapi.db.query('admin::permission').findOne({
           where: { action, subject: wikiJsContentUid, role: wikiJsAdminRole.id },
         });
-        const properties = { fields: wikiJsFields, locales: null };
+        const properties = {};
         if (!existing) {
           await strapi.db.query('admin::permission').create({
             data: { action, subject: wikiJsContentUid, properties, conditions: [], role: wikiJsAdminRole.id },
