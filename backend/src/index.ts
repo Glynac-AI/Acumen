@@ -527,7 +527,7 @@ export default {
     ];
 
     const TENANT_EXCLUDED_SHARED: Record<string, string[]> = {
-      'glynac-ai': ['api::article.article'],
+      'glynac-ai': ['api::article.article', 'api::wiki-js-content.wiki-js-content'],
     };
 
     const getSharedContentTypes = (slug: string): string[] => {
@@ -582,7 +582,7 @@ export default {
     // and is now excluded, the DB row persists. Strapi reads it on /users/me →
     // tries to load the article schema → 404 → useRBAC warning → Publish may be blocked.
     const STALE_PERMISSIONS: Record<string, string[]> = {
-      'glynac-admin': ['api::article.article'],
+      'glynac-admin': ['api::article.article', 'api::wiki-js-content.wiki-js-content'],
     };
     for (const [roleCode, staleUids] of Object.entries(STALE_PERMISSIONS)) {
       const staleRole = await strapi.db.query('admin::role').findOne({ where: { code: roleCode } });
