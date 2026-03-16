@@ -527,7 +527,7 @@ export default {
     ];
 
     const TENANT_EXCLUDED_SHARED: Record<string, string[]> = {
-      'glynac-ai': ['api::article.article', 'api::wiki-js-content.wiki-js-content'],
+      'glynac-ai': ['api::article.article'],
     };
 
     const getSharedContentTypes = (slug: string): string[] => {
@@ -563,14 +563,7 @@ export default {
       const existing = await strapi.db.query('admin::permission').findOne({
         where: { action, subject, role: roleId },
       });
-
-      // RBAC logic for Strapi v5:
-      // - Collection types (subject exists) require { fields: null } for "Select All".
-      // - Plugins (subject is null, e.g. upload) require {} to avoid 403 errors.
-      const properties = subject 
-        ? { fields: allFields || null } 
-        : (allFields ? { fields: allFields } : {});
-
+      const properties = { fields: allFields, locales: null };
       if (!existing) {
         await strapi.db.query('admin::permission').create({
           data: { action, subject, properties, conditions: [], role: roleId },
@@ -589,7 +582,7 @@ export default {
     // and is now excluded, the DB row persists. Strapi reads it on /users/me →
     // tries to load the article schema → 404 → useRBAC warning → Publish may be blocked.
     const STALE_PERMISSIONS: Record<string, string[]> = {
-      'glynac-admin': ['api::article.article', 'api::wiki-js-content.wiki-js-content'],
+      'glynac-admin': ['api::article.article'],
     };
     for (const [roleCode, staleUids] of Object.entries(STALE_PERMISSIONS)) {
       const staleRole = await strapi.db.query('admin::role').findOne({ where: { code: roleCode } });
@@ -613,8 +606,15 @@ export default {
       // Shared types — full CRUD (per-tenant list excludes irrelevant types)
       const sharedContentTypes = getSharedContentTypes(tenantSlug);
       for (const uid of sharedContentTypes) {
+        const cType = strapi.contentType(uid as any);
+        const fields = cType
+          ? Object.keys(cType.attributes).filter(
+            (attr) => !['createdBy', 'updatedBy'].includes(attr)
+          )
+          : null;
+
         for (const action of fullCrudActions) {
-           await upsertAdminPermission(role.id, action, uid, null);
+           await upsertAdminPermission(role.id, action, uid, fields);
         }
       }
 
@@ -626,25 +626,55 @@ export default {
         'plugin::upload.assets.download',
         'plugin::upload.assets.copy-link',
         'plugin::upload.configure-view',
+        'plugin::upload.settings.read',
       ];
       for (const action of uploadActions) {
         await upsertAdminPermission(role.id, action, null, null);
       }
 
       // Tenant model — read + update only
+      const tenantCType = strapi.contentType('api::tenant.tenant' as any);
+      const tenantFields = tenantCType
+        ? Object.keys(tenantCType.attributes).filter(
+          (attr) => !['createdBy', 'updatedBy'].includes(attr)
+        )
+        : null;
       for (const action of readUpdateOnly) {
-        await upsertAdminPermission(role.id, action, 'api::tenant.tenant', null);
+        await upsertAdminPermission(role.id, action, 'api::tenant.tenant', tenantFields);
       }
 
       // Exclusive types — full CRUD for this tenant only
       const exclusiveTypes = exclusiveContentTypes[tenantSlug] || [];
       for (const uid of exclusiveTypes) {
+        const cType = strapi.contentType(uid as any);
+        const fields = cType
+          ? Object.keys(cType.attributes).filter(
+            (attr) => !['createdBy', 'updatedBy'].includes(attr)
+          )
+          : null;
         for (const action of fullCrudActions) {
-          await upsertAdminPermission(role.id, action, uid, null);
+          await upsertAdminPermission(role.id, action, uid, fields);
         }
       }
 
       console.log(`✅ Permissions set for role: ${role.name}`);
+    }
+
+    if (authorRole) {
+      console.log(`⚙️ Setting upload permissions for Author role: ${authorRole.name}...`);
+      const uploadActions = [
+        'plugin::upload.read',
+        'plugin::upload.assets.create',
+        'plugin::upload.assets.update',
+        'plugin::upload.assets.download',
+        'plugin::upload.assets.copy-link',
+        'plugin::upload.configure-view',
+        'plugin::upload.settings.read',
+      ];
+      for (const action of uploadActions) {
+        await upsertAdminPermission(authorRole.id, action, null, null);
+      }
+      console.log(`✅ Upload permissions set for Author role`);
     }
 
     // ─── 6. Seed Tenant-Scoped Strapi Admins ──────────────────────────────────
@@ -893,6 +923,12 @@ export default {
     if (wikiJsAdminRole) {
       // Set permissions for Wiki JS Admin Role
       const wikiJsContentUid = 'api::wiki-js-content.wiki-js-content';
+      const wikiJsCType = strapi.contentType(wikiJsContentUid as any);
+      const wikiJsFields = wikiJsCType
+        ? Object.keys(wikiJsCType.attributes).filter(
+          (attr) => !['createdBy', 'updatedBy'].includes(attr)
+        )
+        : null;
 
       const fullCrudActions = [
         'plugin::content-manager.explorer.create',
@@ -906,7 +942,7 @@ export default {
         const existing = await strapi.db.query('admin::permission').findOne({
           where: { action, subject: wikiJsContentUid, role: wikiJsAdminRole.id },
         });
-        const properties = {};
+        const properties = { fields: wikiJsFields, locales: null };
         if (!existing) {
           await strapi.db.query('admin::permission').create({
             data: { action, subject: wikiJsContentUid, properties, conditions: [], role: wikiJsAdminRole.id },
