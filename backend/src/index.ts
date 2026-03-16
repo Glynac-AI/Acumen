@@ -563,7 +563,14 @@ export default {
       const existing = await strapi.db.query('admin::permission').findOne({
         where: { action, subject, role: roleId },
       });
-      const properties = allFields ? { fields: allFields } : {};
+
+      // RBAC logic for Strapi v5:
+      // - Collection types (subject exists) require { fields: null } for "Select All".
+      // - Plugins (subject is null, e.g. upload) require {} to avoid 403 errors.
+      const properties = subject 
+        ? { fields: allFields || null } 
+        : (allFields ? { fields: allFields } : {});
+
       if (!existing) {
         await strapi.db.query('admin::permission').create({
           data: { action, subject, properties, conditions: [], role: roleId },
