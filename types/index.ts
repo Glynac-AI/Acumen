@@ -1,3 +1,8 @@
+export interface StrapiData<T> {
+    id: number;
+    attributes: T;
+}
+
 // Category Details Component
 export interface CategoryDetail {
     id: string;
@@ -87,10 +92,9 @@ export interface Article {
     seo?: SEO;
 }
 
-// Blog Post Author Component
-export interface BlogPostAuthorComponent {
-    name: string;
-    role: string;
+// Blog Post Author Relation (for relational author)
+export interface BlogPostAuthorRelation {
+    data: StrapiData<Author> | null;
 }
 
 // Blog Post
@@ -103,7 +107,7 @@ export interface BlogPost {
     coverImage: string;
     category: string;
     readTime: string;
-    author: BlogPostAuthorComponent;
+    author: BlogPostAuthorRelation;
     tags?: string[];
     publishDate?: string;
 }

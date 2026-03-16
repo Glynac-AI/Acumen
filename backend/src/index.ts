@@ -557,7 +557,7 @@ export default {
     const upsertAdminPermission = async (
       roleId: number,
       action: string,
-      subject: string,
+      subject: string | null,
       allFields: string[] | null
     ) => {
       const existing = await strapi.db.query('admin::permission').findOne({
@@ -614,8 +614,21 @@ export default {
           : null;
 
         for (const action of fullCrudActions) {
-          await upsertAdminPermission(role.id, action, uid, fields);
+           await upsertAdminPermission(role.id, action, uid, fields);
         }
+      }
+
+      // Add Upload (Media Library) Permissions
+      const uploadActions = [
+        'plugin::upload.read',
+        'plugin::upload.assets.create',
+        'plugin::upload.assets.update',
+        'plugin::upload.assets.download',
+        'plugin::upload.assets.copy-link',
+        'plugin::upload.configure-view',
+      ];
+      for (const action of uploadActions) {
+        await upsertAdminPermission(role.id, action, null, null);
       }
 
       // Tenant model — read + update only

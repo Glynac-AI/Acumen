@@ -83,22 +83,19 @@ export interface StrapiMediaArray {
 // Component: Blog Author
 // ==========================================
 
-export interface BlogAuthor {
-    id: number;
+export interface BlogAuthorAttributes {
     name: string;
-    role: string;
-    description?: string;
-    bio?: string;
-    avatar?: {
-        data?: {
-            attributes?: {
-                url: string;
-                alternativeText?: string | null;
-            };
-        };
-    };
+    title: string; // Renamed from role in component
+    bio: string;
+    photo?: StrapiMedia; // Renamed from avatar in component
     linkedin?: string;
     twitter?: string;
+}
+
+export interface BlogAuthor extends StrapiData<BlogAuthorAttributes> { }
+
+export interface BlogAuthorRelation {
+    data: BlogAuthor | null;
 }
 
 // ==========================================
@@ -141,7 +138,7 @@ export interface BlogPostAttributes {
     category: string;
     tags: string[] | null; // JSON array of strings
     readTime: string;
-    author: BlogAuthor;
+    author: BlogAuthorRelation;
     tenant?: TenantRelation;
     seo?: BlogPostSeo | null;
     createdAt: string;
@@ -233,7 +230,8 @@ export interface BlogPostPreview {
  */
 export function toBlogPostPreview(post: BlogPost): BlogPostPreview {
     const attrs = post.attributes;
-    const author = attrs.author;
+    const authorData = attrs.author?.data;
+    const authorAttrs = authorData?.attributes;
     const coverImage = attrs.coverImage.data?.attributes;
 
     return {
@@ -244,8 +242,8 @@ export function toBlogPostPreview(post: BlogPost): BlogPostPreview {
         coverImageUrl: coverImage?.url || '',
         category: attrs.category,
         readTime: attrs.readTime,
-        authorName: author?.name || 'Unknown Author',
-        authorRole: author?.role || '',
+        authorName: authorAttrs?.name || 'Unknown Author',
+        authorRole: authorAttrs?.title || '', // Mapping title to role for UI compatibility
         publishedDate: attrs.publishedAt || attrs.createdAt,
         tags: Array.isArray(attrs.tags) ? attrs.tags : [],
     };

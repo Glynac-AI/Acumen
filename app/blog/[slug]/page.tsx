@@ -139,7 +139,7 @@ export default async function BlogArticlePage({ params }: BlogPageProps) {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-[#0B1F3B]">{article.author.name}</p>
-                                    <p className="text-xs text-gray-500">{article.author.role}</p>
+                                    <p className="text-xs text-gray-500">{article.author.title}</p>
                                 </div>
                             </div>
 

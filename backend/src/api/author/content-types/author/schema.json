@@ -64,6 +64,12 @@
             "relation": "manyToOne",
             "target": "api::tenant.tenant",
             "inversedBy": "authors"
+        },
+        "blogPosts": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::blog-post.blog-post",
+            "mappedBy": "author"
         }
     }
 }
