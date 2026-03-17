@@ -230,20 +230,38 @@ export interface BlogPostPreview {
  */
 export function toBlogPostPreview(post: BlogPost): BlogPostPreview {
     const attrs = post.attributes;
-    const authorData = attrs.author?.data;
-    const authorAttrs = authorData?.attributes;
-    const coverImage = attrs.coverImage.data?.attributes;
+
+    // Strapi v5 returns flat relations — author is { id, name, title, photo: { url } }
+    // NOT the v4 wrapped format { data: { id, attributes: { name, ... } } }
+    // We cast to any to handle both shapes defensively during transition.
+    const author = attrs.author as any;
+    const authorName: string =
+        author?.name ||          // v5 flat
+        author?.data?.attributes?.name ||  // v4 wrapped (fallback)
+        'Unknown Author';
+    const authorRole: string =
+        author?.title ||         // v5 flat (field is 'title' not 'role')
+        author?.data?.attributes?.title ||
+        '';
+
+    // Strapi v5: coverImage is flat { id, url, ... }
+    // Strapi v4: coverImage was { data: { attributes: { url } } }
+    const coverImage = attrs.coverImage as any;
+    const coverImageUrl: string =
+        coverImage?.url ||                       // v5 flat
+        coverImage?.data?.attributes?.url ||     // v4 wrapped
+        '';
 
     return {
         id: post.id,
         title: attrs.title,
         slug: attrs.slug,
         excerpt: attrs.excerpt,
-        coverImageUrl: coverImage?.url || '',
+        coverImageUrl,
         category: attrs.category,
         readTime: attrs.readTime,
-        authorName: authorAttrs?.name || 'Unknown Author',
-        authorRole: authorAttrs?.title || '', // Mapping title to role for UI compatibility
+        authorName,
+        authorRole,
         publishedDate: attrs.publishedAt || attrs.createdAt,
         tags: Array.isArray(attrs.tags) ? attrs.tags : [],
     };
