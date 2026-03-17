@@ -61,9 +61,10 @@
         },
         "tenant": {
             "type": "relation",
-            "relation": "manyToOne",
+            "relation": "manyToMany",
             "target": "api::tenant.tenant",
-            "inversedBy": "authors"
+            "inversedBy": "authors",
+            "description": "Tenants this author can write for — shared across multiple tenants"
         },
         "blogPosts": {
             "type": "relation",

@@ -39,9 +39,13 @@ export default (policyContext: any, config: Record<string, unknown>, { strapi }:
             if (!ctx.query.filters) {
                 ctx.query.filters = {};
             }
-            ctx.query.filters.tenant = {
-                documentId: tenantDocumentId,
-            };
+            // Skip tenant filter injection for shared models (Author is manyToMany)
+            const isSharedModel = ctx.url?.includes('/authors');
+            if (!isSharedModel) {
+                ctx.query.filters.tenant = {
+                    documentId: tenantDocumentId,
+                };
+            }
             strapi.log.debug(`is-tenant-scoped: Filtering reads for authenticated user to tenant ${ctx.state.tenant.name}`);
         }
 
@@ -80,9 +84,13 @@ export default (policyContext: any, config: Record<string, unknown>, { strapi }:
             if (!ctx.query.filters) {
                 ctx.query.filters = {};
             }
-            ctx.query.filters.tenant = {
-                documentId: ctx.state.tenant.documentId
-            };
+            // Skip tenant filter injection for shared models (Author is manyToMany)
+            const isSharedModel = ctx.url?.includes('/authors');
+            if (!isSharedModel) {
+                ctx.query.filters.tenant = {
+                    documentId: ctx.state.tenant.documentId
+                };
+            }
         }
 
         if (['POST', 'PUT', 'PATCH'].includes(ctx.request?.method)) {

@@ -1,5 +1,14 @@
 /**
- * Author router with tenant-scoped policies
+ * Author router
+ *
+ * Read operations: return authors belonging to the current tenant
+ * (at least one of their tenants matches the resolved tenant).
+ * Write operations: require tenant context.
+ *
+ * Author is a SHARED content type — one author can belong to multiple
+ * tenants. The is-tenant-scoped policy is NOT used here because it injects
+ * a strict single-value tenant filter that breaks manyToMany relations.
+ * Filtering is handled directly in the author controller instead.
  */
 
 export default {
@@ -9,7 +18,8 @@ export default {
             path: '/authors',
             handler: 'author.find',
             config: {
-                policies: ['global::is-tenant-scoped'],
+                auth: false,
+                policies: [],
             },
         },
         {
@@ -17,7 +27,8 @@ export default {
             path: '/authors/:id',
             handler: 'author.findOne',
             config: {
-                policies: ['global::is-tenant-scoped'],
+                auth: false,
+                policies: [],
             },
         },
         {
@@ -25,7 +36,7 @@ export default {
             path: '/authors',
             handler: 'author.create',
             config: {
-                policies: ['global::is-tenant-scoped'],
+                policies: [],
             },
         },
         {
@@ -33,7 +44,7 @@ export default {
             path: '/authors/:id',
             handler: 'author.update',
             config: {
-                policies: ['global::is-tenant-scoped'],
+                policies: [],
             },
         },
         {
@@ -41,7 +52,7 @@ export default {
             path: '/authors/:id',
             handler: 'author.delete',
             config: {
-                policies: ['global::is-tenant-scoped'],
+                policies: [],
             },
         },
     ],

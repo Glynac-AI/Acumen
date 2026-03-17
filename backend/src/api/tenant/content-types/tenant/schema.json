@@ -62,7 +62,7 @@
         },
         "authors": {
             "type": "relation",
-            "relation": "oneToMany",
+            "relation": "manyToMany",
             "target": "api::author.author",
             "mappedBy": "tenant"
         },

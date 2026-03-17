@@ -461,7 +461,11 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             // MUST use integer id in connect[]. The Strapi v5 content-manager admin
             // API processes relation payloads with integer DB ids. Using documentId
             // UUID in connect[] is silently discarded, leaving tenant = NULL.
-            if (['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel) {
+            // Authors are excluded — they are shared (manyToMany) and their tenant
+            // links are managed by the author controller itself, not overwritten here.
+            const isSharedModel = targetModelUid === 'api::author.author';
+
+            if (['POST', 'PUT', 'PATCH'].includes(method) && isTenantScopedModel && !isSharedModel) {
                 if (!ctx.request.body) ctx.request.body = {};
                 ctx.request.body.tenant = {
                     connect: [{ id: tenantId }],
