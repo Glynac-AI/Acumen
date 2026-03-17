@@ -614,7 +614,7 @@ export default {
           : null;
 
         for (const action of fullCrudActions) {
-           await upsertAdminPermission(role.id, action, uid, fields);
+          await upsertAdminPermission(role.id, action, uid, fields);
         }
       }
 
@@ -795,14 +795,10 @@ export default {
         const deleted = await knex(rolesJunctionTable).where({ user_id: adminUserId }).delete();
         console.log(`[RBAC] Removed ${deleted} existing role link(s) for user_id=${adminUserId}`);
 
-        // role_order is a DECIMAL NOT NULL column in Strapi v5's junction table.
-        // Omitting it causes a NOT NULL constraint violation on PostgreSQL,
-        // silently dropping the role assignment and leaving the user with no role
-        // (which Strapi's RBAC then rejects with 403 on every content-manager action).
+        // Note: this DB schema does not have a role_order column — insert only user_id and role_id.
         await knex(rolesJunctionTable).insert({
           user_id: adminUserId,
           role_id: tenantSpecificRole.id,
-          role_order: 1,
         });
         console.log(`[RBAC] ✅ Role assigned: ${adminDef.email} → ${tenantSpecificRole.name} via '${rolesJunctionTable}'`);
 
@@ -965,27 +961,27 @@ export default {
 
       let wikiJsAdminUserId: number | null = null;
       if (!existingWikiJsAdmin) {
-         try {
-           const hashedPassword = await bcrypt.hash('WikiAdmin123!', 10);
-           const created = await strapi.db.query('admin::user').create({
-             data: {
-               email: wikiJsAdminEmail,
-               firstname: 'Wiki',
-               lastname: 'Admin',
-               username: 'wikiAdmin',
-               password: hashedPassword,
-               isActive: true,
-               registrationToken: null,
-               resetPasswordToken: null,
-             },
-           });
-           wikiJsAdminUserId = created.id;
-           console.log(`✅ Created ${wikiJsAdminEmail} (id=${wikiJsAdminUserId})`);
-         } catch (e) {
-             console.error(`Failed to create Wiki JS Admin:`, e);
-         }
+        try {
+          const hashedPassword = await bcrypt.hash('WikiAdmin123!', 10);
+          const created = await strapi.db.query('admin::user').create({
+            data: {
+              email: wikiJsAdminEmail,
+              firstname: 'Wiki',
+              lastname: 'Admin',
+              username: 'wikiAdmin',
+              password: hashedPassword,
+              isActive: true,
+              registrationToken: null,
+              resetPasswordToken: null,
+            },
+          });
+          wikiJsAdminUserId = created.id;
+          console.log(`✅ Created ${wikiJsAdminEmail} (id=${wikiJsAdminUserId})`);
+        } catch (e) {
+          console.error(`Failed to create Wiki JS Admin:`, e);
+        }
       } else {
-         wikiJsAdminUserId = existingWikiJsAdmin.id;
+        wikiJsAdminUserId = existingWikiJsAdmin.id;
       }
 
       if (wikiJsAdminUserId !== null && rolesJunctionTable) {
@@ -999,21 +995,20 @@ export default {
             await knex(rolesJunctionTable).insert({
               user_id: wikiJsAdminUserId,
               role_id: wikiJsAdminRole.id,
-              role_order: 1,
             });
             console.log(`✅ Role Wiki JS Admin assigned to ${wikiJsAdminEmail}`);
           }
         } catch (e) {
-            console.error(`Failed to assign role to Wiki JS Admin via knex, attempting service fallback:`, e);
-            try {
-              const userService = strapi.service('admin::user' as any) as any;
-              await userService.updateById(wikiJsAdminUserId, {
-                roles: [wikiJsAdminRole.id],
-              });
-              console.log(`✅ Role Wiki JS Admin assigned via strapi.service('admin::user') fallback`);
-            } catch (svcErr) {
-              console.error(`❌ Service fallback also failed for Wiki JS Admin:`, svcErr);
-            }
+          console.error(`Failed to assign role to Wiki JS Admin via knex, attempting service fallback:`, e);
+          try {
+            const userService = strapi.service('admin::user' as any) as any;
+            await userService.updateById(wikiJsAdminUserId, {
+              roles: [wikiJsAdminRole.id],
+            });
+            console.log(`✅ Role Wiki JS Admin assigned via strapi.service('admin::user') fallback`);
+          } catch (svcErr) {
+            console.error(`❌ Service fallback also failed for Wiki JS Admin:`, svcErr);
+          }
         }
       }
     }
