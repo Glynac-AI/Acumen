@@ -32,7 +32,31 @@ export default factories.createCoreController('api::blog-post.blog-post', () => 
             };
         }
 
-        // Rely on frontend populate request instead of overriding it.
+        // Always populate author (relation) with explicit fields and its photo (media)
+        ctx.query.populate = {
+            author: {
+                fields: ['name', 'title', 'bio', 'linkedin', 'twitter'], // explicitly request scalar fields
+                populate: {
+                    photo: {
+                        fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
+                    },
+                },
+            },
+            coverImage: {
+                fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
+            },
+            tenant: {
+                fields: ['name', 'slug'],
+            },
+            seo: {
+                populate: {
+                    ogImage: {
+                        fields: ['url', 'alternativeText', 'width', 'height'],
+                    },
+                },
+            },
+        };
+
         return await super.find(ctx);
     },
 
@@ -52,7 +76,30 @@ export default factories.createCoreController('api::blog-post.blog-post', () => 
             };
         }
 
-        // Rely on frontend populate request instead of overriding it.
+        // Always populate author (relation) with explicit fields and its photo (media)
+        ctx.query.populate = {
+            author: {
+                fields: ['name', 'title', 'bio', 'linkedin', 'twitter'], // explicitly request scalar fields
+                populate: {
+                    photo: {
+                        fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
+                    },
+                },
+            },
+            coverImage: {
+                fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
+            },
+            tenant: {
+                fields: ['name', 'slug'],
+            },
+            seo: {
+                populate: {
+                    ogImage: {
+                        fields: ['url', 'alternativeText', 'width', 'height'],
+                    },
+                },
+            },
+        };
 
         return await super.findOne(ctx);
     },
