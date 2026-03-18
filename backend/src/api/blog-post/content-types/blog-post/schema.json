@@ -72,6 +72,15 @@
             "inversedBy": "blogPosts",
             "description": "Tenant this blog post belongs to — used for multi-tenant scoping"
         },
+        "ogImage": {
+            "type": "media",
+            "multiple": false,
+            "required": false,
+            "allowedTypes": [
+                "images"
+            ],
+            "description": "Fallback OG Image (fixes frontend 400 populate error)"
+        },
         "seo": {
             "type": "component",
             "component": "shared.seo",
