@@ -289,6 +289,15 @@ function derivePillar(strapiArticle: StrapiArticle): import('@/types').PillarNam
     return 'Industry Insights';
 }
 
+const FALLBACK_AUTHOR: import('@/types').Author = {
+    id: '0',
+    name: 'Unknown Author',
+    slug: 'unknown',
+    title: '',
+    bio: '',
+    photo: 'https://placehold.co/400x400/49648C/FFFFFF?text=Author',
+};
+
 function transformArticle(strapiArticle: StrapiArticle): Article | null {
     const author = strapiArticle.author;
     const category = strapiArticle.category;
@@ -296,8 +305,10 @@ function transformArticle(strapiArticle: StrapiArticle): Article | null {
     const tags = strapiArticle.tags || [];
 
     if (!author) {
-        console.warn(`Article ${strapiArticle.id} (${strapiArticle.title}) missing required relation: author - skipping`);
-        return null;
+        console.warn(
+            `[ARTICLE MISSING AUTHOR] title="${strapiArticle.title}" id=${strapiArticle.id} slug="${strapiArticle.slug}" — ` +
+            `ACTION REQUIRED: Strapi Admin → Articles → this post → assign an Author → Save & Publish.`
+        );
     }
 
     if (!category) {
@@ -316,13 +327,15 @@ function transformArticle(strapiArticle: StrapiArticle): Article | null {
         articleStatus: (strapiArticle.articleStatus as import('@/types').ArticleStatus) || 'Published',
         subcategories: subcategories.map(transformSubcategory),
         tags: tags.length > 0 ? tags.map(transformTag) : undefined,
-        author: transformAuthor(author),
+        author: author ? transformAuthor(author) : FALLBACK_AUTHOR,
         featuredImage: getMediaURL(strapiArticle.featuredImage),
         publishDate: strapiArticle.publishDate,
         readTime: strapiArticle.readTime,
         isFeatured: strapiArticle.isFeatured || false,
         seo: transformSEO(strapiArticle.seo),
-    };
+        // Keep category for BlogContent.tsx filter compatibility
+        category: transformCategory(category),
+    } as Article & { category: Category };
 }
 
 // ============================================
