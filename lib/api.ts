@@ -966,6 +966,13 @@ export async function fetchBlogPosts(options: {
     params.set('pagination[pageSize]', String(options.limit ?? 100));
     params.set('sort[0]', 'createdAt:desc');
     params.set('filters[publishedAt][$notNull]', 'true');
+
+    // Explicit populate — ensures author and nested photo are always returned
+    params.set('populate[author][populate][photo]', 'true');
+    params.set('populate[coverImage]', 'true');
+    params.set('populate[tenant]', 'true');
+    params.set('populate[seo][populate][ogImage]', 'true');
+
     if (options.slugFilter) {
         params.set('filters[slug][$eq]', options.slugFilter);
     }
