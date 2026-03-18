@@ -4,18 +4,16 @@
  * Scopes all reads to the resolved tenant (injected by the tenant-context middleware).
  * Each tenant (Glynac AI, RegulateThis, Sylvan, …) only sees its own blog posts.
  *
- * Tenant resolution order (handled by tenant-context middleware):
- *   1. Authenticated user's tenant relation
- *   2. X-Tenant-Domain header
- *   3. X-Tenant-Slug header
- *   4. Origin header
- *   5. Referer header
+ * Populate strategy: use relation-level populate objects WITHOUT a `fields` restriction
+ * so that Strapi v5 returns all scalar fields on each relation (author name, title, etc).
+ * Using `fields: [...]` in Strapi v5 can silently suppress scalars in some versions.
  */
 
 import { factories } from '@strapi/strapi';
 
 // @ts-ignore
 export default factories.createCoreController('api::blog-post.blog-post', () => ({
+
     /**
      * List blog posts — filtered to the resolved tenant when present.
      */
@@ -32,28 +30,15 @@ export default factories.createCoreController('api::blog-post.blog-post', () => 
             };
         }
 
-        // Always populate author (relation) with explicit fields and its photo (media)
+        // Populate author + nested photo without field restrictions
         ctx.query.populate = {
             author: {
-                fields: ['name', 'title', 'bio', 'linkedin', 'twitter'], // explicitly request scalar fields
-                populate: {
-                    photo: {
-                        fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
-                    },
-                },
+                populate: { photo: true },
             },
-            coverImage: {
-                fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
-            },
-            tenant: {
-                fields: ['name', 'slug'],
-            },
+            coverImage: true,
+            tenant: true,
             seo: {
-                populate: {
-                    ogImage: {
-                        fields: ['url', 'alternativeText', 'width', 'height'],
-                    },
-                },
+                populate: { ogImage: true },
             },
         };
 
@@ -66,7 +51,6 @@ export default factories.createCoreController('api::blog-post.blog-post', () => 
     async findOne(ctx) {
         const existingFilters = (ctx.query.filters || {}) as Record<string, unknown>;
 
-        // Scope by tenant if resolved by middleware
         if (ctx.state.tenant) {
             ctx.query.filters = {
                 ...existingFilters,
@@ -76,28 +60,14 @@ export default factories.createCoreController('api::blog-post.blog-post', () => 
             };
         }
 
-        // Always populate author (relation) with explicit fields and its photo (media)
         ctx.query.populate = {
             author: {
-                fields: ['name', 'title', 'bio', 'linkedin', 'twitter'], // explicitly request scalar fields
-                populate: {
-                    photo: {
-                        fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
-                    },
-                },
+                populate: { photo: true },
             },
-            coverImage: {
-                fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
-            },
-            tenant: {
-                fields: ['name', 'slug'],
-            },
+            coverImage: true,
+            tenant: true,
             seo: {
-                populate: {
-                    ogImage: {
-                        fields: ['url', 'alternativeText', 'width', 'height'],
-                    },
-                },
+                populate: { ogImage: true },
             },
         };
 
