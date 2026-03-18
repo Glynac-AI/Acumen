@@ -172,9 +172,11 @@ async function fetchAPI<T>(
 ): Promise<T> {
     const url = getStrapiURL(`/api${path}`);
 
+    const tenantSlug = process.env.NEXT_PUBLIC_TENANT_SLUG;
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
         ...(STRAPI_API_TOKEN && { Authorization: `Bearer ${STRAPI_API_TOKEN}` }),
+        ...(tenantSlug && { 'X-Tenant-Slug': tenantSlug }),
         ...options.headers,
     };
 
@@ -871,3 +873,110 @@ export async function unsubscribeFromNewsletter(
         };
     }
 }
+
+// ============================================
+// BLOG POST (tenant-scoped) API
+// ============================================
+
+interface StrapiBlogPost {
+    id: number;
+    documentId: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    category: string;
+    readTime: string;
+    tags?: string[] | null;
+    publishedAt?: string | null;
+    createdAt: string;
+    updatedAt: string;
+    author?: StrapiAuthor | null;
+    coverImage?: StrapiMedia | null;
+    seo?: StrapiSEO | null;
+    tenant?: { id: number; name: string; slug: string } | null;
+}
+
+const FALLBACK_BLOG_AUTHOR: Author = {
+    id: '0',
+    name: 'Unknown Author',
+    slug: 'unknown',
+    title: '',
+    bio: '',
+    photo: 'https://placehold.co/400x400/49648C/FFFFFF?text=Author',
+};
+
+function transformBlogPost(post: StrapiBlogPost): Article {
+    if (!post.author) {
+        console.warn(
+            `[BLOG POST MISSING AUTHOR] title="${post.title}" id=${post.id} slug="${post.slug}" — ` +
+            `ACTION REQUIRED: Strapi Admin → Blog Posts → this post → assign an Author → Save & Publish.`
+        );
+    }
+
+    const readTimeNum = parseInt(post.readTime ?? '5', 10) || 5;
+    const categoryStr = post.category || 'Industry Insights';
+    const pillar: PillarName = VALID_PILLARS.includes(categoryStr)
+        ? (categoryStr as PillarName)
+        : 'Industry Insights';
+    const slugified = categoryStr.toLowerCase().replace(/[&\s]+/g, '-');
+    const syntheticCategory: Category = {
+        id: slugified,
+        name: categoryStr,
+        slug: slugified,
+        subtitle: '',
+        description: '',
+        order: 0,
+        details: [],
+    };
+
+    return {
+        id: post.id.toString(),
+        title: post.title,
+        slug: post.slug,
+        excerpt: post.excerpt,
+        content: post.content,
+        pillar,
+        articleStatus: 'Published' as ArticleStatus,
+        subcategories: [],
+        tags: post.tags
+            ? (post.tags as string[]).filter(Boolean).map((t: string, i: number) => ({
+                id: String(i),
+                name: t,
+                slug: t.toLowerCase().replace(/\s+/g, '-'),
+            }))
+            : undefined,
+        author: post.author ? transformAuthor(post.author) : FALLBACK_BLOG_AUTHOR,
+        featuredImage: getMediaURL(post.coverImage),
+        publishDate: post.publishedAt || post.createdAt,
+        readTime: readTimeNum,
+        isFeatured: false,
+        seo: transformSEO(post.seo),
+        category: syntheticCategory,
+    } as Article & { category: Category };
+}
+
+export async function fetchBlogPosts(options: {
+    limit?: number;
+    page?: number;
+    slugFilter?: string;
+} = {}): Promise<Article[]> {
+    const params = new URLSearchParams();
+    params.set('pagination[page]', String(options.page ?? 1));
+    params.set('pagination[pageSize]', String(options.limit ?? 100));
+    params.set('sort[0]', 'createdAt:desc');
+    params.set('filters[publishedAt][$notNull]', 'true');
+    if (options.slugFilter) {
+        params.set('filters[slug][$eq]', options.slugFilter);
+    }
+    const response = await fetchAPI<StrapiResponse<StrapiBlogPost[]>>(
+        `/blog-posts?${params.toString()}`
+    );
+    return (response.data ?? []).map(transformBlogPost);
+}
+
+export async function fetchBlogPostBySlug(slug: string): Promise<Article | null> {
+    const posts = await fetchBlogPosts({ slugFilter: slug });
+    return posts[0] ?? null;
+}
+

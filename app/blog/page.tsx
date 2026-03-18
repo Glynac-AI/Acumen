@@ -1,14 +1,14 @@
 import { Suspense } from 'react';
 import { Container } from '@/components/ui/Container';
 import { BlogContent } from '@/components/blog/BlogContent';
-import { fetchCategories, fetchArticles } from '@/lib/api';
+import { fetchCategories, fetchBlogPosts } from '@/lib/api';
 import type { Metadata } from 'next';
 
 // Revalidate data every 60 seconds
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-    title: 'Blog - Latest Insights | RegulateThis',
+    title: 'Blog - Latest Insights | Glynac AI',
     description: 'Sharp analysis on practice management, software, and compliance. Published when we have something worth saying.',
 };
 
@@ -29,9 +29,9 @@ function BlogLoading() {
 }
 
 export default async function BlogPage() {
-    // Fetch all categories and articles from Strapi
+    // Fetch categories and blog posts from Strapi (tenant-scoped via X-Tenant-Slug header)
     const categories = await fetchCategories();
-    const allArticles = await fetchArticles();
+    const allArticles = await fetchBlogPosts();
 
     return (
         <Suspense fallback={<BlogLoading />}>
