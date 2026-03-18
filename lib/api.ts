@@ -1,4 +1,4 @@
-import { Article, Author, Category, Subcategory, Tag, SEOMetadata, NewsletterSubscription } from '@/types';
+import { Article, Author, Category, Subcategory, Tag, ArticleStatus, PillarName } from '@/types';
 
 // ============================================
 // STRAPI V5 TYPES & INTERFACES
@@ -45,12 +45,14 @@ interface StrapiArticle {
     publishDate: string;
     readTime: number;
     isFeatured?: boolean;
+    articleStatus?: string | null;
     createdAt: string;
     updatedAt: string;
     publishedAt?: string | null;
     featuredImage?: StrapiMedia | null;
     author?: StrapiAuthor | null;
     category?: StrapiCategory | null;
+    pillar?: StrapiCategory | null;
     subcategories?: StrapiSubcategory[];
     tags?: StrapiTag[];
     seo?: StrapiSEO | null;
@@ -140,7 +142,7 @@ interface StrapiResponse<T> {
 // CONFIGURATION
 // ============================================
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 function getStrapiURL(path: string = ''): string {
@@ -209,7 +211,7 @@ async function fetchAPI<T>(
 // TRANSFORM FUNCTIONS
 // ============================================
 
-function transformSEO(seo?: StrapiSEO | null): SEOMetadata | undefined {
+function transformSEO(seo?: StrapiSEO | null): import('@/types').SEO | undefined {
     if (!seo) return undefined;
 
     return {
@@ -236,7 +238,7 @@ function transformSubcategory(strapiSubcategory: StrapiSubcategory): Subcategory
         name: strapiSubcategory.name,
         slug: strapiSubcategory.slug,
         description: strapiSubcategory.description || undefined,
-        categoryId: strapiSubcategory.category?.id.toString() || '',
+        category: strapiSubcategory.category ? transformCategory(strapiSubcategory.category) : undefined,
     };
 }
 
@@ -247,7 +249,7 @@ function transformCategory(strapiCategory: StrapiCategory): Category {
         slug: strapiCategory.slug,
         subtitle: strapiCategory.subtitle,
         description: strapiCategory.description,
-        details: strapiCategory.details?.map(d => d.detail) || [],
+        details: strapiCategory.details?.map(d => ({ id: d.id.toString(), detail: d.detail })) || [],
         order: strapiCategory.order,
     };
 }
@@ -264,6 +266,27 @@ function transformAuthor(strapiAuthor: StrapiAuthor): Author {
         twitter: strapiAuthor.twitter || undefined,
         email: strapiAuthor.email || undefined,
     };
+}
+
+// Valid PillarName values — must stay in sync with types/index.ts
+const VALID_PILLARS: string[] = [
+    'Compliance & Regulation',
+    'Technology & Operations',
+    'Practice Management',
+    'Client Strategy',
+    'Industry Insights',
+];
+
+function derivePillar(strapiArticle: StrapiArticle): import('@/types').PillarName {
+    const pillarName = strapiArticle.pillar?.name;
+    if (pillarName && VALID_PILLARS.includes(pillarName)) {
+        return pillarName as import('@/types').PillarName;
+    }
+    const categoryName = strapiArticle.category?.name;
+    if (categoryName && VALID_PILLARS.includes(categoryName)) {
+        return categoryName as import('@/types').PillarName;
+    }
+    return 'Industry Insights';
 }
 
 function transformArticle(strapiArticle: StrapiArticle): Article | null {
@@ -289,7 +312,8 @@ function transformArticle(strapiArticle: StrapiArticle): Article | null {
         slug: strapiArticle.slug,
         content: strapiArticle.content,
         excerpt: strapiArticle.excerpt,
-        category: transformCategory(category),
+        pillar: derivePillar(strapiArticle),
+        articleStatus: (strapiArticle.articleStatus as import('@/types').ArticleStatus) || 'Published',
         subcategories: subcategories.map(transformSubcategory),
         tags: tags.length > 0 ? tags.map(transformTag) : undefined,
         author: transformAuthor(author),
@@ -330,6 +354,7 @@ export async function fetchArticles(options: {
         'populate[7]': 'featuredImage',
         'populate[8]': 'seo',
         'populate[9]': 'seo.ogImage',
+        'populate[10]': 'pillar',
     });
 
     if (featured !== undefined) {
@@ -372,6 +397,7 @@ export async function fetchArticleBySlug(slug: string): Promise<Article | null> 
         'populate[7]': 'featuredImage',
         'populate[8]': 'seo',
         'populate[9]': 'seo.ogImage',
+        'populate[10]': 'pillar',
     });
 
     try {
@@ -677,7 +703,7 @@ export async function getArticleCountByCategory(categorySlug: string): Promise<n
 /**
  * Transform Strapi subscriber to app format
  */
-function transformSubscriber(strapiSubscriber: StrapiSubscriber): NewsletterSubscription {
+function transformSubscriber(strapiSubscriber: StrapiSubscriber): Record<string, unknown> {
     return {
         id: strapiSubscriber.documentId,
         email: strapiSubscriber.email,
@@ -690,7 +716,7 @@ function transformSubscriber(strapiSubscriber: StrapiSubscriber): NewsletterSubs
 /**
  * Fetch all active newsletter subscribers
  */
-export async function fetchActiveSubscribers(): Promise<NewsletterSubscription[]> {
+export async function fetchActiveSubscribers(): Promise<Record<string, unknown>[]> {
     try {
         const params = new URLSearchParams({
             'filters[subscriptionStatus][$eq]': 'subscribed',
@@ -742,7 +768,7 @@ export async function getActiveSubscriberCount(): Promise<number> {
 export interface SubscribeResponse {
     success: boolean;
     message: string;
-    data?: NewsletterSubscription;
+    data?: Record<string, unknown>;
     error?: string;
 }
 
