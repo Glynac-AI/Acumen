@@ -32,30 +32,7 @@ export default factories.createCoreController('api::blog-post.blog-post', () => 
             };
         }
 
-        // Always populate author (component) and coverImage (media)
-        // author is an embedded component — no data wrapper in response
-        ctx.query.populate = {
-            author: {
-                populate: {
-                    photo: {
-                        fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
-                    },
-                },
-            },
-            coverImage: {
-                fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
-            },
-            tenant: {
-                fields: ['name', 'slug'],
-            },
-            seo: {
-                populate: {
-                    ogImage: {
-                        fields: ['url', 'alternativeText', 'width', 'height'],
-                    },
-                },
-            },
-        };
+        // Rely on frontend populate request instead of overriding it.
 
         return await super.find(ctx);
     },
@@ -76,29 +53,7 @@ export default factories.createCoreController('api::blog-post.blog-post', () => 
             };
         }
 
-        // Always populate author (component) and coverImage (media)
-        ctx.query.populate = {
-            author: {
-                populate: {
-                    photo: {
-                        fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
-                    },
-                },
-            },
-            coverImage: {
-                fields: ['url', 'alternativeText', 'width', 'height', 'formats'],
-            },
-            tenant: {
-                fields: ['name', 'slug'],
-            },
-            seo: {
-                populate: {
-                    ogImage: {
-                        fields: ['url', 'alternativeText', 'width', 'height'],
-                    },
-                },
-            },
-        };
+        // Rely on frontend populate request instead of overriding it.
 
         return await super.findOne(ctx);
     },

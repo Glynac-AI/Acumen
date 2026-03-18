@@ -62,7 +62,7 @@
             "relation": "manyToOne",
             "target": "api::author.author",
             "inversedBy": "blogPosts",
-            "required": false,
+            "required": true,
             "description": "Author of the blog post"
         },
         "tenant": {
