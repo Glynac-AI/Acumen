@@ -1,83 +1,79 @@
-// app/layout.tsx
 import type { Metadata } from "next";
-import Script from "next/script";
+import { Playfair_Display, Inter } from "next/font/google";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Analytics, GoogleTagManagerNoScript, CustomScripts } from "@/components/analytics";
+import { getSiteSettings, getStrapiMediaUrl } from "@/lib/strapi";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
-import CookieConsent from "@/components/ui/CookieConsent";
 
-export const metadata: Metadata = {
-  title: "Acumen Strategy - Modern Compliance Solutions for Wealth Management",
-  description: "Software, products, and services designed to help wealth management firms navigate compliance requirements and scale their operations.",
-  icons: {
-    icon: [
-      { url: "/favicon.png", type: "image/png" },
-    ],
-    apple: "/favicon.png",
-  },
-  openGraph: {
-    title: "Acumen Strategy - Modern Compliance Solutions for Wealth Management",
-    description: "Software, products, and services designed to help wealth management firms navigate compliance requirements and scale their operations.",
-    images: ["/og.png"],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Acumen Strategy - Modern Compliance Solutions for Wealth Management",
-    description: "Software, products, and services designed to help wealth management firms navigate compliance requirements and scale their operations.",
-    images: ["/og.png"],
-  },
-};
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
 
-export default function RootLayout({
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  const title =
+    settings?.metaTitle || settings?.siteName || "Acumen Blog";
+  const description =
+    settings?.metaDescription || settings?.siteDescription || "";
+  const keywords = settings?.keywords || undefined;
+
+  const ogImageUrl = settings?.ogImage?.data
+    ? getStrapiMediaUrl(settings.ogImage.data.attributes.url)
+    : undefined;
+
+  return {
+    title,
+    description,
+    ...(keywords ? { keywords } : {}),
+    openGraph: {
+      title,
+      description,
+      ...(ogImageUrl ? { images: [{ url: ogImageUrl }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(ogImageUrl ? { images: [ogImageUrl] } : {}),
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch site settings from Strapi for analytics configuration
+  const siteSettings = await getSiteSettings();
+
   return (
-    <html lang="en">
+    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <head>
-        {/* Google Tag Manager */}
-        <Script id="google-tag-manager" strategy="afterInteractive">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-M3L4737Z');
-          `}
-        </Script>
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-FSZ476K9KS"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-FSZ476K9KS');
-          `}
-        </Script>
+        {/* Analytics scripts from Strapi Site Settings */}
+        <Analytics settings={siteSettings} />
       </head>
-      <body className="antialiased">
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-M3L4737Z"
-            height="0"
-            width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
-          />
-        </noscript>
-        <SmoothScrollProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-          <CookieConsent />
-        </SmoothScrollProvider>
+      <body className="antialiased font-sans">
+        {/* GTM NoScript fallback */}
+        <GoogleTagManagerNoScript settings={siteSettings} />
+        {/* Custom body scripts */}
+        <CustomScripts settings={siteSettings} location="body" />
+
+        <Header />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

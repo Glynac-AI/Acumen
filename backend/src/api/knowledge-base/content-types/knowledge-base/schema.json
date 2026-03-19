@@ -1,0 +1,96 @@
+{
+    "kind": "collectionType",
+    "collectionName": "knowledge_bases",
+    "info": {
+        "singularName": "knowledge-base",
+        "pluralName": "knowledge-bases",
+        "displayName": "Knowledge Base",
+        "description": "Internal knowledge base articles — reference docs, FAQs, and institutional knowledge synced to Wiki.js"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true,
+            "maxLength": 200
+        },
+        "slug": {
+            "type": "uid",
+            "targetField": "title",
+            "required": true
+        },
+        "summary": {
+            "type": "text",
+            "maxLength": 500
+        },
+        "body": {
+            "type": "richtext",
+            "required": true
+        },
+        "product": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Product or service this article relates to"
+        },
+        "persona": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Target audience / role"
+        },
+        "category": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Knowledge base category (e.g. 'API Reference', 'How-To', 'Troubleshooting')"
+        },
+        "owner": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Team or individual responsible for this article"
+        },
+        "reviewDate": {
+            "type": "date",
+            "description": "Next scheduled review date"
+        },
+        "confidentiality": {
+            "type": "enumeration",
+            "enum": ["public", "internal", "restricted", "confidential"],
+            "default": "internal"
+        },
+        "syncToWiki": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, this article is synced to Wiki.js on create/update/publish"
+        },
+        "wikiPath": {
+            "type": "string",
+            "description": "Custom Wiki.js page path (defaults to /knowledge-base/{slug})"
+        },
+        "wikiTags": {
+            "type": "string",
+            "description": "Comma-separated tags for the Wiki.js page"
+        },
+        "lastSyncedAt": {
+            "type": "datetime"
+        },
+        "lastSyncStatus": {
+            "type": "enumeration",
+            "enum": ["success", "failed", "pending"]
+        },
+        "lastSyncError": {
+            "type": "text"
+        },
+        "wikiPageId": {
+            "type": "integer",
+            "description": "Stored Wiki.js page ID for direct update/delete operations"
+        },
+        "tenant": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::tenant.tenant",
+            "inversedBy": "knowledgeBases"
+        }
+    }
+}

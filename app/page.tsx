@@ -1,17 +1,24 @@
-import HeroSection from '@/components/sections/home/HeroSection';
-import SolutionsSection from '@/components/sections/home/SolutionsSection';
-import ProcessSection from '@/components/sections/home/ProcessSection';
-import UseCasesSection from '@/components/sections/home/UseCasesSection';
-import CTASection from '@/components/sections/home/CTASection';
+import React from 'react';
+import { HeroSection } from '@/components/home/HeroSection';
+import { WhoThisIsForSection } from '@/components/home/WhoThisIsForSection';
+import { RecentKnowledgeSection } from '@/components/home/RecentKnowledgeSection';
+import { KnowledgeByProductSection } from '@/components/home/KnowledgeByProductSection';
+import { IndustryInsightsSection } from '@/components/home/IndustryInsightsSection';
+import { RecentArticlesSection } from '@/components/home/RecentArticlesSection';
+import { NewsletterSection } from '@/components/home/NewsletterSection';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <>
       <HeroSection />
-      <SolutionsSection />
-      <ProcessSection />
-      <UseCasesSection />
-      <CTASection />
-    </div>
+      <WhoThisIsForSection />
+      {/* Knowledge system entry points — live playbook pages grouped by product and recency */}
+      <RecentKnowledgeSection />
+      <KnowledgeByProductSection />
+      {/* Existing blog content sections */}
+      <IndustryInsightsSection />
+      <RecentArticlesSection />
+      <NewsletterSection />
+    </>
   );
 }

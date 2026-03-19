@@ -1,33 +1,29 @@
-import { ReactNode } from 'react';
+import React from 'react';
+import { cn } from '@/lib/utils';
 
-interface SectionProps {
-    children: ReactNode;
-    className?: string;
+interface SectionProps extends React.HTMLAttributes<HTMLElement> {
+    children: React.ReactNode;
     background?: 'white' | 'muted' | 'gradient';
-    padding?: 'sm' | 'md' | 'lg';
 }
 
-export default function Section({
+export const Section: React.FC<SectionProps> = ({
     children,
-    className = '',
     background = 'white',
-    padding = 'lg'
-}: SectionProps) {
+    className,
+    ...props
+}) => {
     const backgrounds = {
         white: 'bg-white',
-        muted: 'bg-muted/30',
-        gradient: 'bg-gradient-to-br from-primary via-primary to-accent',
-    };
-
-    const paddings = {
-        sm: 'py-12',
-        md: 'py-16',
-        lg: 'py-24',
+        muted: 'bg-cream',
+        gradient: 'bg-gradient-to-b from-white to-cream',
     };
 
     return (
-        <section className={`${backgrounds[background]} ${paddings[padding]} ${className}`}>
+        <section
+            className={cn('py-12 md:py-16 lg:py-20', backgrounds[background], className)}
+            {...props}
+        >
             {children}
         </section>
     );
-}
+};
