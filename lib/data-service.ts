@@ -5,7 +5,7 @@
  * Always attempts to fetch from Strapi first.
  */
 
-import type { Author, Article, Tag, Pillar } from '@/types';
+import type { Author, Article, Tag, Pillar, KnowledgeProductEntry, PlaybookPage } from '@/types';
 import {
     getRecentArticles as getStrapiRecentArticles,
     getFeaturedArticle as getStrapiFeaturedArticle,
@@ -18,6 +18,11 @@ import {
     transformAuthor,
     transformTag,
 } from './strapi';
+import {
+    getProductEntryPoints,
+    fetchRecentLivePlaybookPages,
+} from './knowledge';
+
 
 /**
  * Get the featured article
@@ -123,7 +128,8 @@ export async function getTags(): Promise<Tag[]> {
 export async function getPillars(): Promise<Pillar[]> {
     try {
         const response = await getStrapiPillars();
-        return response.data.map(p => p.attributes.name as Pillar);
+        // Strapi v5 returns flat objects — no .attributes wrapper
+        return response.data.map(p => p.name as Pillar);
     } catch (error) {
         console.error('Failed to fetch pillars from Strapi:', error);
     }
@@ -148,4 +154,26 @@ export async function getAllArticles(): Promise<Article[]> {
         console.error('Failed to fetch all articles from Strapi:', error);
     }
     return [];
+}
+
+// ─── Knowledge system helpers ───────────────────────────────────────────────────
+
+/**
+ * Get the N most recently updated live PlaybookPages.
+ * Returns empty array gracefully if the playbook-pages collection
+ * does not exist in Strapi yet.
+ */
+export async function getFeaturedPlaybookPages(
+    limit: number = 6
+): Promise<PlaybookPage[]> {
+    return fetchRecentLivePlaybookPages(limit);
+}
+
+/**
+ * Get product-level entry points for the knowledge portal homepage section.
+ * Each entry represents one product with its live page count and section count.
+ * Returns empty array gracefully if no live knowledge pages exist yet.
+ */
+export async function getKnowledgeEntryPoints(): Promise<KnowledgeProductEntry[]> {
+    return getProductEntryPoints();
 }
