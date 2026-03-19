@@ -128,19 +128,6 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             return next();
         }
 
-        // ── FIX 5: Clean 404 for preview URL requests ───────────────────────
-        if (/\/content-manager\/preview\/url\//.test(url)) {
-            ctx.status = 404;
-            ctx.body = {
-                error: {
-                    status: 404,
-                    name: 'NotFoundError',
-                    message: 'Preview URL is not configured for this content type.',
-                },
-            };
-            return;
-        }
-
         // ════════════════════════════════════════════════════════════════════
         // UPWARD CYCLE — run next() first, then intercept the RESPONSE
         // ════════════════════════════════════════════════════════════════════

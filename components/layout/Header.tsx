@@ -9,6 +9,7 @@ export const Header: React.FC = () => {
 
     const mainNavLinks = [
         { href: '/', label: 'Home' },
+        { href: '/knowledge', label: 'Knowledge' },
         { href: '/blog', label: 'Blog' },
         { href: '/authors', label: 'Authors' },
         { href: '/about', label: 'About' },
@@ -61,7 +62,7 @@ export const Header: React.FC = () => {
                         </span>
                     </Link>
 
-                    {/* Desktop Navigation - Topics First */}
+                    {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center space-x-6">
                         <Link
                             href="/"
@@ -70,7 +71,14 @@ export const Header: React.FC = () => {
                             Home
                         </Link>
 
-                        {/* Topics Dropdown - Now Second */}
+                        <Link
+                            href="/knowledge"
+                            className="text-sm font-medium text-[#0B1F3B] hover:text-[#49648C] transition-colors"
+                        >
+                            Knowledge
+                        </Link>
+
+                        {/* Topics Dropdown */}
                         <div className="relative group">
                             <button className="text-sm font-medium text-[#0B1F3B] hover:text-[#49648C] transition-colors flex items-center gap-1">
                                 Topics
@@ -168,6 +176,14 @@ export const Header: React.FC = () => {
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 Home
+                            </Link>
+
+                            <Link
+                                href="/knowledge"
+                                className="px-4 py-2 text-sm font-medium text-[#0B1F3B] hover:bg-[#EEE9DF] rounded transition-colors"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                Knowledge
                             </Link>
 
                             {/* Topics Section in Mobile */}

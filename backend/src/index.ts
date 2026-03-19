@@ -120,6 +120,10 @@ const tenantScopedContentTypes = [
   'api::blog-post.blog-post',
   'api::regulatethis-subscriber.regulatethis-subscriber',
   'api::sylvan-request-access.sylvan-request-access',
+  'api::playbook.playbook',
+  'api::playbook-page.playbook-page',
+  'api::knowledge-base.knowledge-base',
+  'api::raw-material.raw-material',
 ];
 
 // Tenant admin accounts (Strapi Admin Panel)
@@ -178,6 +182,10 @@ export default {
 
     const WIKI_JS_CONTENT_UID = 'api::wiki-js-content.wiki-js-content';
 
+    // All four new dedicated knowledge-system UIDs
+    const DEDICATED_UIDS = wikiSyncService.DEDICATED_SYNC_UIDS;
+    const ALL_DEDICATED_UIDS: string[] = Object.values(DEDICATED_UIDS);
+
     strapi.documents.use(async (context, next) => {
       const ctx = context as any;
       const targetActions = ['create', 'update', 'publish', 'delete'];
@@ -196,18 +204,34 @@ export default {
       // PATH A: wiki-js-content — dedicated opt-in sync (with status write-back)
       if (uid === WIKI_JS_CONTENT_UID) {
         if (ctx.action === 'delete') {
-          // Tier 3: Delete the mirrored Wiki.js page using the stored integer ID.
-          // Falls back to no-op gracefully if wikiPageId was never stored.
           const wikiPageId = entry.wikiPageId;
           if (wikiPageId) {
             wikiSyncService.deletePageById(Number(wikiPageId))
               .catch(err => console.error(`[wiki-sync] wiki-js-content delete error (wikiPageId=${wikiPageId}):`, err));
           }
         } else if (['create', 'update', 'publish'].includes(ctx.action)) {
-          // Pass the strapi instance so syncWikiJsContent can write status back
-          // via strapi.db.query() — bypassing the middleware to prevent infinite loops
           wikiSyncService.syncWikiJsContent(entry as any, strapi)
             .catch(err => console.error(`[wiki-sync] wiki-js-content sync error:`, err));
+        }
+        return result;
+      }
+
+      // PATH A2: Dedicated knowledge system types (playbook, playbook-page, knowledge-base, raw-material)
+      // Each uses syncDedicatedContent which handles:
+      //   • opt-in guard (syncToWiki / sync_to_wiki must be true)
+      //   • playbook-page approval gate (approval_status must be 'live' or 'approved')
+      //   • status write-back (lastSyncStatus, lastSyncedAt, lastSyncError, wikiPageId)
+      //   • type-specific markdown renderers
+      if (ALL_DEDICATED_UIDS.includes(uid)) {
+        if (ctx.action === 'delete') {
+          const wikiPageId = entry.wikiPageId;
+          if (wikiPageId) {
+            wikiSyncService.deletePageById(Number(wikiPageId))
+              .catch(err => console.error(`[wiki-sync] ${uid} delete error (wikiPageId=${wikiPageId}):`, err));
+          }
+        } else if (['create', 'update', 'publish'].includes(ctx.action)) {
+          wikiSyncService.syncDedicatedContent(entry as any, uid as any, strapi)
+            .catch(err => console.error(`[wiki-sync] ${uid} sync error:`, err));
         }
         return result;
       }
@@ -421,6 +445,11 @@ export default {
     const publicPermissionsToSeed = [
       'api::blog-post.blog-post.find',
       'api::blog-post.blog-post.findOne',
+      // PlaybookPage: public read access (content filtering is done by approval_status + sync_to_wiki)
+      'api::playbook-page.playbook-page.find',
+      'api::playbook-page.playbook-page.findOne',
+      // NOTE: raw-material is intentionally NOT granted public access.
+      // It is internal-only source material and must never be exposed publicly.
     ];
 
     const publicRole = await strapi.db.query('plugin::users-permissions.role').findOne({
@@ -524,6 +553,10 @@ export default {
       'api::subcategory.subcategory',
       'api::site-setting.site-setting',
       'api::wiki-js-content.wiki-js-content',
+      'api::playbook.playbook',
+      'api::playbook-page.playbook-page',
+      'api::knowledge-base.knowledge-base',
+      'api::raw-material.raw-material',
     ];
 
     const TENANT_EXCLUDED_SHARED: Record<string, string[]> = {

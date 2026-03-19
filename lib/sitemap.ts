@@ -1,4 +1,5 @@
 import { Article, Author, Tag, Category, Subcategory } from '@/types';
+import type { PlaybookPage } from '@/types/knowledge';
 import { getBaseUrl } from '@/config/site';
 
 const SITE_URL = getBaseUrl();
@@ -28,7 +29,8 @@ export function generateSitemap(
     authors: Author[],
     categories: Category[],
     subcategories: Subcategory[],
-    tags: Tag[]
+    tags: Tag[],
+    knowledgePages?: PlaybookPage[]
 ): string {
     const urls: SitemapURL[] = [];
 
@@ -144,6 +146,25 @@ export function generateSitemap(
             priority: 0.5,
         });
     });
+
+    // Knowledge pages (only publicly live PlaybookPages — never RawMaterial)
+    if (knowledgePages && knowledgePages.length > 0) {
+        urls.push({
+            loc: `${SITE_URL}/knowledge`,
+            lastmod: formatDate(knowledgePages[0].updatedAt),
+            changefreq: 'daily',
+            priority: 0.9,
+        });
+
+        knowledgePages.forEach((page) => {
+            urls.push({
+                loc: `${SITE_URL}/knowledge/${escapeXml(page.slug)}`,
+                lastmod: formatDate(page.updatedAt),
+                changefreq: 'weekly',
+                priority: 0.7,
+            });
+        });
+    }
 
     // Generate XML
     const urlsXml = urls

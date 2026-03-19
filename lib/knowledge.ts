@@ -1,391 +1,339 @@
 /**
- * lib/knowledge.ts
+ * Knowledge Service
  *
- * Canonical fetch + transform layer for the PlaybookPage knowledge model.
+ * Unified data access layer for the PlaybookPage knowledge system.
+ * Reuses the Strapi fetch utility from lib/strapi.ts.
  *
- * Architecture constraints this file enforces:
- *  - Strapi 5 is the single source of truth
- *  - Wiki.js is read-only; this file never writes to it
- *  - sync is one-way Strapi → Wiki.js
- *  - PlaybookPage is the only public-facing knowledge model
- *  - RawMaterial types are defined here but NO public export exposes raw material data
- *  - `isPublicLive()` is the single reusable lifecycle gate — use it everywhere
- *
- * Wiki path taxonomy: /{product}/{section}/{sub-topic}
- * Naming rules: lowercase, hyphens only, no spaces, no underscores
+ * Architecture rules enforced here:
+ * - Public routes ONLY see pages where approval_status=live AND sync_to_wiki=true
+ * - RawMaterial is NEVER fetched or exposed through this module
+ * - Visibility group filtering is prepared but requires auth context
  */
 
+import type { StrapiResponse, StrapiMeta } from './strapi';
 import type {
-    PlaybookPage,
-    RawMaterial,
-    KnowledgeLifecycleStatus,
-    VisibilityGroup,
-    KnowledgeProductEntry,
-    Tag,
-} from '@/types';
+  StrapiPlaybookPageV5,
+  PlaybookPage,
+  Product,
+  ApprovalStatus,
+  VisibilityGroup,
+  ReviewCadence,
+} from '@/types/knowledge';
+import {
+  isPublicLiveContent,
+  filterPublicLivePages,
+  groupByProduct,
+  groupBySection,
+} from '@/types/knowledge';
 
-// ─── Runtime config ────────────────────────────────────────────────────────────
+// ─── Runtime config (mirrors strapi.ts pattern) ──────────────────────────────
 
-function getStrapiUrl(): string {
-    return process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603';
-}
+let runtimeConfig: { strapiUrl: string } | null = null;
 
-// ─── Raw Strapi v5 shapes (internal, not exported publicly) ───────────────────
+async function getRuntimeConfig(): Promise<{ strapiUrl: string }> {
+  if (runtimeConfig) return runtimeConfig;
 
-interface StrapiTagFlat {
-    id: number;
-    documentId?: string;
-    name: string;
-    slug: string;
-}
-
-/**
- * Raw Strapi v5 PlaybookPage record — flat, no .attributes wrapper.
- * Field names match the Strapi schema definition for api::playbook-page.playbook-page
- */
-interface StrapiPlaybookPage {
-    id: number;
-    documentId?: string;
-    title: string;
-    summary?: string | null;
-    content: string;
-    product?: string | null;
-    section?: string | null;
-    wiki_path?: string | null;
-    sync_to_wiki: boolean;
-    approval_status: KnowledgeLifecycleStatus;
-    visibility_groups?: VisibilityGroup[] | null;
-    content_owner?: string | null;
-    created_by?: string | null;
-    last_updated_by?: string | null;
-    tags?: StrapiTagFlat[];
-    last_reviewed?: string | null;
-    review_cadence?: string | null;
-    slug?: string | null;
-    publishedAt?: string | null;
-    createdAt?: string;
-    updatedAt?: string;
-}
-
-/**
- * Raw Strapi v5 RawMaterial record — INTERNAL ONLY.
- * This type is never returned from any public function.
- */
-interface StrapiRawMaterial {
-    id: number;
-    documentId?: string;
-    title: string;
-    type?: string | null;
-    product?: string | null;
-    file?: { url: string } | null;
-    external_url?: string | null;
-    notes?: string | null;
-    sections_to_update?: string[] | null;
-    processed: boolean;
-    resulting_pages?: string[] | null;
-    date?: string | null;
-    createdAt?: string;
-    updatedAt?: string;
-}
-
-interface StrapiListResponse<T> {
-    data: T[];
-    meta: {
-        pagination?: {
-            page: number;
-            pageSize: number;
-            pageCount: number;
-            total: number;
-        };
+  if (typeof window === 'undefined') {
+    runtimeConfig = {
+      strapiUrl: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603',
     };
+    return runtimeConfig;
+  }
+
+  try {
+    const response = await fetch('/api/config');
+    if (response.ok) {
+      runtimeConfig = await response.json();
+      return runtimeConfig!;
+    }
+  } catch (error) {
+    console.error('Failed to fetch runtime config:', error);
+  }
+
+  runtimeConfig = {
+    strapiUrl: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:5603',
+  };
+  return runtimeConfig;
 }
 
-// ─── Fetch utility ─────────────────────────────────────────────────────────────
+// ─── Fetch utility (consistent with strapi.ts) ──────────────────────────────
 
-async function fetchKnowledge<T>(
-    endpoint: string,
-    options: RequestInit = {}
+async function fetchStrapi<T>(
+  endpoint: string,
+  options: RequestInit = {}
 ): Promise<T> {
-    const baseUrl = getStrapiUrl();
-    const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-    };
+  const config = await getRuntimeConfig();
 
-    if (typeof window === 'undefined' && process.env.STRAPI_API_TOKEN) {
-        (headers as Record<string, string>)['Authorization'] =
-            `Bearer ${process.env.STRAPI_API_TOKEN}`;
-    }
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
 
-    const url = `${baseUrl}/api${endpoint}`;
-    const response = await fetch(url, {
-        ...options,
-        headers,
-        cache: 'no-store',
-    });
+  if (typeof window === 'undefined' && process.env.STRAPI_API_TOKEN) {
+    (headers as Record<string, string>)['Authorization'] =
+      `Bearer ${process.env.STRAPI_API_TOKEN}`;
+  }
 
-    if (!response.ok) {
-        throw new Error(
-            `[knowledge] Strapi API error ${response.status} on ${url}: ${response.statusText}`
-        );
-    }
+  const tenantSlug = process.env.NEXT_PUBLIC_TENANT_SLUG;
+  if (typeof window === 'undefined' && tenantSlug) {
+    (headers as Record<string, string>)['X-Tenant-Slug'] = tenantSlug;
+  }
 
-    return response.json() as Promise<T>;
-}
+  const response = await fetch(`${config.strapiUrl}/api${endpoint}`, {
+    ...options,
+    headers,
+    cache: 'no-store',
+  });
 
-// ─── Lifecycle gate ────────────────────────────────────────────────────────────
-
-/**
- * The single reusable public lifecycle guard.
- *
- * A PlaybookPage is publicly live only when ALL three conditions hold:
- *  1. sync_to_wiki === true    (editorial publish gate)
- *  2. approval_status === 'Live'  (editorial approval)
- *  3. publishedAt !== null     (Strapi draft/publish gate)
- *
- * Use this function everywhere instead of repeating the logic.
- * Never expose content that fails this check on any public route.
- */
-export function isPublicLive(page: StrapiPlaybookPage): boolean {
-    return (
-        page.sync_to_wiki === true &&
-        page.approval_status === 'Live' &&
-        page.publishedAt !== null &&
-        page.publishedAt !== undefined
+  if (!response.ok) {
+    throw new Error(
+      `Strapi API error: ${response.status} ${response.statusText}`
     );
+  }
+
+  return response.json();
 }
 
-// ─── Visibility guard ──────────────────────────────────────────────────────────
+// ─── Transform: Strapi v5 flat → frontend PlaybookPage ─────────────────────
+
+export function transformPlaybookPage(
+  raw: StrapiPlaybookPageV5
+): PlaybookPage {
+  return {
+    id: raw.id.toString(),
+    documentId: raw.documentId,
+    title: raw.title,
+    slug: raw.slug,
+    summary: raw.summary || '',
+    content: typeof raw.content === 'string' ? raw.content : JSON.stringify(raw.content),
+    product: raw.product,
+    section: raw.section,
+    wikiPath: raw.wiki_path,
+    syncToWiki: raw.sync_to_wiki,
+    approvalStatus: raw.approval_status,
+    visibilityGroups: Array.isArray(raw.visibility_groups)
+      ? (raw.visibility_groups as VisibilityGroup[])
+      : [],
+    contentOwner: raw.content_owner ?? undefined,
+    createdBy: raw.created_by ?? undefined,
+    lastUpdatedBy: raw.last_updated_by ?? undefined,
+    tags: Array.isArray(raw.tags) ? raw.tags : [],
+    lastReviewed: raw.last_reviewed ?? undefined,
+    reviewCadence: (raw.review_cadence as ReviewCadence) ?? undefined,
+    createdAt: raw.createdAt,
+    updatedAt: raw.updatedAt,
+  };
+}
+
+// ─── Public API: PlaybookPage fetchers ──────────────────────────────────────
 
 /**
- * Returns true if the page is visible to the given group, or if the page has
- * no visibility restrictions configured (empty array = unrestricted).
- *
- * Full auth enforcement lives at the session/middleware layer.
- * This helper is for data-layer pre-filtering only.
+ * Fetch all publicly live playbook pages.
+ * Applies server-side filters for approval_status=live and sync_to_wiki=true,
+ * then double-checks client-side with isPublicLiveContent.
  */
-export function isVisibleToGroup(
-    page: PlaybookPage,
-    group: VisibilityGroup | null
-): boolean {
-    if (!page.visibility_groups || page.visibility_groups.length === 0) {
-        return true; // no restriction configured
-    }
-    if (!group) return false;
-    return page.visibility_groups.includes(group);
-}
+export async function getPublicPlaybookPages(params?: {
+  product?: Product;
+  section?: string;
+  limit?: number;
+}): Promise<PlaybookPage[]> {
+  const searchParams = new URLSearchParams();
 
-// ─── Wiki path utilities ───────────────────────────────────────────────────────
+  // Server-side filters for live content
+  searchParams.set('filters[approval_status][$eq]', 'live');
+  searchParams.set('filters[sync_to_wiki][$eq]', 'true');
+  searchParams.set('filters[publishedAt][$notNull]', 'true');
+  searchParams.set('sort', 'updatedAt:desc');
+  searchParams.set('populate', '*');
 
-/**
- * Normalizes a wiki path segment to the naming rules:
- *   - lowercase only
- *   - hyphens for multi-word segments
- *   - no spaces, no underscores
- *   - no redundant separators
- */
-export function normalizeWikiSegment(segment: string): string {
-    return segment
-        .trim()
-        .toLowerCase()
-        .replace(/[\s_]+/g, '-')
-        .replace(/[^a-z0-9-/]/g, '')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-}
+  if (params?.product) {
+    searchParams.set('filters[product][$eq]', params.product);
+  }
+  if (params?.section) {
+    searchParams.set('filters[section][$eq]', params.section);
+  }
+  if (params?.limit) {
+    searchParams.set('pagination[pageSize]', params.limit.toString());
+  } else {
+    searchParams.set('pagination[pageSize]', '100');
+  }
 
-/**
- * Derives an expected wiki path from product + section + title if wiki_path
- * is not explicitly set. Follows the /{product}/{section}/{sub-topic} pattern.
- */
-export function deriveWikiPath(
-    product?: string | null,
-    section?: string | null,
-    title?: string | null
-): string {
-    const segments = [product, section, title]
-        .filter((s): s is string => Boolean(s))
-        .map(normalizeWikiSegment)
-        .filter(Boolean);
-    return '/' + segments.join('/');
-}
+  try {
+    const response = await fetchStrapi<StrapiResponse<StrapiPlaybookPageV5[]>>(
+      `/playbook-pages?${searchParams.toString()}`
+    );
 
-// ─── Transform ─────────────────────────────────────────────────────────────────
-
-function transformTag(t: StrapiTagFlat): Tag {
-    return { id: t.id.toString(), name: t.name, slug: t.slug };
-}
-
-function transformPlaybookPage(raw: StrapiPlaybookPage): PlaybookPage {
-    return {
-        id: raw.id.toString(),
-        documentId: raw.documentId,
-        title: raw.title,
-        summary: raw.summary ?? undefined,
-        content: raw.content,
-        product: raw.product ?? undefined,
-        section: raw.section ?? undefined,
-        wiki_path:
-            raw.wiki_path ??
-            deriveWikiPath(raw.product, raw.section, raw.title),
-        sync_to_wiki: raw.sync_to_wiki,
-        approval_status: raw.approval_status,
-        visibility_groups: raw.visibility_groups ?? [],
-        content_owner: raw.content_owner ?? undefined,
-        created_by: raw.created_by ?? undefined,
-        last_updated_by: raw.last_updated_by ?? undefined,
-        tags: raw.tags ? raw.tags.map(transformTag) : [],
-        last_reviewed: raw.last_reviewed ?? undefined,
-        review_cadence: raw.review_cadence ?? undefined,
-        slug: raw.slug ?? undefined,
-        publishedAt: raw.publishedAt,
-        createdAt: raw.createdAt,
-        updatedAt: raw.updatedAt,
-    };
-}
-
-// ─── Build Strapi filter params for live pages ─────────────────────────────────
-
-function livePagesParams(extra: Record<string, string> = {}): URLSearchParams {
-    const params = new URLSearchParams({
-        'filters[sync_to_wiki][$eq]': 'true',
-        'filters[approval_status][$eq]': 'Live',
-        'filters[publishedAt][$notNull]': 'true',
-        'populate[0]': 'tags',
-        'sort[0]': 'updatedAt:desc',
-        ...extra,
-    });
-    return params;
-}
-
-// ─── Public fetch functions ────────────────────────────────────────────────────
-
-/**
- * Fetch live PlaybookPages with optional pagination and product/section filters.
- * Only returns pages that pass `isPublicLive()` — enforced both server-side via
- * query params and client-side via post-filter for safety.
- */
-export async function fetchLivePlaybookPages(opts: {
-    limit?: number;
-    page?: number;
-    product?: string;
-    section?: string;
-} = {}): Promise<PlaybookPage[]> {
-    try {
-        const extra: Record<string, string> = {};
-        if (opts.limit) extra['pagination[pageSize]'] = opts.limit.toString();
-        if (opts.page) extra['pagination[page]'] = opts.page.toString();
-        if (opts.product) extra['filters[product][$eq]'] = opts.product;
-        if (opts.section) extra['filters[section][$eq]'] = opts.section;
-
-        const params = livePagesParams(extra);
-        const response = await fetchKnowledge<StrapiListResponse<StrapiPlaybookPage>>(
-            `/playbook-pages?${params.toString()}`
-        );
-
-        return response.data
-            .filter(isPublicLive) // double-check — never trust filters alone
-            .map(transformPlaybookPage);
-    } catch (error) {
-        console.error('[knowledge] fetchLivePlaybookPages failed:', error);
-        return [];
-    }
+    // Double-check: client-side filter to ensure nothing leaks
+    const livePages = filterPublicLivePages(response.data);
+    return livePages.map(transformPlaybookPage);
+  } catch (error) {
+    console.error('Failed to fetch public playbook pages:', error);
+    return [];
+  }
 }
 
 /**
- * Fetch a single live PlaybookPage by its exact wiki_path.
- * Returns null if the page does not exist or is not publicly live.
+ * Fetch a single playbook page by slug.
+ * Enforces public-live gate.
  */
-export async function fetchPlaybookPageByWikiPath(
-    wikiPath: string
+export async function getPublicPlaybookPageBySlug(
+  slug: string
 ): Promise<PlaybookPage | null> {
-    try {
-        const params = new URLSearchParams({
-            'filters[wiki_path][$eq]': wikiPath,
-            'filters[publishedAt][$notNull]': 'true',
-            'populate[0]': 'tags',
-        });
+  const searchParams = new URLSearchParams();
+  searchParams.set('filters[slug][$eq]', slug);
+  searchParams.set('filters[approval_status][$eq]', 'live');
+  searchParams.set('filters[sync_to_wiki][$eq]', 'true');
+  searchParams.set('filters[publishedAt][$notNull]', 'true');
+  searchParams.set('populate', '*');
 
-        const response = await fetchKnowledge<StrapiListResponse<StrapiPlaybookPage>>(
-            `/playbook-pages?${params.toString()}`
-        );
+  try {
+    const response = await fetchStrapi<StrapiResponse<StrapiPlaybookPageV5[]>>(
+      `/playbook-pages?${searchParams.toString()}`
+    );
 
-        const raw = response.data.find(isPublicLive);
-        return raw ? transformPlaybookPage(raw) : null;
-    } catch (error) {
-        console.error(
-            `[knowledge] fetchPlaybookPageByWikiPath(${wikiPath}) failed:`,
-            error
-        );
-        return null;
-    }
+    if (!response.data || response.data.length === 0) return null;
+
+    const page = response.data[0];
+    if (!isPublicLiveContent(page)) return null;
+
+    return transformPlaybookPage(page);
+  } catch (error) {
+    console.error(`Failed to fetch playbook page by slug: ${slug}`, error);
+    return null;
+  }
 }
 
 /**
- * Fetch all live PlaybookPages for a given product slug.
+ * Fetch a playbook page by wiki_path.
+ * Enforces public-live gate.
  */
-export async function fetchPlaybookPagesByProduct(
-    product: string
+export async function getPublicPlaybookPageByWikiPath(
+  wikiPath: string
+): Promise<PlaybookPage | null> {
+  const searchParams = new URLSearchParams();
+  searchParams.set('filters[wiki_path][$eq]', wikiPath);
+  searchParams.set('filters[approval_status][$eq]', 'live');
+  searchParams.set('filters[sync_to_wiki][$eq]', 'true');
+  searchParams.set('filters[publishedAt][$notNull]', 'true');
+  searchParams.set('populate', '*');
+
+  try {
+    const response = await fetchStrapi<StrapiResponse<StrapiPlaybookPageV5[]>>(
+      `/playbook-pages?${searchParams.toString()}`
+    );
+
+    if (!response.data || response.data.length === 0) return null;
+
+    const page = response.data[0];
+    if (!isPublicLiveContent(page)) return null;
+
+    return transformPlaybookPage(page);
+  } catch (error) {
+    console.error(
+      `Failed to fetch playbook page by wiki path: ${wikiPath}`,
+      error
+    );
+    return null;
+  }
+}
+
+/**
+ * Get all public live pages grouped by product.
+ * Used for the homepage knowledge entry points.
+ */
+export async function getPublicPagesByProduct(): Promise<
+  Record<Product, PlaybookPage[]>
+> {
+  const pages = await getPublicPlaybookPages();
+  return groupByProduct(pages);
+}
+
+/**
+ * Get all public live pages grouped by section.
+ */
+export async function getPublicPagesBySection(): Promise<
+  Record<string, PlaybookPage[]>
+> {
+  const pages = await getPublicPlaybookPages();
+  return groupBySection(pages);
+}
+
+/**
+ * Get the most recently updated live playbook pages.
+ */
+export async function getRecentlyUpdatedPages(
+  limit: number = 5
 ): Promise<PlaybookPage[]> {
-    return fetchLivePlaybookPages({ product, limit: 100 });
+  return getPublicPlaybookPages({ limit });
 }
 
 /**
- * Returns one entry per distinct product that has at least one live page,
- * with the count of live pages and distinct sections per product.
- *
- * Used by the homepage KnowledgeEntrySection to build product nav cards.
- * Returns an empty array gracefully if no playbook-pages collection exists yet.
+ * Get featured/latest live pages for a specific product.
  */
-export async function getProductEntryPoints(): Promise<KnowledgeProductEntry[]> {
-    try {
-        // Fetch a broad set — enough for homepage aggregation
-        const pages = await fetchLivePlaybookPages({ limit: 500 });
-
-        const map = new Map<string, { sections: Set<string>; count: number }>();
-        for (const page of pages) {
-            const product = page.product;
-            if (!product) continue;
-            if (!map.has(product)) {
-                map.set(product, { sections: new Set(), count: 0 });
-            }
-            const entry = map.get(product)!;
-            entry.count += 1;
-            if (page.section) entry.sections.add(page.section);
-        }
-
-        return Array.from(map.entries())
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([product, { sections, count }]) => ({
-                product,
-                sectionCount: sections.size,
-                pageCount: count,
-                slug: normalizeWikiSegment(product),
-            }));
-    } catch (error) {
-        console.error('[knowledge] getProductEntryPoints failed:', error);
-        return [];
-    }
-}
-
-/**
- * Fetch the N most recently updated live PlaybookPages.
- * Suitable for "latest knowledge" sections on the homepage.
- */
-export async function fetchRecentLivePlaybookPages(
-    limit: number = 6
+export async function getProductPages(
+  product: Product,
+  limit: number = 10
 ): Promise<PlaybookPage[]> {
-    return fetchLivePlaybookPages({ limit });
+  return getPublicPlaybookPages({ product, limit });
 }
 
-// ─── RawMaterial — INTERNAL ONLY, no public export ───────────────────────────
-//
-// The RawMaterial type is defined in types/index.ts for completeness.
-// No public function in this file fetches or returns RawMaterial data.
-// If internal admin tooling needs raw material access it must use a
-// server-side-only route with authentication, never a public page.
-//
-// The type alias below exists only to satisfy the TypeScript compiler when
-// internal utilities reference it — it intentionally produces no runtime code.
-type _RawMaterialInternal = RawMaterial; // eslint-disable-line @typescript-eslint/no-unused-vars
-type _StrapiRawMaterialInternal = StrapiRawMaterial; // eslint-disable-line @typescript-eslint/no-unused-vars
+/**
+ * Get all distinct products that have at least one live page.
+ */
+export async function getActiveProducts(): Promise<Product[]> {
+  const byProduct = await getPublicPagesByProduct();
+  return (Object.entries(byProduct) as [Product, PlaybookPage[]][])
+    .filter(([, pages]) => pages.length > 0)
+    .map(([product]) => product);
+}
+
+/**
+ * Get all distinct sections for a given product that have at least one live page.
+ */
+export async function getProductSections(
+  product: Product
+): Promise<string[]> {
+  const pages = await getPublicPlaybookPages({ product });
+  const sections = new Set(pages.map((p) => p.section));
+  return Array.from(sections).sort();
+}
+
+// ─── Visibility-aware filtering (ready for auth integration) ────────────────
+
+/**
+ * Filter pages by user visibility groups.
+ * Pass the user's groups from auth context.
+ * If userGroups is empty/undefined, only pages with no visibility restrictions are shown.
+ */
+export function filterByVisibility(
+  pages: PlaybookPage[],
+  userGroups?: VisibilityGroup[]
+): PlaybookPage[] {
+  if (!userGroups || userGroups.length === 0) {
+    // No auth context: only show pages with no visibility restrictions
+    return pages.filter(
+      (p) => !p.visibilityGroups || p.visibilityGroups.length === 0
+    );
+  }
+
+  return pages.filter((p) => {
+    if (!p.visibilityGroups || p.visibilityGroups.length === 0) return true;
+    return p.visibilityGroups.some((g) => userGroups.includes(g));
+  });
+}
+
+// ─── Product display helpers ────────────────────────────────────────────────
+
+const PRODUCT_LABELS: Record<Product, string> = {
+  'acumen-strategy': 'Acumen Strategy',
+  glynac: 'Glynac',
+  phh: 'PHH',
+  sylvan: 'Sylvan',
+  'toll-booth': 'Toll Booth',
+};
+
+export function getProductLabel(product: Product): string {
+  return PRODUCT_LABELS[product] || product;
+}
+
+export { groupByProduct, groupBySection } from '@/types/knowledge';

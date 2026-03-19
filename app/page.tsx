@@ -1,7 +1,8 @@
 import React from 'react';
 import { HeroSection } from '@/components/home/HeroSection';
 import { WhoThisIsForSection } from '@/components/home/WhoThisIsForSection';
-import { KnowledgeEntrySection } from '@/components/home/KnowledgeEntrySection';
+import { RecentKnowledgeSection } from '@/components/home/RecentKnowledgeSection';
+import { KnowledgeByProductSection } from '@/components/home/KnowledgeByProductSection';
 import { IndustryInsightsSection } from '@/components/home/IndustryInsightsSection';
 import { RecentArticlesSection } from '@/components/home/RecentArticlesSection';
 import { NewsletterSection } from '@/components/home/NewsletterSection';
@@ -11,8 +12,10 @@ export default function HomePage() {
     <>
       <HeroSection />
       <WhoThisIsForSection />
-      {/* Knowledge portal entry — shows live PlaybookPage products. Hidden if none exist. */}
-      <KnowledgeEntrySection />
+      {/* Knowledge system entry points — live playbook pages grouped by product and recency */}
+      <RecentKnowledgeSection />
+      <KnowledgeByProductSection />
+      {/* Existing blog content sections */}
       <IndustryInsightsSection />
       <RecentArticlesSection />
       <NewsletterSection />

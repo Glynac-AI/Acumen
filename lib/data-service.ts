@@ -3,9 +3,13 @@
  * 
  * Unified data access layer that fetches from Strapi CMS.
  * Always attempts to fetch from Strapi first.
+ *
+ * Also exposes knowledge system functions from lib/knowledge.ts
+ * for homepage and knowledge portal components.
  */
 
-import type { Author, Article, Tag, Pillar, KnowledgeProductEntry, PlaybookPage } from '@/types';
+import type { Author, Article, Tag, Pillar } from '@/types';
+import type { PlaybookPage, Product } from '@/types/knowledge';
 import {
     getRecentArticles as getStrapiRecentArticles,
     getFeaturedArticle as getStrapiFeaturedArticle,
@@ -19,10 +23,14 @@ import {
     transformTag,
 } from './strapi';
 import {
-    getProductEntryPoints,
-    fetchRecentLivePlaybookPages,
+    getPublicPlaybookPages,
+    getPublicPlaybookPageBySlug,
+    getPublicPagesByProduct,
+    getRecentlyUpdatedPages,
+    getProductPages,
+    getActiveProducts,
+    getProductSections,
 } from './knowledge';
-
 
 /**
  * Get the featured article
@@ -128,7 +136,7 @@ export async function getTags(): Promise<Tag[]> {
 export async function getPillars(): Promise<Pillar[]> {
     try {
         const response = await getStrapiPillars();
-        // Strapi v5 returns flat objects — no .attributes wrapper
+        // v5: flat objects — no .attributes wrapper
         return response.data.map(p => p.name as Pillar);
     } catch (error) {
         console.error('Failed to fetch pillars from Strapi:', error);
@@ -156,24 +164,98 @@ export async function getAllArticles(): Promise<Article[]> {
     return [];
 }
 
-// ─── Knowledge system helpers ───────────────────────────────────────────────────
+// ─── Knowledge System Functions ───────────────────────────────────────────────
+// These delegate to lib/knowledge.ts which enforces public-live content gates.
+// RawMaterial is intentionally NOT exposed here or anywhere in the public layer.
 
 /**
- * Get the N most recently updated live PlaybookPages.
- * Returns empty array gracefully if the playbook-pages collection
- * does not exist in Strapi yet.
+ * Get all publicly live playbook pages.
  */
-export async function getFeaturedPlaybookPages(
-    limit: number = 6
-): Promise<PlaybookPage[]> {
-    return fetchRecentLivePlaybookPages(limit);
+export async function getLivePlaybookPages(): Promise<PlaybookPage[]> {
+    try {
+        return await getPublicPlaybookPages();
+    } catch (error) {
+        console.error('Failed to fetch live playbook pages:', error);
+    }
+    return [];
 }
 
 /**
- * Get product-level entry points for the knowledge portal homepage section.
- * Each entry represents one product with its live page count and section count.
- * Returns empty array gracefully if no live knowledge pages exist yet.
+ * Get a single publicly live playbook page by slug.
  */
-export async function getKnowledgeEntryPoints(): Promise<KnowledgeProductEntry[]> {
-    return getProductEntryPoints();
+export async function getPlaybookPageBySlug(slug: string): Promise<PlaybookPage | undefined> {
+    try {
+        const page = await getPublicPlaybookPageBySlug(slug);
+        return page ?? undefined;
+    } catch (error) {
+        console.error('Failed to fetch playbook page by slug:', error);
+    }
+    return undefined;
+}
+
+/**
+ * Get live playbook pages grouped by product.
+ */
+export async function getPlaybookPagesByProduct(): Promise<Record<Product, PlaybookPage[]>> {
+    try {
+        return await getPublicPagesByProduct();
+    } catch (error) {
+        console.error('Failed to fetch playbook pages by product:', error);
+    }
+    // Return empty product map
+    return {
+        'acumen-strategy': [],
+        'glynac': [],
+        'phh': [],
+        'sylvan': [],
+        'toll-booth': [],
+    };
+}
+
+/**
+ * Get the most recently updated live playbook pages.
+ */
+export async function getRecentPlaybookPages(limit: number = 5): Promise<PlaybookPage[]> {
+    try {
+        return await getRecentlyUpdatedPages(limit);
+    } catch (error) {
+        console.error('Failed to fetch recent playbook pages:', error);
+    }
+    return [];
+}
+
+/**
+ * Get live playbook pages for a specific product.
+ */
+export async function getPlaybookPagesForProduct(product: Product, limit: number = 10): Promise<PlaybookPage[]> {
+    try {
+        return await getProductPages(product, limit);
+    } catch (error) {
+        console.error(`Failed to fetch playbook pages for product ${product}:`, error);
+    }
+    return [];
+}
+
+/**
+ * Get products that have at least one live playbook page.
+ */
+export async function getActiveProductList(): Promise<Product[]> {
+    try {
+        return await getActiveProducts();
+    } catch (error) {
+        console.error('Failed to fetch active products:', error);
+    }
+    return [];
+}
+
+/**
+ * Get sections within a product that have live playbook pages.
+ */
+export async function getPlaybookSectionsForProduct(product: Product): Promise<string[]> {
+    try {
+        return await getProductSections(product);
+    } catch (error) {
+        console.error(`Failed to fetch sections for product ${product}:`, error);
+    }
+    return [];
 }
