@@ -1,7 +1,7 @@
 import { factories } from '@strapi/strapi';
 
 // Create default routes
-const defaultRoutes = factories.createCoreRouter('api::wiki-js-content.wiki-js-content' as any);
+const defaultRoutes: any = factories.createCoreRouter('api::wiki-js-content.wiki-js-content' as any);
 
 // Add custom routes
 const customRoutes = {
@@ -31,7 +31,7 @@ const customRoutes = {
 
 export default {
   routes: [
-    ...defaultRoutes.routes,
+    ...(Array.isArray(defaultRoutes.routes) ? defaultRoutes.routes : []),
     ...customRoutes.routes,
   ],
 };

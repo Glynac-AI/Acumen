@@ -14,7 +14,7 @@ export default factories.createCoreController(
       
       try {
         // Fetch the entry using Document Service
-        const entry = await strapi.documents('api::wiki-js-content.wiki-js-content').findOne({
+        const entry: any = await strapi.documents('api::wiki-js-content.wiki-js-content' as any).findOne({
           documentId: documentId,
         });
         
@@ -29,10 +29,10 @@ export default factories.createCoreController(
 
         // Trigger sync
         console.log(`[wiki-sync] Manual sync triggered for: ${entry.title}`);
-        await wikiSyncService.syncWikiJsContent(entry as any, strapi);
+        await wikiSyncService.syncWikiJsContent(entry, strapi);
         
         // Fetch updated entry to get sync status
-        const updatedEntry = await strapi.documents('api::wiki-js-content.wiki-js-content').findOne({
+        const updatedEntry: any = await strapi.documents('api::wiki-js-content.wiki-js-content' as any).findOne({
           documentId: documentId,
         });
 
@@ -40,17 +40,17 @@ export default factories.createCoreController(
           success: true,
           message: 'Sync triggered successfully',
           syncStatus: {
-            lastSyncStatus: updatedEntry.lastSyncStatus,
-            lastSyncedAt: updatedEntry.lastSyncedAt,
-            lastSyncError: updatedEntry.lastSyncError,
-            wikiPageId: updatedEntry.wikiPageId,
+            lastSyncStatus: updatedEntry?.lastSyncStatus || null,
+            lastSyncedAt: updatedEntry?.lastSyncedAt || null,
+            lastSyncError: updatedEntry?.lastSyncError || null,
+            wikiPageId: updatedEntry?.wikiPageId || null,
           },
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('[wiki-sync] Manual sync error:', error);
         return ctx.badRequest('Sync failed', { 
-          error: error.message,
-          details: error.toString(),
+          error: error?.message || 'Unknown error',
+          details: error?.toString() || '',
         });
       }
     },
