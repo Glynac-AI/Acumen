@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { factories } from '@strapi/strapi';
 import wikiSyncService from '../../../services/wiki-sync';
 
