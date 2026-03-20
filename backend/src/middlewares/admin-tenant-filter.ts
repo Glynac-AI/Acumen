@@ -75,8 +75,47 @@ const TENANT_HIDDEN_TYPES: Record<string, string[]> = {
     'glynac-ai': ['api::article.article'],
 };
 
-/** Returns true if uid is visible and accessible for tenantSlug. */
-function isContentTypeAllowed(uid: string, tenantSlug: string): boolean {
+// ─── Wiki.js Admin RBAC configuration ─────────────────────────────────────────
+
+/**
+ * Content types that Wiki.js Admin role CAN access.
+ * Wiki admin has FULL CRUD on these 6 content types only.
+ */
+const WIKI_JS_ADMIN_TYPES: string[] = [
+    'api::wiki-js-content.wiki-js-content',
+    'api::playbook.playbook',
+    'api::playbook-page.playbook-page',
+    'api::knowledge-base.knowledge-base',
+    'api::raw-material.raw-material',
+    'api::author-wiki.author-wiki',
+];
+
+/**
+ * Content types that Wiki.js Admin role CANNOT access.
+ * These are hidden from sidebar, init, permissions and hard-blocked.
+ */
+const WIKI_JS_ADMIN_HIDDEN: string[] = [
+    'api::article.article',
+    'api::blog-post.blog-post',
+    'api::pillar.pillar',
+    'api::tag.tag',
+    'api::category.category',
+    'api::tenant.tenant',
+    'api::author.author',  // Regular author - wiki admin uses author-wiki instead
+    'api::regulatethis-subscriber.regulatethis-subscriber',
+    'api::sylvan-request-access.sylvan-request-access',
+    'plugin::upload.folder',
+    'plugin::upload.file',
+];
+
+/** Returns true if uid is visible and accessible for tenantSlug or wiki admin. */
+function isContentTypeAllowed(uid: string, tenantSlug: string, isWikiJsAdmin: boolean = false): boolean {
+    // Wiki.js Admin RBAC - only sees WIKI_JS_ADMIN_TYPES
+    if (isWikiJsAdmin) {
+        return WIKI_JS_ADMIN_TYPES.includes(uid);
+    }
+
+    // Regular tenant RBAC
     if (ALL_EXCLUSIVE_TYPES.includes(uid)) {
         return (TENANT_EXCLUSIVE_TYPES[tenantSlug] || []).includes(uid);
     }
@@ -142,6 +181,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             const isSuperAdmin = adminUser.roles?.some((r: any) => r.code === 'strapi-super-admin');
             if (isSuperAdmin) return;
 
+            // Check if user is Wiki.js Admin
+            const isWikiJsAdmin = adminUser.roles?.some((r: any) => r.code === 'wiki-js-admin');
+
             // Resolve tenant slug — DB relation first, email fallback second
             let tenantSlug: string = adminUser.tenant?.slug || '';
             if (!tenantSlug && adminUser.email) {
@@ -155,7 +197,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
             strapi.log.info(
                 `[Admin RBAC] UPWARD ${method} ${url.substring(0, 80)} | ` +
-                `user=${adminUser.email} | tenant='${tenantSlug}'`
+                `user=${adminUser.email} | tenant='${tenantSlug}' | wikiAdmin=${isWikiJsAdmin}`
             );
 
             // ── Filter /content-manager/content-types (SIDEBAR) ───────────────
@@ -167,7 +209,7 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                         const filtered = responseData.filter((ct: any) => {
                             const uid: string = ct.uid || '';
                             if (uid === 'api::tenant.tenant') return false;
-                            return isContentTypeAllowed(uid, tenantSlug);
+                            return isContentTypeAllowed(uid, tenantSlug, isWikiJsAdmin);
                         });
                         if (ctx.body?.data !== undefined) {
                             ctx.body.data = filtered;
@@ -205,14 +247,14 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                             const filtered = ctArray.filter((ct: any) => {
                                 const uid: string = ct.uid || '';
                                 if (uid === 'api::tenant.tenant') return false;
-                                return isContentTypeAllowed(uid, tenantSlug);
+                                return isContentTypeAllowed(uid, tenantSlug, isWikiJsAdmin);
                             });
                             if (ctPath === 'root') {
                                 initData.contentTypes = filtered;
                             } else {
                                 initData.data.contentTypes = filtered;
                             }
-                            strapi.log.info(`[Admin RBAC] Init: ${before} → ${filtered.length} for '${tenantSlug}'`);
+                            strapi.log.info(`[Admin RBAC] Init: ${before} → ${filtered.length} for '${tenantSlug}' | wikiAdmin=${isWikiJsAdmin}`);
                         }
                     }
                 } catch (e) {
@@ -256,10 +298,10 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
                                 p.action === 'plugin::content-manager.explorer.update'
                             );
                         }
-                        return isContentTypeAllowed(uid, tenantSlug);
+                        return isContentTypeAllowed(uid, tenantSlug, isWikiJsAdmin);
                     });
 
-                    strapi.log.info(`[Admin RBAC] Permissions: ${before} → ${filtered.length} for '${tenantSlug}'`);
+                    strapi.log.info(`[Admin RBAC] Permissions: ${before} → ${filtered.length} for '${tenantSlug}' | wikiAdmin=${isWikiJsAdmin}`);
 
                     // FIX 6: Restore to exact path — never write bare array to ctx.body
                     // when the original shape was { data: { permissions: [...] } }
@@ -303,6 +345,9 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
             const isSuperAdmin = adminUser.roles?.some((r: any) => r.code === 'strapi-super-admin');
             if (isSuperAdmin) return next();
+
+            // Check if user is Wiki.js Admin
+            const isWikiJsAdmin = adminUser.roles?.some((r: any) => r.code === 'wiki-js-admin');
 
             // Resolve tenant — DB relation first, email fallback second.
             let tenantId: number | null = adminUser.tenant?.id || null;
@@ -371,10 +416,10 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
 
             // ── Hard block forbidden / hidden types ───────────────────────────
             // FIX 3 + FIX 4: Always check isBlocked first, then short-circuit sub-actions.
-            const isBlocked = !isContentTypeAllowed(targetModelUid, tenantSlug);
+            const isBlocked = !isContentTypeAllowed(targetModelUid, tenantSlug, isWikiJsAdmin);
 
             if (isBlocked) {
-                strapi.log.info(`[Admin RBAC] HARD BLOCK: ${method} ${targetModelUid} for '${tenantSlug}'`);
+                strapi.log.info(`[Admin RBAC] HARD BLOCK: ${method} ${targetModelUid} for '${tenantSlug}' | wikiAdmin=${isWikiJsAdmin}`);
                 ctx.status = 403;
                 ctx.body = {
                     error: {
@@ -389,6 +434,13 @@ export default (config: Record<string, unknown>, { strapi }: { strapi: Core.Stra
             // FIX 4: Allowed sub-actions pass through immediately after block check.
             // These have no documentId ownership context and require no body injection.
             if (isSubAction) {
+                return next();
+            }
+
+            // Wiki.js Admin users don't need tenant injection - their content types
+            // are not tenant-scoped. They passed the hard-block check, so allow through.
+            if (isWikiJsAdmin) {
+                strapi.log.info(`[Admin RBAC] Wiki.js Admin access: ${method} ${targetModelUid}`);
                 return next();
             }
 
