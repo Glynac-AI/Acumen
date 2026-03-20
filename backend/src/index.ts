@@ -951,13 +951,14 @@ export default {
 
     if (wikiJsAdminRole) {
       // Set permissions for Wiki JS Admin Role
-      const wikiJsContentUid = 'api::wiki-js-content.wiki-js-content';
-      const wikiJsCType = strapi.contentType(wikiJsContentUid as any);
-      const wikiJsFields = wikiJsCType
-        ? Object.keys(wikiJsCType.attributes).filter(
-          (attr) => !['createdBy', 'updatedBy'].includes(attr)
-        )
-        : null;
+      // All 5 knowledge system content types should be visible in Content Manager
+      const wikiAdminContentTypes = [
+        'api::wiki-js-content.wiki-js-content',
+        'api::playbook.playbook',
+        'api::playbook-page.playbook-page',
+        'api::raw-material.raw-material',
+        'api::knowledge-base.knowledge-base',
+      ];
 
       const fullCrudActions = [
         'plugin::content-manager.explorer.create',
@@ -967,21 +968,45 @@ export default {
         'plugin::content-manager.explorer.publish',
       ];
 
-      for (const action of fullCrudActions) {
-        const existing = await strapi.db.query('admin::permission').findOne({
-          where: { action, subject: wikiJsContentUid, role: wikiJsAdminRole.id },
-        });
-        const properties = { fields: wikiJsFields, locales: null };
-        if (!existing) {
-          await strapi.db.query('admin::permission').create({
-            data: { action, subject: wikiJsContentUid, properties, conditions: [], role: wikiJsAdminRole.id },
+      for (const uid of wikiAdminContentTypes) {
+        const cType = strapi.contentType(uid as any);
+        const fields = cType
+          ? Object.keys(cType.attributes).filter(
+            (attr) => !['createdBy', 'updatedBy'].includes(attr)
+          )
+          : null;
+        const properties = { fields, locales: null };
+
+        for (const action of fullCrudActions) {
+          const existing = await strapi.db.query('admin::permission').findOne({
+            where: { action, subject: uid, role: wikiJsAdminRole.id },
           });
-        } else {
-          await strapi.db.query('admin::permission').update({
-            where: { id: existing.id },
-            data: { properties },
-          });
+          if (!existing) {
+            await strapi.db.query('admin::permission').create({
+              data: { action, subject: uid, properties, conditions: [], role: wikiJsAdminRole.id },
+            });
+          } else {
+            await strapi.db.query('admin::permission').update({
+              where: { id: existing.id },
+              data: { properties },
+            });
+          }
         }
+        console.log(`✅ Wiki JS Admin permissions set for: ${uid}`);
+      }
+
+      // Media Library access for wiki admin
+      const wikiUploadActions = [
+        'plugin::upload.read',
+        'plugin::upload.assets.create',
+        'plugin::upload.assets.update',
+        'plugin::upload.assets.download',
+        'plugin::upload.assets.copy-link',
+        'plugin::upload.configure-view',
+        'plugin::upload.settings.read',
+      ];
+      for (const action of wikiUploadActions) {
+        await upsertAdminPermission(wikiJsAdminRole.id, action, null, null);
       }
       console.log(`✅ Permissions set for Wiki JS Admin role`);
 
