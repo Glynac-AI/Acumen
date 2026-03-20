@@ -93,6 +93,10 @@ const WIKI_JS_ADMIN_TYPES: string[] = [
 /**
  * Content types that Wiki.js Admin role CANNOT access.
  * These are hidden from sidebar, init, permissions and hard-blocked.
+ * 
+ * NOTE: plugin::upload.folder and plugin::upload.file are NOT blocked here
+ * because Wiki.js Admin needs access to the Media Library. Folder isolation
+ * is handled by the upload-tenant-filter middleware instead.
  */
 const WIKI_JS_ADMIN_HIDDEN: string[] = [
     'api::article.article',
@@ -104,15 +108,20 @@ const WIKI_JS_ADMIN_HIDDEN: string[] = [
     'api::author.author',  // Regular author - wiki admin uses author-wiki instead
     'api::regulatethis-subscriber.regulatethis-subscriber',
     'api::sylvan-request-access.sylvan-request-access',
-    'plugin::upload.folder',
-    'plugin::upload.file',
 ];
 
 /** Returns true if uid is visible and accessible for tenantSlug or wiki admin. */
 function isContentTypeAllowed(uid: string, tenantSlug: string, isWikiJsAdmin: boolean = false): boolean {
-    // Wiki.js Admin RBAC - only sees WIKI_JS_ADMIN_TYPES
+    // Wiki.js Admin RBAC - sees WIKI_JS_ADMIN_TYPES + upload plugin
     if (isWikiJsAdmin) {
-        return WIKI_JS_ADMIN_TYPES.includes(uid);
+        // Allow Wiki.js Admin content types
+        if (WIKI_JS_ADMIN_TYPES.includes(uid)) return true;
+        
+        // Allow upload plugin (folder isolation handled by upload-tenant-filter middleware)
+        if (uid === 'plugin::upload.folder' || uid === 'plugin::upload.file') return true;
+        
+        // Block everything else
+        return false;
     }
 
     // Regular tenant RBAC
