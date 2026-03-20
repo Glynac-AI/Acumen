@@ -112,6 +112,9 @@ const WIKI_JS_ADMIN_HIDDEN: string[] = [
 
 /** Returns true if uid is visible and accessible for tenantSlug or wiki admin. */
 function isContentTypeAllowed(uid: string, tenantSlug: string, isWikiJsAdmin: boolean = false): boolean {
+    // Global permissions (like upload actions without a subject) have empty uid.
+    if (!uid) return true;
+
     // Wiki.js Admin RBAC - sees WIKI_JS_ADMIN_TYPES + upload plugin
     if (isWikiJsAdmin) {
         // Allow Wiki.js Admin content types
