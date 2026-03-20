@@ -950,7 +950,8 @@ export default {
     }
 
     if (wikiJsAdminRole) {
-      // Set permissions for Wiki JS Admin Role
+      console.log(`⚙️ Seeding permissions for Wiki JS Admin role: ${wikiJsAdminRole.name}...`);
+      
       // All 5 knowledge system content types should be visible in Content Manager
       const wikiAdminContentTypes = [
         'api::wiki-js-content.wiki-js-content',
@@ -975,22 +976,9 @@ export default {
             (attr) => !['createdBy', 'updatedBy'].includes(attr)
           )
           : null;
-        const properties = { fields, locales: null };
 
         for (const action of fullCrudActions) {
-          const existing = await strapi.db.query('admin::permission').findOne({
-            where: { action, subject: uid, role: wikiJsAdminRole.id },
-          });
-          if (!existing) {
-            await strapi.db.query('admin::permission').create({
-              data: { action, subject: uid, properties, conditions: [], role: wikiJsAdminRole.id },
-            });
-          } else {
-            await strapi.db.query('admin::permission').update({
-              where: { id: existing.id },
-              data: { properties },
-            });
-          }
+          await upsertAdminPermission(wikiJsAdminRole.id, action, uid, fields);
         }
         console.log(`✅ Wiki JS Admin permissions set for: ${uid}`);
       }
