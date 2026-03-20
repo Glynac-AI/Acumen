@@ -952,13 +952,14 @@ export default {
     if (wikiJsAdminRole) {
       console.log(`⚙️ Seeding permissions for Wiki JS Admin role (id=${wikiJsAdminRole.id})...`);
 
-      // All 5 knowledge system content types visible in Content Manager for wiki admin
+      // All 6 knowledge system content types visible in Content Manager for wiki admin
       const wikiAdminContentTypes = [
         'api::wiki-js-content.wiki-js-content',
         'api::playbook.playbook',
         'api::playbook-page.playbook-page',
         'api::raw-material.raw-material',
         'api::knowledge-base.knowledge-base',
+        'api::author-wiki.author-wiki',
       ];
 
       const wikiCrudActions = [
@@ -1036,8 +1037,10 @@ export default {
           'plugin::upload.assets.update',
           'plugin::upload.assets.download',
           'plugin::upload.assets.copy-link',
+          'plugin::upload.assets.delete',
           'plugin::upload.configure-view',
           'plugin::upload.settings.read',
+          'plugin::upload.assets.access',
         ];
         for (const action of wikiUploadActions) {
           const existingUploadPerm = await knex('admin_permissions as p')

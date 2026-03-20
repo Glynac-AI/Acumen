@@ -54,6 +54,9 @@ export default [
   // Tenant context middleware - must be after body parsing
   'global::tenant-context',
 
-  // Admin tenant filter middleware
+  // Admin tenant filter middleware - must come before upload filter
   'global::admin-tenant-filter',
+
+  // Upload tenant filter middleware - enforces media library isolation
+  'global::upload-tenant-filter',
 ];
