@@ -56,4 +56,7 @@ export default [
 
   // Admin tenant filter middleware
   'global::admin-tenant-filter',
+
+  // Upload tenant filter middleware - for media library isolation
+  'global::upload-tenant-filter',
 ];

@@ -616,6 +616,20 @@ export default {
     // tries to load the article schema → 404 → useRBAC warning → Publish may be blocked.
     const STALE_PERMISSIONS: Record<string, string[]> = {
       'glynac-admin': ['api::article.article'],
+      'wiki-js-admin': [
+        // Clean up if wiki-js-admin accidentally got these permissions
+        'api::article.article',
+        'api::blog-post.blog-post',
+        'api::pillar.pillar',
+        'api::tag.tag',
+        'api::category.category',
+        'api::subcategory.subcategory',
+        'api::site-setting.site-setting',
+        'api::tenant.tenant',
+        'api::regulatethis-subscriber.regulatethis-subscriber',
+        'api::sylvan-request-access.sylvan-request-access',
+        'api::author.author',
+      ],
     };
     for (const [roleCode, staleUids] of Object.entries(STALE_PERMISSIONS)) {
       const staleRole = await strapi.db.query('admin::role').findOne({ where: { code: roleCode } });
@@ -950,14 +964,17 @@ export default {
     }
 
     if (wikiJsAdminRole) {
-      // Set permissions for Wiki JS Admin Role
-      const wikiJsContentUid = 'api::wiki-js-content.wiki-js-content';
-      const wikiJsCType = strapi.contentType(wikiJsContentUid as any);
-      const wikiJsFields = wikiJsCType
-        ? Object.keys(wikiJsCType.attributes).filter(
-          (attr) => !['createdBy', 'updatedBy'].includes(attr)
-        )
-        : null;
+      console.log(`⚙️ Setting permissions for Wiki JS Admin role...`);
+
+      // Content types with FULL CRUD for Wiki JS Admin
+      const wikiJsContentTypes = [
+        'api::wiki-js-content.wiki-js-content',
+        'api::playbook.playbook',
+        'api::playbook-page.playbook-page',
+        'api::knowledge-base.knowledge-base',
+        'api::raw-material.raw-material',
+        'api::author-wiki.author-wiki',
+      ];
 
       const fullCrudActions = [
         'plugin::content-manager.explorer.create',
@@ -967,23 +984,63 @@ export default {
         'plugin::content-manager.explorer.publish',
       ];
 
-      for (const action of fullCrudActions) {
+      // Set FULL CRUD permissions for Wiki JS content types
+      for (const uid of wikiJsContentTypes) {
+        const cType = strapi.contentType(uid as any);
+        const fields = cType
+          ? Object.keys(cType.attributes).filter(
+              (attr) => !['createdBy', 'updatedBy'].includes(attr)
+            )
+          : null;
+
+        for (const action of fullCrudActions) {
+          const existing = await strapi.db.query('admin::permission').findOne({
+            where: { action, subject: uid, role: wikiJsAdminRole.id },
+          });
+          const properties = { fields, locales: null };
+          if (!existing) {
+            await strapi.db.query('admin::permission').create({
+              data: { action, subject: uid, properties, conditions: [], role: wikiJsAdminRole.id },
+            });
+          } else {
+            await strapi.db.query('admin::permission').update({
+              where: { id: existing.id },
+              data: { properties },
+            });
+          }
+        }
+      }
+
+      // Add Upload (Media Library) Permissions - INCLUDING DELETE
+      const wikiJsUploadActions = [
+        'plugin::upload.read',
+        'plugin::upload.assets.create',
+        'plugin::upload.assets.update',
+        'plugin::upload.assets.download',
+        'plugin::upload.assets.copy-link',
+        'plugin::upload.configure-view',
+        'plugin::upload.assets.delete',
+      ];
+
+      for (const action of wikiJsUploadActions) {
         const existing = await strapi.db.query('admin::permission').findOne({
-          where: { action, subject: wikiJsContentUid, role: wikiJsAdminRole.id },
+          where: { action, role: wikiJsAdminRole.id, subject: null },
         });
-        const properties = { fields: wikiJsFields, locales: null };
+        
         if (!existing) {
           await strapi.db.query('admin::permission').create({
-            data: { action, subject: wikiJsContentUid, properties, conditions: [], role: wikiJsAdminRole.id },
-          });
-        } else {
-          await strapi.db.query('admin::permission').update({
-            where: { id: existing.id },
-            data: { properties },
+            data: { 
+              action, 
+              role: wikiJsAdminRole.id, 
+              subject: null, 
+              properties: {}, 
+              conditions: [] 
+            },
           });
         }
       }
-      console.log(`✅ Permissions set for Wiki JS Admin role`);
+
+      console.log(`✅ Permissions set for Wiki JS Admin role (6 content types + upload with delete)`);
 
       // Create Admin User
       const wikiJsAdminEmail = 'wikiadmin@glynac.ai';
@@ -1045,6 +1102,60 @@ export default {
         }
       }
     }
+
+    // ─── 9. Seed Upload Folders for Tenant Isolation ──────────────────────
+    console.log('⚙️ Seeding tenant upload folders...');
+
+    const tenantFolders = [
+      { name: 'Glynac AI Media', path: '/glynac-ai', pathId: 1 },
+      { name: 'Sylvan Media', path: '/sylvan', pathId: 2 },
+      { name: 'RegulateThis Media', path: '/regulatethis', pathId: 3 },
+      { name: 'Wiki.js Media', path: '/wiki-js', pathId: 4 },
+    ];
+
+    for (const folderData of tenantFolders) {
+      let folder = await strapi.db.query('plugin::upload.folder').findOne({
+        where: { path: folderData.path },
+      });
+
+      if (!folder) {
+        folder = await strapi.db.query('plugin::upload.folder').create({
+          data: {
+            name: folderData.name,
+            path: folderData.path,
+            pathId: folderData.pathId,
+            parent: null,
+          },
+        });
+        console.log(`✅ Created upload folder: ${folderData.path}`);
+      } else {
+        console.log(`📋 Upload folder already exists: ${folderData.path}`);
+      }
+    }
+
+    // Check for existing media files and assign to appropriate folders
+    console.log('⚙️ Checking existing media files for folder assignment...');
+
+    // Get all files without a folder assignment
+    const orphanedFiles = await strapi.db.query('plugin::upload.file').findMany({
+      where: { folder: null },
+    });
+
+    if (orphanedFiles.length > 0) {
+      console.log(`📋 Found ${orphanedFiles.length} files without folder assignment`);
+      
+      // Log them for manual review
+      for (const file of orphanedFiles) {
+        console.log(`  - File: ${file.name} (id=${file.id})`);
+      }
+      
+      console.log('⚠️  Manual folder assignment may be needed for existing files');
+      console.log('⚠️  Consider running a migration script to assign folders based on user');
+    } else {
+      console.log('✅ No orphaned files found - all media properly organized');
+    }
+
+    console.log('✅ Tenant upload folders seeded successfully');
 
     console.log('✅ Data Repair complete.');
   },

@@ -98,6 +98,12 @@
             "relation": "manyToOne",
             "target": "api::tenant.tenant",
             "inversedBy": "rawMaterials"
+        },
+        "author_wikis": {
+            "type": "relation",
+            "relation": "manyToMany",
+            "target": "api::author-wiki.author-wiki",
+            "mappedBy": "raw_materials"
         }
     }
 }

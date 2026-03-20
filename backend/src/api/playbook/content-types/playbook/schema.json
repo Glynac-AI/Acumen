@@ -96,6 +96,12 @@
             "relation": "manyToOne",
             "target": "api::tenant.tenant",
             "inversedBy": "playbooks"
+        },
+        "author_wikis": {
+            "type": "relation",
+            "relation": "manyToMany",
+            "target": "api::author-wiki.author-wiki",
+            "mappedBy": "playbooks"
         }
     }
 }

@@ -49,6 +49,12 @@
     },
     "wikiPageId": {
       "type": "integer"
+    },
+    "author_wikis": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::author-wiki.author-wiki",
+      "mappedBy": "wiki_js_contents"
     }
   }
 }

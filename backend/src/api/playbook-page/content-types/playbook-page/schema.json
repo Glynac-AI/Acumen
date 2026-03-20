@@ -112,6 +112,12 @@
             "relation": "manyToOne",
             "target": "api::tenant.tenant",
             "inversedBy": "playbookPages"
+        },
+        "author_wikis": {
+            "type": "relation",
+            "relation": "manyToMany",
+            "target": "api::author-wiki.author-wiki",
+            "mappedBy": "playbook_pages"
         }
     }
 }

@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "author_wikis",
+  "info": {
+    "singularName": "author-wiki",
+    "pluralName": "author-wikis",
+    "displayName": "Author Wiki",
+    "description": "Authors for Wiki.js knowledge content"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email"
+    },
+    "bio": {
+      "type": "text"
+    },
+    "avatar": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "title": {
+      "type": "string"
+    },
+    "linkedin": {
+      "type": "string"
+    },
+    "twitter": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "wiki_js_contents": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::wiki-js-content.wiki-js-content",
+      "inversedBy": "author_wikis"
+    },
+    "playbooks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::playbook.playbook",
+      "inversedBy": "author_wikis"
+    },
+    "playbook_pages": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::playbook-page.playbook-page",
+      "inversedBy": "author_wikis"
+    },
+    "knowledge_bases": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::knowledge-base.knowledge-base",
+      "inversedBy": "author_wikis"
+    },
+    "raw_materials": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::raw-material.raw-material",
+      "inversedBy": "author_wikis"
+    }
+  }
+}
