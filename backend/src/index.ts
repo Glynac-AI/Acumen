@@ -950,9 +950,9 @@ export default {
     }
 
     if (wikiJsAdminRole) {
-      console.log(`⚙️ Seeding permissions for Wiki JS Admin role: ${wikiJsAdminRole.name}...`);
-      
-      // All 5 knowledge system content types should be visible in Content Manager
+      console.log(`⚙️ Seeding permissions for Wiki JS Admin role (id=${wikiJsAdminRole.id})...`);
+
+      // All 5 knowledge system content types visible in Content Manager for wiki admin
       const wikiAdminContentTypes = [
         'api::wiki-js-content.wiki-js-content',
         'api::playbook.playbook',
@@ -961,7 +961,7 @@ export default {
         'api::knowledge-base.knowledge-base',
       ];
 
-      const fullCrudActions = [
+      const wikiCrudActions = [
         'plugin::content-manager.explorer.create',
         'plugin::content-manager.explorer.read',
         'plugin::content-manager.explorer.update',
@@ -969,34 +969,106 @@ export default {
         'plugin::content-manager.explorer.publish',
       ];
 
-      for (const uid of wikiAdminContentTypes) {
-        const cType = strapi.contentType(uid as any);
-        const fields = cType
-          ? Object.keys(cType.attributes).filter(
-            (attr) => !['createdBy', 'updatedBy'].includes(attr)
-          )
-          : null;
+      // ── Detect the permission-role junction table (Strapi v5 uses _lnk, v4 uses _links) ──
+      let permRoleJunctionTable: string | null = null;
+      for (const candidate of ['admin_permissions_role_lnk', 'admin_permissions_role_links']) {
+        const exists = await knex.schema.hasTable(candidate);
+        if (exists) { permRoleJunctionTable = candidate; break; }
+      }
+      console.log(`[Wiki Admin] Permission-role junction table: '${permRoleJunctionTable}'`);
 
-        for (const action of fullCrudActions) {
-          await upsertAdminPermission(wikiJsAdminRole.id, action, uid, fields);
+      if (!permRoleJunctionTable) {
+        console.error('[Wiki Admin] ❌ Cannot find permission-role junction table — permissions will not be seeded.');
+      } else {
+        for (const uid of wikiAdminContentTypes) {
+          const cType = strapi.contentType(uid as any);
+          const fields = cType
+            ? Object.keys(cType.attributes).filter(
+              (attr) => !['createdBy', 'updatedBy'].includes(attr)
+            )
+            : null;
+          const properties = JSON.stringify({ fields, locales: null });
+
+          for (const action of wikiCrudActions) {
+            // Check if a permission row already exists for this action+subject
+            // by joining through the junction table — NOT using the broken ORM `where: { role: roleId }`
+            const existingPerm = await knex('admin_permissions as p')
+              .join(`${permRoleJunctionTable} as lnk`, 'p.id', 'lnk.permission_id')
+              .where({ 'p.action': action, 'p.subject': uid, 'lnk.role_id': wikiJsAdminRole.id })
+              .select('p.id')
+              .first();
+
+            if (!existingPerm) {
+              // Insert the permission row and link it to the role via junction table
+              const [insertedPerm] = await knex('admin_permissions')
+                .insert({
+                  action,
+                  subject: uid,
+                  properties,
+                  conditions: '[]',
+                  created_at: new Date(),
+                  updated_at: new Date(),
+                })
+                .returning('id');
+
+              const permId = typeof insertedPerm === 'object' ? insertedPerm.id : insertedPerm;
+
+              await knex(permRoleJunctionTable).insert({
+                permission_id: permId,
+                role_id: wikiJsAdminRole.id,
+              });
+              console.log(`  ✅ Created: ${action} → ${uid}`);
+            } else {
+              // Update properties on existing permission row
+              await knex('admin_permissions')
+                .where({ id: existingPerm.id })
+                .update({ properties, updated_at: new Date() });
+              console.log(`  📋 Already exists: ${action} → ${uid}`);
+            }
+          }
+          console.log(`✅ Wiki JS Admin permissions done for: ${uid}`);
         }
-        console.log(`✅ Wiki JS Admin permissions set for: ${uid}`);
+
+        // Media Library access for wiki admin (no subject — global upload permissions)
+        const wikiUploadActions = [
+          'plugin::upload.read',
+          'plugin::upload.assets.create',
+          'plugin::upload.assets.update',
+          'plugin::upload.assets.download',
+          'plugin::upload.assets.copy-link',
+          'plugin::upload.configure-view',
+          'plugin::upload.settings.read',
+        ];
+        for (const action of wikiUploadActions) {
+          const existingUploadPerm = await knex('admin_permissions as p')
+            .join(`${permRoleJunctionTable} as lnk`, 'p.id', 'lnk.permission_id')
+            .where({ 'p.action': action, 'lnk.role_id': wikiJsAdminRole.id })
+            .whereNull('p.subject')
+            .select('p.id')
+            .first();
+
+          if (!existingUploadPerm) {
+            const [insertedPerm] = await knex('admin_permissions')
+              .insert({
+                action,
+                subject: null,
+                properties: JSON.stringify({ fields: null, locales: null }),
+                conditions: '[]',
+                created_at: new Date(),
+                updated_at: new Date(),
+              })
+              .returning('id');
+            const permId = typeof insertedPerm === 'object' ? insertedPerm.id : insertedPerm;
+            await knex(permRoleJunctionTable).insert({
+              permission_id: permId,
+              role_id: wikiJsAdminRole.id,
+            });
+            console.log(`  ✅ Upload permission created: ${action}`);
+          }
+        }
       }
 
-      // Media Library access for wiki admin
-      const wikiUploadActions = [
-        'plugin::upload.read',
-        'plugin::upload.assets.create',
-        'plugin::upload.assets.update',
-        'plugin::upload.assets.download',
-        'plugin::upload.assets.copy-link',
-        'plugin::upload.configure-view',
-        'plugin::upload.settings.read',
-      ];
-      for (const action of wikiUploadActions) {
-        await upsertAdminPermission(wikiJsAdminRole.id, action, null, null);
-      }
-      console.log(`✅ Permissions set for Wiki JS Admin role`);
+      console.log(`✅ Permissions fully seeded for Wiki JS Admin role`);
 
       // Create Admin User
       const wikiJsAdminEmail = 'wikiadmin@glynac.ai';
