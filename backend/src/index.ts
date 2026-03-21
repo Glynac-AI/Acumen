@@ -960,6 +960,8 @@ export default {
         'api::raw-material.raw-material',
         'api::knowledge-base.knowledge-base',
         'api::author-wiki.author-wiki',
+        'plugin::upload.file',
+        'plugin::upload.folder',
       ];
 
       const wikiCrudActions = [
@@ -1007,13 +1009,23 @@ export default {
         'plugin::upload.assets.copy-link',
         'plugin::upload.assets.delete',
         'plugin::upload.configure-view',
-        'plugin::upload.settings.read'
+        'plugin::upload.settings.read',
+        'plugin::upload.assets.access'
       ];
       
       for (const action of wikiUploadActions) {
         await upsertAdminPermission(wikiJsAdminRole.id, action, null, null);
       }
       console.log(`  ✅ Upload permissions created for Wiki JS Admin`);
+
+      // ── Diagnostic Logging ──
+      const finalPerms = await strapi.db.query('admin::permission').findMany({
+        where: { role: wikiJsAdminRole.id }
+      });
+      strapi.log.info(`[RBAC DIAGNOSTIC] Wiki JS Admin has ${finalPerms.length} total permissions in DB.`);
+      finalPerms.slice(0, 10).forEach(p => {
+        strapi.log.debug(`  - ${p.action} | subject: ${p.subject} | conditions: ${JSON.stringify(p.conditions)}`);
+      });
 
       console.log(`✅ Permissions fully seeded for Wiki JS Admin role`);
 
